@@ -1,0 +1,84 @@
+name: "Report a data or model gap"
+description: "Flag a gap in Phenopackets, registries, PRO instruments, or data standards that prevents capturing a part of the rare disease story."
+title: "[GAP-DATA] "
+labels: ["data-gap"]
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to flag structural or coverage gaps in data models, registries, or standards (not ontology term gaps — use the ontology gap form for those).
+
+  - type: dropdown
+    id: affected_standard
+    attributes:
+      label: Affected standard or system
+      multiple: true
+      options:
+        - Phenopackets (GA4GH)
+        - FHIR (HL7)
+        - OMOP CDM
+        - IAMRARE registry model
+        - RARE-X data model
+        - ALS TDI Registry
+        - PhenoDB
+        - Other / multiple
+    validations:
+      required: true
+
+  - type: input
+    id: disease_context
+    attributes:
+      label: Disease context
+      placeholder: "e.g. ALS, Stargardt, any rare disease"
+
+  - type: textarea
+    id: gap_description
+    attributes:
+      label: What cannot be captured and why?
+      description: "Be specific about what clinical information is missing and which model element (or absence thereof) is responsible."
+      placeholder: |
+        I am trying to represent: ...
+        The current model handles this by: ...
+        What is lost: ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: gap_category
+    attributes:
+      label: Category of gap
+      multiple: true
+      options:
+        - Longitudinal / trajectory data (change over time)
+        - Disease progression rate or slope
+        - Patient-reported outcomes not linkable to clinical terms
+        - Caregiver / family impact
+        - Social determinants of health
+        - Diagnostic uncertainty or revision
+        - Treatment response / lack of response
+        - Functional status / disability
+        - Imaging findings not mapped to terms
+        - Environmental / exposure history
+        - Other
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution or workaround (optional)
+      placeholder: "e.g. Add a Measurement element with LOINC code for ALSFRS-R total score..."
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: How critical is this gap to rare disease phenotyping?
+      options:
+        - Critical — blocks meaningful data sharing
+        - High — significant information loss
+        - Medium — workarounds exist but are imperfect
+        - Low — minor nuance lost
+
+  - type: input
+    id: contributor
+    attributes:
+      label: Your name / affiliation (optional)

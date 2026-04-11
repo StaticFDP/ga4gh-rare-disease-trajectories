@@ -1,0 +1,75 @@
+name: "Report an ontology gap"
+description: "Flag a clinical concept that is missing, imprecise, or poorly scoped in HPO, Mondo, ECTO, or related ontologies."
+title: "[GAP-ONTOLOGY] "
+labels: ["ontology-gap"]
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to flag concepts that cannot be adequately expressed using current ontology terms.
+
+  - type: dropdown
+    id: ontology
+    attributes:
+      label: Which ontology has the gap?
+      multiple: true
+      options:
+        - HPO (Human Phenotype Ontology)
+        - Mondo (Disease Ontology)
+        - ECTO (Environmental conditions and Treatments Ontology)
+        - Other / multiple
+    validations:
+      required: true
+
+  - type: input
+    id: disease_context
+    attributes:
+      label: Disease context
+      placeholder: "e.g. ALS, Stargardt disease, unspecified rare disease"
+
+  - type: textarea
+    id: concept
+    attributes:
+      label: Clinical concept that cannot be adequately expressed
+      description: "Describe what you are trying to capture and why current terms don't work."
+      placeholder: |
+        I am trying to represent: ...
+        The closest existing term is: HP:XXXXXXX (label)
+        Why it is insufficient: ...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: gap_type
+    attributes:
+      label: Type of gap
+      options:
+        - Missing term (concept does not exist at all)
+        - Term too broad (no sufficiently specific term)
+        - Term too narrow (existing term is over-specified)
+        - Wrong axis (concept modeled under wrong parent)
+        - Modifier missing (need a qualifier/severity/laterality that doesn't exist)
+        - Temporal dimension missing (cannot express change over time)
+        - PRO / patient-reported concept not in scope of HPO
+        - Other
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution (optional)
+      placeholder: |
+        Suggested new term: ...
+        Suggested parent: ...
+        Definition: ...
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Concrete clinical examples
+      placeholder: "e.g. A patient with ALS whose weakness progresses from distal to proximal — there is no HPO term for progression pattern..."
+
+  - type: input
+    id: contributor
+    attributes:
+      label: Your name / affiliation (optional)

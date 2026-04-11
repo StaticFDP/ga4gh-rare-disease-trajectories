@@ -1,0 +1,156 @@
+# FAIR Data Point — Catalog metadata
+# Aligned with DCAT2 (W3C) and FDP specification.
+# This YAML is the human-editable source; convert to Turtle/RDF using scripts/yaml-to-ttl.py (to be created).
+#
+# FDP spec: https://specs.fairdatapoint.org/
+# DCAT2:    https://www.w3.org/TR/vocab-dcat-2/
+
+"@context":
+  dcat: "https://www.w3.org/ns/dcat#"
+  dcterms: "http://purl.org/dc/terms/"
+  foaf: "http://xmlns.com/foaf/0.1/"
+  xsd: "http://www.w3.org/2001/XMLSchema#"
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#"
+  mondo: "http://purl.obolibrary.org/obo/MONDO_"
+  hp: "http://purl.obolibrary.org/obo/HP_"
+
+catalog:
+  "@type": "dcat:Catalog"
+  dcterms:title: "Rare Disease Trajectory Descriptions — GA4GH Session April 2026"
+  dcterms:description: >
+    Structured disease narratives, ontology mappings, and gap analyses collected during
+    the GA4GH 'Bring Your Own Disease' biohackathon session (April 16, 2026). Content
+    is intended to improve rare disease phenotyping using HPO, Phenopackets, and Mondo.
+  dcterms:issued: "2026-04-16"
+  dcterms:modified: "2026-04-16"
+  dcterms:language: "http://id.loc.gov/vocabulary/iso639-1/en"
+  dcterms:license: "https://creativecommons.org/licenses/by/4.0/"
+  dcterms:rights: "Open access — CC BY 4.0"
+  foaf:homepage: ""  # fill with GitHub repo URL once created
+  dcat:themeTaxonomy:
+    - "http://purl.obolibrary.org/obo/mondo.owl"
+    - "http://purl.obolibrary.org/obo/hp.owl"
+  dcterms:publisher:
+    "@type": "foaf:Organization"
+    foaf:name: "GA4GH Rare Disease Phenotyping Working Group"
+    foaf:page: "https://www.ga4gh.org/"
+
+  # ─── Datasets (one per case / registry) ───────────────────────────────
+  dcat:dataset:
+
+    - "@type": "dcat:Dataset"
+      "@id": "dataset/als-tdi"
+      dcterms:title: "ALS TDI Registry — Disease Trajectory Description"
+      dcterms:description: >
+        Structured narrative and phenotype mapping for Amyotrophic Lateral Sclerosis
+        based on data collected by the ALS Therapy Development Institute registry.
+      dcterms:subject:
+        - mondo: "0004976"   # Amyotrophic lateral sclerosis
+      dcat:keyword:
+        - "ALS"
+        - "motor neuron disease"
+        - "disease trajectory"
+        - "registry"
+        - "Phenopackets"
+      dcterms:creator:
+        foaf:name: "Danielle Boyce"
+        foaf:organization: "ALS TDI"
+      dcterms:issued: "2026-04-16"
+      dcterms:license: "https://creativecommons.org/licenses/by/4.0/"
+      dcat:distribution:
+        - "@type": "dcat:Distribution"
+          dcterms:format: "text/markdown"
+          dcat:accessURL: "cases/als-tdi/narrative.md"
+        - "@type": "dcat:Distribution"
+          dcterms:format: "application/yaml"
+          dcat:accessURL: "cases/als-tdi/timeline.yaml"
+        - "@type": "dcat:Distribution"
+          dcterms:format: "application/yaml"
+          dcat:accessURL: "cases/als-tdi/phenotype-map.yaml"
+
+    - "@type": "dcat:Dataset"
+      "@id": "dataset/rare-x"
+      dcterms:title: "RARE-X PRO Surveys — Patient-Reported Outcome Mapping"
+      dcterms:description: >
+        Structured analysis of RARE-X patient-reported outcome survey data and its
+        mappability to HPO terms and Phenopackets elements.
+      dcterms:subject: []  # multiple diseases — fill per survey
+      dcat:keyword:
+        - "patient-reported outcomes"
+        - "PRO"
+        - "RARE-X"
+        - "HPO mapping"
+      dcterms:creator:
+        foaf:name: "Zohreh Talebizadeh"
+      dcterms:issued: "2026-04-16"
+      dcterms:license: "https://creativecommons.org/licenses/by/4.0/"
+      dcat:distribution:
+        - "@type": "dcat:Distribution"
+          dcterms:format: "text/markdown"
+          dcat:accessURL: "cases/rare-x/narrative.md"
+
+    - "@type": "dcat:Dataset"
+      "@id": "dataset/iamrare"
+      dcterms:title: "IAMRARE Registry — Structured Narrative Description"
+      dcterms:description: >
+        Analysis of IAMRARE patient registry data elements against HPO, Phenopackets,
+        and Mondo, with identified gaps.
+      dcterms:subject: []  # multiple diseases
+      dcat:keyword:
+        - "IAMRARE"
+        - "NORD"
+        - "patient registry"
+        - "rare disease"
+      dcterms:creator:
+        foaf:name: "Janine Lewis"
+      dcterms:issued: "2026-04-16"
+      dcterms:license: "https://creativecommons.org/licenses/by/4.0/"
+      dcat:distribution:
+        - "@type": "dcat:Distribution"
+          dcterms:format: "text/markdown"
+          dcat:accessURL: "cases/iamrare/narrative.md"
+
+    - "@type": "dcat:Dataset"
+      "@id": "dataset/phenodb"
+      dcterms:title: "PhenoDB — Clinical Genetics Phenotyping Workflow"
+      dcterms:description: >
+        Structured narrative and phenotype mapping based on the PhenoDB clinical genetics
+        database at Johns Hopkins, with analysis of Phenopackets alignment.
+      dcterms:subject: []  # multiple diseases
+      dcat:keyword:
+        - "PhenoDB"
+        - "clinical genetics"
+        - "HPO"
+        - "Phenopackets"
+        - "Johns Hopkins"
+      dcterms:creator:
+        foaf:name: "Ada Hamosh"
+        foaf:organization: "Johns Hopkins University"
+      dcterms:issued: "2026-04-16"
+      dcterms:license: "https://creativecommons.org/licenses/by/4.0/"
+      dcat:distribution:
+        - "@type": "dcat:Distribution"
+          dcterms:format: "text/markdown"
+          dcat:accessURL: "cases/phenodb/narrative.md"
+
+    - "@type": "dcat:Dataset"
+      "@id": "dataset/gaps"
+      dcterms:title: "Identified Ontology and Data Model Gaps"
+      dcterms:description: >
+        Community-curated list of gaps in HPO, Mondo, ECTO, Phenopackets, and rare disease
+        registries, identified during the April 2026 GA4GH session.
+      dcat:keyword:
+        - "ontology gaps"
+        - "HPO"
+        - "Phenopackets"
+        - "rare disease"
+        - "phenotyping"
+      dcterms:issued: "2026-04-16"
+      dcterms:license: "https://creativecommons.org/licenses/by/4.0/"
+      dcat:distribution:
+        - "@type": "dcat:Distribution"
+          dcterms:format: "text/markdown"
+          dcat:accessURL: "gaps/ontology-gaps.md"
+        - "@type": "dcat:Distribution"
+          dcterms:format: "text/markdown"
+          dcat:accessURL: "gaps/data-model-gaps.md"

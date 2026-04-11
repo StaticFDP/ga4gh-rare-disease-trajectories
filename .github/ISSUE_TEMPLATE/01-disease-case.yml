@@ -1,0 +1,100 @@
+name: "Submit a disease case"
+description: "Capture a rare disease narrative, timeline overview, and key data types. No Git knowledge required."
+title: "[CASE] "
+labels: ["disease-case", "needs-mapping"]
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        Fill in as much as you can. Partial entries are welcome — every contribution helps.
+        Leave any field blank if you don't know the answer.
+
+  - type: input
+    id: disease_name
+    attributes:
+      label: Disease name
+      placeholder: "e.g. Amyotrophic Lateral Sclerosis"
+    validations:
+      required: true
+
+  - type: input
+    id: mondo_id
+    attributes:
+      label: Mondo disease ID
+      placeholder: "e.g. MONDO:0004976 — look up at https://mondo.monarchinitiative.org/"
+
+  - type: input
+    id: registry
+    attributes:
+      label: Registry or data source
+      placeholder: "e.g. ALS TDI Registry, PhenoDB, IAMRARE"
+
+  - type: textarea
+    id: narrative
+    attributes:
+      label: Disease narrative (plain language)
+      description: "Describe the typical patient journey: onset, diagnostic odyssey, key events, current state. No patient-identifying information."
+      placeholder: |
+        Onset: ...
+        Diagnostic odyssey: ...
+        Key clinical milestones: ...
+        Current management: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: timeline_events
+    attributes:
+      label: Key timeline events (one per line)
+      description: "List significant events with approximate timing. Format: [time] — [event]"
+      placeholder: |
+        age:40y — first symptom (muscle weakness in right hand)
+        onset+6mo — EMG confirms lower motor neuron involvement
+        onset+8mo — definitive ALS diagnosis
+        onset+14mo — PEG tube placed
+
+  - type: dropdown
+    id: data_types
+    attributes:
+      label: Data types collected in this registry/case (select all that apply)
+      multiple: true
+      options:
+        - Structured phenotype terms (HPO)
+        - Clinical narrative / free text
+        - Genetic / genomic data
+        - Lab results / biomarkers
+        - Patient-reported outcomes (PROs)
+        - Imaging
+        - Functional assessments
+        - Family history / pedigree
+        - Treatment / medication history
+        - Disease progression / longitudinal follow-up
+        - Other
+
+  - type: textarea
+    id: hpo_terms
+    attributes:
+      label: HPO terms that apply (if known)
+      description: "List HP:XXXXXXX terms, one per line"
+      placeholder: |
+        HP:0002360 — Sleep disturbance
+        HP:0003473 — Fatigable weakness
+
+  - type: textarea
+    id: narrative_gaps
+    attributes:
+      label: What clinical nuance is LOST when encoding this case in HPO terms alone?
+      placeholder: "e.g. Rate of progression, caregiver burden, patient's experience of the diagnostic odyssey..."
+
+  - type: textarea
+    id: missing_data
+    attributes:
+      label: What information SHOULD be collected but currently is NOT?
+      placeholder: "e.g. Time from first symptom to first specialist visit is rarely recorded..."
+
+  - type: input
+    id: contributor
+    attributes:
+      label: Your name / affiliation (optional)
+      placeholder: "e.g. Ada Hamosh, Johns Hopkins"

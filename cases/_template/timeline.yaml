@@ -1,0 +1,65 @@
+# Disease trajectory timeline
+# One entry per clinically significant event.
+# time_point: use ISO 8601 (absolute) or relative notation (e.g. "onset+6mo", "age:2y")
+# certainty: confirmed | probable | reported
+# data_available: yes | no | partial
+# source: where this data point comes from (registry, EHR, patient report, literature)
+
+disease_mondo_id: ""          # e.g. MONDO:0007739
+disease_name: ""
+
+timeline:
+
+  - event_id: T001
+    label: "Symptom onset"
+    time_point: null           # e.g. "age:35y" or "2019-03"
+    certainty: confirmed
+    description: ""
+    hpo_terms: []              # HPO terms present at this time point
+    data_available: yes
+    source: ""
+
+  - event_id: T002
+    label: "First medical contact"
+    time_point: null
+    certainty: confirmed
+    description: ""
+    hpo_terms: []
+    data_available: yes
+    source: ""
+
+  - event_id: T003
+    label: "Initial (incorrect) diagnosis"
+    time_point: null
+    certainty: probable
+    description: ""
+    mondo_terms: []            # MONDO terms for diagnoses considered
+    data_available: partial
+    source: ""
+
+  - event_id: T004
+    label: "Definitive diagnosis"
+    time_point: null
+    certainty: confirmed
+    description: ""
+    mondo_terms: []
+    diagnostic_criteria_met: []   # e.g. ["genetic confirmation", "clinical criteria"]
+    data_available: yes
+    source: ""
+
+  - event_id: T005
+    label: "Treatment initiation"
+    time_point: null
+    certainty: confirmed
+    description: ""
+    ecto_terms: []             # ECTO terms for exposures/treatments if applicable
+    data_available: yes
+    source: ""
+
+  # Add more events as needed — copy the block above
+
+# Gaps in timeline data
+timeline_gaps:
+  - description: ""            # e.g. "time between symptom onset and first specialist visit not recorded"
+    impact: ""                 # why does this gap matter?
+    possible_source: ""        # where could this data be obtained?

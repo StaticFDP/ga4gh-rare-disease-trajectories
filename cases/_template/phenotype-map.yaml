@@ -1,0 +1,90 @@
+# Phenotype mapping template
+# Maps clinical narrative elements to existing standards and identifies gaps.
+# Use CURIEs for all ontology terms: HP:0001250, MONDO:0007739, ECTO:0000002
+
+disease_name: ""
+disease_mondo_id: ""
+
+# ─────────────────────────────────────────────
+# SECTION 1: HPO term mapping
+# For each clinical feature, record whether HPO captures it adequately.
+# coverage: full | partial | missing
+# ─────────────────────────────────────────────
+hpo_mapping:
+
+  - clinical_feature: ""        # plain language description
+    hpo_term: null              # HP:XXXXXXX or null if missing
+    hpo_label: ""
+    coverage: full              # full | partial | missing
+    notes: ""                   # what nuance is lost, if any?
+
+  # - clinical_feature: ""
+  #   hpo_term: null
+  #   coverage: missing
+  #   gap_description: ""       # describe what is missing in HPO
+
+# ─────────────────────────────────────────────
+# SECTION 2: Phenopackets element coverage
+# Check which Phenopacket building blocks apply to this disease.
+# ─────────────────────────────────────────────
+phenopackets_coverage:
+  individual:
+    used: true
+    notes: ""
+  phenotypic_features:
+    used: true
+    notes: ""
+  diseases:
+    used: true
+    notes: ""
+  measurements:
+    used: false
+    notes: ""                   # e.g. "FVC% slope not captured as Measurement"
+  medical_actions:
+    used: false
+    notes: ""
+  exposures:                    # maps to ECTO
+    used: false
+    notes: ""
+  files:                        # genomic files, images
+    used: false
+    notes: ""
+  biosamples:
+    used: false
+    notes: ""
+  interpretations:
+    used: false
+    notes: ""
+
+  # What is in the clinical narrative that does NOT fit any Phenopacket element?
+  unrepresented_narrative_elements:
+    - ""
+
+# ─────────────────────────────────────────────
+# SECTION 3: Patient-reported outcomes (PROs)
+# ─────────────────────────────────────────────
+pro_data:
+  instruments_used: []          # e.g. ["ALSFRS-R", "EQ-5D-5L"]
+  structured_in_registry: false
+  mapped_to_hpo: false
+  gap_description: ""
+
+# ─────────────────────────────────────────────
+# SECTION 4: Longitudinal / trajectory elements
+# Things that are inherently temporal and poorly captured by a snapshot.
+# ─────────────────────────────────────────────
+trajectory_elements:
+  - element: ""                 # e.g. "rate of FVC decline"
+    current_representation: ""  # how it is captured today, if at all
+    ideal_representation: ""    # how it should be captured
+    existing_standard: null     # term/model that could apply, or null
+
+# ─────────────────────────────────────────────
+# SECTION 5: Summary gap assessment
+# ─────────────────────────────────────────────
+gap_summary:
+  hpo_gaps: []                  # list of missing/insufficient HPO coverage areas
+  phenopackets_gaps: []         # structural gaps in the Phenopackets schema
+  mondo_gaps: []                # missing or imprecise disease terms
+  registry_gaps: []             # data not collected in current registries
+  priority_gaps: []             # top 3 gaps to address first
