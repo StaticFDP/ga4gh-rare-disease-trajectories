@@ -2,26 +2,24 @@
  * BYOD Form Receiver — Cloudflare Worker
  *
  * Routes:
- *   GET  /auth/login              → login page (ORCID preferred, GitHub fallback)
- *   GET  /auth/orcid              → start ORCID OAuth flow
- *   GET  /auth/orcid/callback     → handle ORCID redirect
- *   GET  /auth/github             → start GitHub OAuth flow
- *   GET  /auth/github/callback    → handle GitHub redirect
- *   GET  /auth/logout             → clear session
- *   GET  /forms/disease-case      → disease case form (auth required)
- *   GET  /forms/ontology-gap      → ontology gap form (auth required)
- *   GET  /forms/data-gap          → data / model gap form (auth required)
- *   GET  /forms/form-feedback     → form feedback (auth required)
- *   POST /submit                  → create GitHub Issue (auth required)
- *   GET  /                        → redirect to landing page
+ *   GET  /auth/login                → ORCID login page
+ *   GET  /auth/orcid                → start ORCID OAuth flow
+ *   GET  /auth/orcid/callback       → handle ORCID redirect
+ *   GET  /auth/logout               → clear session
+ *   GET  /auth/status               → JSON session status (CORS, credentialed)
+ *   GET  /forms/disease-case        → disease case form (auth required)
+ *   GET  /forms/ontology-gap        → ontology gap form (auth required)
+ *   GET  /forms/data-gap            → data / model gap form (auth required)
+ *   GET  /forms/form-feedback       → form feedback (auth required)
+ *   GET  /forms/disease-resource    → disease resource form (auth required)
+ *   POST /submit                    → create GitHub Issue (auth required)
+ *   GET  /                          → redirect to landing page
  *
  * Secrets (wrangler secret put):
- *   GITHUB_TOKEN      — fine-grained PAT, Issues: Read & Write
- *   ORCID_CLIENT_ID   — from orcid.org/developer-tools
+ *   GITHUB_TOKEN        — fine-grained PAT, Issues: Read & Write
+ *   ORCID_CLIENT_ID     — from orcid.org/developer-tools
  *   ORCID_CLIENT_SECRET
- *   GH_CLIENT_ID      — from github.com/settings/developers OAuth App
- *   GH_CLIENT_SECRET
- *   SESSION_SECRET    — any random 32+ char string
+ *   SESSION_SECRET      — any random 32+ char string
  *
  * Vars (wrangler.toml):
  *   GITHUB_REPO   — e.g. "StaticFDP/ga4gh-rare-disease-trajectories"
@@ -86,7 +84,7 @@ function makeState(returnTo) {
 
 function parseState(raw) {
   try { return JSON.parse(decodeURIComponent(raw)); }
-  catch { return { returnTo: '/forms/disease-case' }; }
+  catch { return { returnTo: '/' }; }
 }
 
 // ── Shared CSS ────────────────────────────────────────────────────────────────
@@ -176,7 +174,6 @@ textarea { resize: vertical; min-height: 90px; }
   background: #f0fdf4; border: 1px solid #86efac;
   border-radius: 8px; padding: 10px 14px; font-size: 14px;
 }
-.identity-chip .id-icon { font-size: 18px; flex-shrink: 0; }
 .identity-chip .id-name { font-weight: 700; color: #15803d; }
 .identity-chip .id-via  { font-size: 12px; color: var(--muted); margin-left: 4px; }
 /* ── Auth page ── */
@@ -191,18 +188,7 @@ textarea { resize: vertical; min-height: 90px; }
 }
 .login-btn:hover { filter: brightness(.93); transform: translateY(-1px); text-decoration: none; }
 .login-btn.orcid  { background: #a6ce39; color: #000; }
-.login-btn.github { background: #24292e; color: #fff; }
 .login-btn svg { flex-shrink: 0; }
-.login-divider {
-  font-size: 12px; color: var(--muted); text-align: center;
-  margin: 16px 0; position: relative;
-}
-.login-divider::before, .login-divider::after {
-  content: ''; position: absolute; top: 50%;
-  width: 42%; height: 1px; background: var(--border);
-}
-.login-divider::before { left: 0; }
-.login-divider::after  { right: 0; }
 .login-note { font-size: 12px; color: var(--muted); margin-top: 20px; }
 /* ── Identity bar ── */
 .id-bar {
@@ -213,7 +199,6 @@ textarea { resize: vertical; min-height: 90px; }
 .id-bar a { color: var(--brand-dark); font-weight: 600; }
 /* ── Thank-you / error ── */
 .thankyou { text-align: center; padding: 72px 20px; }
-.thankyou .icon { font-size: 56px; margin-bottom: 16px; }
 .thankyou h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
 .thankyou p { color: var(--muted); margin-bottom: 6px; font-size: 15px; }
 .thankyou a.btn-back {
@@ -254,9 +239,7 @@ function page(title, subtitle, idBar, body, landing) {
 
 function identityBar(session, landing) {
   if (!session) return '';
-  const label = session.provider === 'orcid'
-    ? `✓ Signed in via ORCID &nbsp;·&nbsp; <strong>${session.name || session.id}</strong> <span style="font-family:monospace;font-size:11px">(${session.id})</span>`
-    : `✓ Signed in via GitHub &nbsp;·&nbsp; <strong>${session.name || session.login}</strong>`;
+  const label = `Signed in via ORCID &nbsp;·&nbsp; <strong>${session.name || session.id}</strong> <span style="font-family:monospace;font-size:11px">(${session.id})</span>`;
   return `<div class="id-bar">${label}<a href="/auth/logout">Sign out</a></div>`;
 }
 
@@ -279,7 +262,6 @@ function loginPage(returnTo, env) {
 
   const body = `
   <div class="login-page">
-    <div style="font-size:48px;margin-bottom:16px">🔐</div>
     <h1>Sign in to contribute</h1>
     <p class="sub">
       A quick sign-in prevents spam and makes your submission attributable.
@@ -365,7 +347,7 @@ async function orcidCallback(request, env) {
     return new Response(null, {
       status: 302,
       headers: {
-        Location: returnTo || '/forms/disease-case',
+        Location: returnTo || env.LANDING_PAGE || '/',
         'Set-Cookie': sessionCookie(session),
       },
     });
@@ -374,81 +356,6 @@ async function orcidCallback(request, env) {
   }
 }
 
-// ── GitHub OAuth ──────────────────────────────────────────────────────────────
-
-const GH_AUTH  = 'https://github.com/login/oauth/authorize';
-const GH_TOKEN = 'https://github.com/login/oauth/access_token';
-const GH_USER  = 'https://api.github.com/user';
-
-function githubStart(request, env) {
-  const url      = new URL(request.url);
-  const returnTo = url.searchParams.get('return') || env.LANDING_PAGE || '/';
-  const state    = makeState(returnTo);
-  const redirect = `${url.origin}/auth/github/callback`;
-
-  const auth = new URL(GH_AUTH);
-  auth.searchParams.set('client_id',    env.GH_CLIENT_ID);
-  auth.searchParams.set('redirect_uri', redirect);
-  auth.searchParams.set('scope',        'read:user');
-  auth.searchParams.set('state',        state);
-
-  return Response.redirect(auth.toString(), 302);
-}
-
-async function githubCallback(request, env) {
-  const url      = new URL(request.url);
-  const code     = url.searchParams.get('code');
-  const rawState = url.searchParams.get('state') || '';
-  const { returnTo } = parseState(rawState);
-  const landing  = env.LANDING_PAGE || '/';
-
-  if (!code) return html(400, errorPage('GitHub login failed — no code received.', landing));
-  if (!env.SESSION_SECRET) return html(500, errorPage('Server misconfiguration: SESSION_SECRET is not set. Please contact the administrator.', landing));
-
-  try {
-    const tokenResp = await fetch(GH_TOKEN, {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        client_id:     env.GH_CLIENT_ID,
-        client_secret: env.GH_CLIENT_SECRET,
-        code,
-        redirect_uri:  `${url.origin}/auth/github/callback`,
-      }),
-    });
-
-    const tokenData = await tokenResp.json();
-    if (!tokenData.access_token) {
-      return html(502, errorPage(`GitHub token exchange failed: ${tokenData.error_description || tokenData.error || 'no access_token'}`, landing));
-    }
-
-    const userResp = await fetch(GH_USER, {
-      headers: {
-        'Authorization': `Bearer ${tokenData.access_token}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'User-Agent': 'byod-form-receiver',
-      },
-    });
-
-    const user = await userResp.json();
-    const session = await makeSession({
-      provider: 'github',
-      id:       String(user.id),
-      login:    user.login || '',
-      name:     user.name  || user.login || '',
-    }, env.SESSION_SECRET);
-
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: returnTo || '/forms/disease-case',
-        'Set-Cookie': sessionCookie(session),
-      },
-    });
-  } catch (err) {
-    return html(500, errorPage(`GitHub login error: ${err.message}`, landing));
-  }
-}
 
 // ── Auth middleware ───────────────────────────────────────────────────────────
 
@@ -476,17 +383,15 @@ const DISEASE_ID_FIELD = `
 </div>`;
 
 function contributorField(session) {
-  const name     = session?.name  || session?.login || session?.id || '';
-  const isOrcid  = session?.provider === 'orcid';
-  const icon     = isOrcid ? '🔬' : '🐙';
-  const via      = isOrcid
+  const name    = session?.name  || session?.login || session?.id || '';
+  const isOrcid = session?.provider === 'orcid';
+  const via     = isOrcid
     ? `ORCID — ${session.id}`
     : `GitHub — @${session?.login || session?.id || ''}`;
   return `
 <div class="field">
   <label>Contributor — <span style="font-weight:400;color:var(--muted)">collected automatically from your login</span></label>
   <div class="identity-chip">
-    <span class="id-icon">${icon}</span>
     <span class="id-name">${name}</span>
     <span class="id-via">via ${via}</span>
   </div>
@@ -1032,7 +937,6 @@ function thankyouPage(issueUrl, landing) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Submitted · Bring Your Own Disease</title><style>${CSS}</style></head><body>
   <div class="thankyou">
-    <div class="icon">✅</div>
     <h1>Thank you!</h1>
     <p>Your contribution has been received and added to the session repository.</p>
     ${issueLink}
@@ -1046,7 +950,7 @@ function errorPage(msg, landing) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Error · Bring Your Own Disease</title><style>${CSS}</style></head><body>
   <div class="thankyou">
-    <div class="icon">⚠️</div><h1>Something went wrong</h1>
+    <h1>Something went wrong</h1>
     <div class="error-box">${msg}</div>
     <a class="btn-back" href="${landing}">← Back to session page</a>
   </div></body></html>`;
@@ -1088,12 +992,10 @@ export default {
     const landing = env.LANDING_PAGE || '/';
 
     // ── Auth routes (no session required) ────────────────────────────────────
-    if (path === '/auth/status')          return authStatus(request, env);
-    if (path === '/auth/login')           return html(200, loginPage(url.searchParams.get('return') || env.LANDING_PAGE || '/', env));
-    if (path === '/auth/orcid')           return orcidStart(request, env);
-    if (path === '/auth/orcid/callback')  return orcidCallback(request, env);
-    if (path === '/auth/github')          return githubStart(request, env);
-    if (path === '/auth/github/callback') return githubCallback(request, env);
+    if (path === '/auth/status')         return authStatus(request, env);
+    if (path === '/auth/login')          return html(200, loginPage(url.searchParams.get('return') || env.LANDING_PAGE || '/', env));
+    if (path === '/auth/orcid')          return orcidStart(request, env);
+    if (path === '/auth/orcid/callback') return orcidCallback(request, env);
     if (path === '/auth/logout') {
       return new Response(null, {
         status: 302,

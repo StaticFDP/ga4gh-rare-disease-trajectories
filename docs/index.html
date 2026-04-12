@@ -95,7 +95,6 @@
       opacity: 0.8;
     }
 
-    .header-meta span::before { margin-right: 5px; }
 
     /* ── Section titles ───────────────────────────────────────────────── */
     section { padding: 48px 0; }
@@ -141,12 +140,6 @@
     .path-card.blue {
       background: var(--accent-light);
       border-color: #bfdbfe;
-    }
-
-    .path-icon {
-      font-size: 36px;
-      margin-bottom: 12px;
-      display: block;
     }
 
     .path-card h3 {
@@ -446,9 +439,9 @@
       as FAIR open data.
     </p>
     <div class="header-meta">
-      <span>📅 April 16, 2026 &nbsp;·&nbsp; 2:00 – 4:45 PM</span>
-      <span>👥 All backgrounds welcome</span>
-      <span>🌐 Data stays open</span>
+      <span>April 16, 2026 &nbsp;·&nbsp; 2:00 – 4:45 PM</span>
+      <span>All backgrounds welcome</span>
+      <span>Data stays open</span>
     </div>
   </div>
 </header>
@@ -467,11 +460,10 @@
 
       <!-- Path A — non-technical -->
       <div class="path-card green">
-        <span class="path-icon">🩺</span>
         <div class="who">For clinicians · patient advocates · registry managers</div>
         <h3>Share a disease resource</h3>
         <p>
-          Fill in a web form — <strong>no GitHub account needed</strong>, no code.
+          Fill in a web form — no code required.
           Use any disease ontology you know: Orphanet, OMIM, ICD, SNOMED, GARD, and more.
           Your submission becomes a GitHub Issue that the team turns into FAIR data.
         </p>
@@ -490,25 +482,24 @@
         <div style="display:flex; flex-direction:column; gap:8px;">
           <a class="btn btn-green"
              href="https://byod-form-receiver.andra-76d.workers.dev/forms/disease-case"
-             target="_blank" rel="noopener">🦠 Submit a disease case</a>
+             target="_blank" rel="noopener">Submit a disease case</a>
           <a class="btn btn-green"
              href="https://byod-form-receiver.andra-76d.workers.dev/forms/disease-resource"
-             target="_blank" rel="noopener">📚 Submit a disease resource</a>
+             target="_blank" rel="noopener">Submit a disease resource</a>
           <a class="btn btn-green"
              href="https://byod-form-receiver.andra-76d.workers.dev/forms/ontology-gap"
-             target="_blank" rel="noopener">🔍 Report an ontology gap</a>
+             target="_blank" rel="noopener">Report an ontology gap</a>
           <a class="btn btn-green"
              href="https://byod-form-receiver.andra-76d.workers.dev/forms/data-gap"
-             target="_blank" rel="noopener">📊 Report a data / model gap</a>
+             target="_blank" rel="noopener">Report a data / model gap</a>
           <a class="btn btn-green"
              href="https://byod-form-receiver.andra-76d.workers.dev/forms/form-feedback"
-             target="_blank" rel="noopener">💬 Feedback on these forms</a>
+             target="_blank" rel="noopener">Feedback on these forms</a>
         </div>
       </div>
 
       <!-- Path B — technical -->
       <div class="path-card blue">
-        <span class="path-icon">🧬</span>
         <div class="who">For bioinformaticians · data engineers · ontologists</div>
         <h3>Contribute structured data</h3>
         <p>
@@ -532,24 +523,16 @@
     <div class="issue-links">
       <a class="issue-chip"
          href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/new?template=01-disease-case.yml"
-         target="_blank" rel="noopener">
-        🦠 Submit a disease case
-      </a>
+         target="_blank" rel="noopener">Submit a disease case</a>
       <a class="issue-chip"
          href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/new?template=02-ontology-gap.yml"
-         target="_blank" rel="noopener">
-        🔍 Report an ontology gap
-      </a>
+         target="_blank" rel="noopener">Report an ontology gap</a>
       <a class="issue-chip"
          href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/new?template=03-data-gap.yml"
-         target="_blank" rel="noopener">
-        📊 Report a data / model gap
-      </a>
+         target="_blank" rel="noopener">Report a data / model gap</a>
       <a class="issue-chip"
          href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/new?template=04-form-feedback.yml"
-         target="_blank" rel="noopener">
-        💬 Feedback on these forms — or propose a new one
-      </a>
+         target="_blank" rel="noopener">Feedback on these forms — or propose a new one</a>
     </div>
   </section>
 
@@ -564,7 +547,7 @@
 
     <div class="fdp-panel">
       <div class="fdp-text">
-        <h3>🗂 This session's FAIR Data Point</h3>
+        <h3>This session's FAIR Data Point</h3>
         <p>
           Catalog and dataset metadata for all disease cases collected in this session.
           Served as RDF Turtle and JSON-LD. Updated automatically on every merge.
@@ -589,7 +572,7 @@
       </div>
 
       <div class="fdp-text">
-        <h3>🌐 StaticFDP Index</h3>
+        <h3>StaticFDP Index</h3>
         <p>
           A daily-crawled index of all registered FAIR Data Points.
           This session's FDP will appear here after the first push.
@@ -617,7 +600,7 @@
     <!-- Disease dataset index — key new section -->
     <div class="fdp-panel" style="margin-top:1.25rem; border: 2px solid var(--brand);">
       <div class="fdp-text" style="flex:2">
-        <h3>🧬 Per-Disease FAIR Dataset Index</h3>
+        <h3>Per-Disease FAIR Dataset Index</h3>
         <p>
           Every disease submitted during this and future sessions becomes its own
           versioned FAIR dataset — <code>diseases/{slug}/</code> in this repository.
@@ -630,7 +613,7 @@
              href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/"
              target="_blank" rel="noopener"
              style="background:var(--brand);color:#fff;font-weight:700;">
-            🧬 Disease index ↗
+            Disease index ↗
           </a>
           <a class="fdp-link"
              href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl"
@@ -811,7 +794,6 @@ curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl
 
       <div style="border:2px solid var(--brand); border-radius:var(--radius); overflow:hidden;">
         <div style="background:var(--brand); color:#fff; padding:1.1rem 1.25rem;">
-          <div style="font-size:1.4rem; margin-bottom:.3rem;">🔎</div>
           <strong style="font-size:1rem;">Demo 1 — SPARQL across FDPs</strong>
           <p style="font-size:.82rem; opacity:.85; margin-top:.3rem;">
             Query RDF metadata from all registered FDPs in your browser — no server needed.
@@ -832,8 +814,7 @@ curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl
 
       <div style="border:2px solid var(--accent); border-radius:var(--radius); overflow:hidden;">
         <div style="background:var(--accent); color:#fff; padding:1.1rem 1.25rem;">
-          <div style="font-size:1.4rem; margin-bottom:.3rem;">🔄</div>
-          <strong style="font-size:1rem;">Demo 2 — Form → RDF pipeline</strong>
+          <strong style="font-size:1rem;">Demo 2 — Form to RDF pipeline</strong>
           <p style="font-size:.82rem; opacity:.85; margin-top:.3rem;">
             Watch a web-form submission become machine-readable linked data in real time.
           </p>
@@ -888,8 +869,7 @@ curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl
     if (!btn) return;
 
     if (data.loggedIn) {
-      const icon = data.provider === 'orcid' ? '🔬' : '🐙';
-      btn.textContent = `${icon} ${data.name}`;
+      btn.textContent = data.name || 'Signed in';
       btn.style.background    = 'rgba(166,206,57,.25)';
       btn.style.borderColor   = 'rgba(166,206,57,.5)';
       btn.style.color         = '#d4f08a';

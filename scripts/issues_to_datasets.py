@@ -492,15 +492,15 @@ def make_index_html(diseases: list[dict], jsonld: str) -> str:
           {id_badge}
         </div>
         <div class="dc-stats">
-          <span title="Case submissions">📋 {n_cases} case{"s" if n_cases != 1 else ""}</span>
-          <span title="Ontology gaps">🔍 {n_onto} ontology gap{"s" if n_onto != 1 else ""}</span>
-          <span title="Data gaps">📊 {n_data} data gap{"s" if n_data != 1 else ""}</span>
+          <span title="Case submissions">{n_cases} case{"s" if n_cases != 1 else ""}</span>
+          <span title="Ontology gaps">{n_onto} ontology gap{"s" if n_onto != 1 else ""}</span>
+          <span title="Data gaps">{n_data} data gap{"s" if n_data != 1 else ""}</span>
         </div>
         {f'<div class="dc-chips">{type_chips}</div>' if type_chips else ""}
         <div class="dc-meta">First contributed: {created} · Updated: {TODAY}</div>
         <div class="dc-actions">
-          <a href="{FDP_BASE_URL}/diseases/{slug}.ttl" class="btn btn-ttl">⬇ TTL</a>
-          <a href="{FDP_BASE_URL}/diseases/{slug}.jsonld" class="btn btn-jsonld">⬇ JSON-LD</a>
+          <a href="{FDP_BASE_URL}/diseases/{slug}.ttl" class="btn btn-ttl">TTL</a>
+          <a href="{FDP_BASE_URL}/diseases/{slug}.jsonld" class="btn btn-jsonld">JSON-LD</a>
           <a href="https://github.com/{GITHUB_REPO}/tree/main/diseases/{slug}" target="_blank" class="btn btn-gh">GitHub ↗</a>
           <a href="https://fdp.semscape.org/sparql-demo/" target="_blank" class="btn btn-sparql">SPARQL ↗</a>
         </div>
@@ -629,7 +629,7 @@ def make_index_html(diseases: list[dict], jsonld: str) -> str:
 </nav>
 
 <div class="band">
-  <h1>🧬 Rare Disease Datasets</h1>
+  <h1>Rare Disease Datasets</h1>
   <p class="lead">
     Community-contributed, FAIR-compliant disease trajectory datasets from GA4GH biohackathon sessions.
     Each disease gets its own versioned dataset — machine-readable in RDF Turtle and JSON-LD,
@@ -648,7 +648,7 @@ def make_index_html(diseases: list[dict], jsonld: str) -> str:
   <!-- machine-readable access -->
   <div class="access-panel">
     <div>
-      <h3>📥 Load this index</h3>
+      <h3>Load this index</h3>
       <pre><code># Python (rdflib)
 from rdflib import Graph
 g = Graph()
@@ -660,13 +660,13 @@ rdf &lt;- rdf_parse("{FDP_BASE_URL}/diseases/index.ttl",
       <pre><code># curl
 curl {FDP_BASE_URL}/diseases/index.ttl</code></pre>
       <div class="access-links">
-        <a href="index.ttl"     class="btn-dl btn-ttl">⬇ index.ttl</a>
-        <a href="index.jsonld"  class="btn-dl btn-jsonld">⬇ index.jsonld</a>
-        <a href="/sparql-demo/" class="btn-dl btn-sparql">▶ Open SPARQL demo</a>
+        <a href="index.ttl"     class="btn-dl btn-ttl">index.ttl</a>
+        <a href="index.jsonld"  class="btn-dl btn-jsonld">index.jsonld</a>
+        <a href="/sparql-demo/" class="btn-dl btn-sparql">Open SPARQL demo</a>
       </div>
     </div>
     <div>
-      <h3>🔎 Query all diseases at once</h3>
+      <h3>Query all diseases at once</h3>
       <pre><code>PREFIX dcat:    &lt;https://www.w3.org/ns/dcat#&gt;
 PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
 PREFIX ordo:    &lt;http://www.orpha.net/ORDO/Orphanet_&gt;
@@ -694,9 +694,9 @@ SELECT ?disease ?title ?ordo WHERE {{
 
   <!-- contribute CTA -->
   <div class="cta">
-    <p>Missing a disease? Submit a case via the BYOD web form — it takes 5 minutes and no GitHub account is needed. Your submission becomes a versioned FAIR dataset within 60 seconds.</p>
+    <p>Missing a disease? Submit a case via the BYOD web form — it takes 5 minutes and only requires an ORCID login. Your submission becomes a versioned FAIR dataset within 60 seconds.</p>
     <a href="https://byod-form-receiver.andra-76d.workers.dev/forms/disease-case" class="btn-cta">
-      🦠 Submit a disease case →
+      Submit a disease case
     </a>
   </div>
 
