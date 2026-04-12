@@ -89,12 +89,15 @@
     /* access panel */
     .access-panel{background:var(--gray-9);color:#fff;border-radius:var(--radius);
                    padding:1.5rem;margin-bottom:2.5rem;display:grid;
-                   grid-template-columns:1fr 1fr;gap:1.5rem}
-    @media(max-width:640px){.access-panel{grid-template-columns:1fr}}
+                   grid-template-columns:3fr 2fr;gap:1.5rem}
+    @media(max-width:780px){.access-panel{grid-template-columns:1fr}}
+    /* min-width:0 is required so overflow-x:auto works inside grid cells */
+    .access-panel > div{min-width:0}
     .access-panel h3{font-size:.95rem;color:#fff;margin-bottom:.75rem}
     .access-panel pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
                         padding:.75rem 1rem;font-size:.78rem;overflow-x:auto;
-                        color:#e6edf3;line-height:1.6;margin-bottom:.5rem}
+                        color:#e6edf3;line-height:1.6;margin-bottom:.5rem;
+                        white-space:pre;word-break:normal}
     .access-links{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
     .btn-dl{display:inline-block;padding:.4rem .9rem;border-radius:6px;font-size:.82rem;
              font-weight:600;color:#fff;text-decoration:none}
@@ -181,8 +184,8 @@ g = Graph()
 g.parse("https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl")</code></pre>
       <pre><code># R (rdflib)
 library(rdflib)
-rdf &lt;- rdf_parse("https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl",
-                 format="turtle")</code></pre>
+url &lt;- "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl"
+rdf &lt;- rdf_parse(url, format="turtle")</code></pre>
       <pre><code># curl
 curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl</code></pre>
       <div class="access-links">
