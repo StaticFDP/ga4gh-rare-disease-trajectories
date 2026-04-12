@@ -14,15 +14,29 @@
   "dataset": [
     {
       "@type": "Dataset",
-      "name": "test",
-      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/",
+      "name": "Amyotrophic lateral sclerosis (ALS)",
+      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/",
       "dateModified": "2026-04-12",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
         "encodingFormat": "text/turtle",
-        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl"
-      }
+        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.ttl"
+      },
+      "identifier": "ORPHA:803"
+    },
+    {
+      "@type": "Dataset",
+      "name": "Duchenne muscular dystrophy (DMD)",
+      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/",
+      "dateModified": "2026-04-12",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "text/turtle",
+        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.ttl"
+      },
+      "identifier": "ORPHA:98895"
     }
   ]
 }

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Rare Disease Datasets — GA4GH BYOD</title>
-  <meta name="description" content="1 community-contributed, FAIR-compliant rare disease trajectory datasets from GA4GH biohackathon sessions. Machine-readable RDF/Turtle and JSON-LD." />
+  <meta name="description" content="2 community-contributed, FAIR-compliant rare disease trajectory datasets from GA4GH biohackathon sessions. Machine-readable RDF/Turtle and JSON-LD." />
   <link rel="alternate" type="text/turtle"    href="index.ttl" />
   <link rel="alternate" type="application/ld+json" href="index.jsonld" />
 
@@ -25,15 +25,29 @@
   "dataset": [
     {
       "@type": "Dataset",
-      "name": "test",
-      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/",
+      "name": "Amyotrophic lateral sclerosis (ALS)",
+      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/",
       "dateModified": "2026-04-12",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
         "encodingFormat": "text/turtle",
-        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl"
-      }
+        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.ttl"
+      },
+      "identifier": "ORPHA:803"
+    },
+    {
+      "@type": "Dataset",
+      "name": "Duchenne muscular dystrophy (DMD)",
+      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/",
+      "dateModified": "2026-04-12",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "text/turtle",
+        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.ttl"
+      },
+      "identifier": "ORPHA:98895"
     }
   ]
 }
@@ -148,7 +162,7 @@
     queryable via SPARQL, and ready to use as input for your hackathon.
   </p>
   <div class="badges">
-    <span class="badge badge-green">1 disease dataset</span>
+    <span class="badge badge-green">2 disease datasets</span>
     <span class="badge badge-blue">CC BY 4.0</span>
     <span class="badge badge-gray">Updated 2026-04-12</span>
     <span class="badge badge-gray">git-versioned</span>
@@ -198,26 +212,46 @@ SELECT ?disease ?title ?ordo WHERE {
   </div>
 
   <!-- disease cards -->
-  <h2>Disease datasets (1)</h2>
+  <h2>Disease datasets (2)</h2>
   <p class="section-intro">Each card links to a standalone, versioned FAIR dataset for that disease.</p>
   <div class="disease-grid">
 
-      <div class="disease-card" id="disease-test">
+      <div class="disease-card" id="orpha-803">
         <div class="dc-header">
-          <div class="dc-name">test</div>
-          
+          <div class="dc-name">Amyotrophic lateral sclerosis (ALS)</div>
+          <a href="https://www.orpha.net/en/disease/detail/803" target="_blank" class="id-badge">ORPHA:803</a>
         </div>
         <div class="dc-stats">
           <span title="Case submissions">📋 1 case</span>
           <span title="Ontology gaps">🔍 0 ontology gaps</span>
           <span title="Data gaps">📊 0 data gaps</span>
         </div>
-        <div class="dc-chips"><span class="chip">sdfdgf</span></div>
+        <div class="dc-chips"><span class="chip">ALS TDI Registry (ALS Therapy Development Institute)</span></div>
         <div class="dc-meta">First contributed: 2026-04-12 · Updated: 2026-04-12</div>
         <div class="dc-actions">
-          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl" class="btn btn-ttl">⬇ TTL</a>
-          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.jsonld" class="btn btn-jsonld">⬇ JSON-LD</a>
-          <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/tree/main/diseases/disease-test" target="_blank" class="btn btn-gh">GitHub ↗</a>
+          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.ttl" class="btn btn-ttl">⬇ TTL</a>
+          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.jsonld" class="btn btn-jsonld">⬇ JSON-LD</a>
+          <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/tree/main/diseases/orpha-803" target="_blank" class="btn btn-gh">GitHub ↗</a>
+          <a href="https://fdp.semscape.org/sparql-demo/" target="_blank" class="btn btn-sparql">SPARQL ↗</a>
+        </div>
+      </div>
+
+      <div class="disease-card" id="orpha-98895">
+        <div class="dc-header">
+          <div class="dc-name">Duchenne muscular dystrophy (DMD)</div>
+          <a href="https://www.orpha.net/en/disease/detail/98895" target="_blank" class="id-badge">ORPHA:98895</a>
+        </div>
+        <div class="dc-stats">
+          <span title="Case submissions">📋 1 case</span>
+          <span title="Ontology gaps">🔍 0 ontology gaps</span>
+          <span title="Data gaps">📊 0 data gaps</span>
+        </div>
+        <div class="dc-chips"><span class="chip">Duchenne Data Platform (Duchenne Parent Project / FAIR Data Systems S.L.)</span></div>
+        <div class="dc-meta">First contributed: 2026-04-12 · Updated: 2026-04-12</div>
+        <div class="dc-actions">
+          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.ttl" class="btn btn-ttl">⬇ TTL</a>
+          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.jsonld" class="btn btn-jsonld">⬇ JSON-LD</a>
+          <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/tree/main/diseases/orpha-98895" target="_blank" class="btn btn-gh">GitHub ↗</a>
           <a href="https://fdp.semscape.org/sparql-demo/" target="_blank" class="btn btn-sparql">SPARQL ↗</a>
         </div>
       </div>

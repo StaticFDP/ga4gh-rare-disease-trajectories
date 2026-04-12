@@ -1,0 +1,46 @@
+@prefix dcat:    <https://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
+@prefix omim:    <https://omim.org/entry/> .
+@prefix hp:      <http://purl.obolibrary.org/obo/HP_> .
+@prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+
+# Disease dataset: Duchenne muscular dystrophy (DMD)
+# Slug: orpha-98895
+# Auto-generated 2026-04-12 from GitHub Issues
+# Version: c01f7bdbc324
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/> a dcat:Dataset ;
+    dcterms:title "Duchenne muscular dystrophy (DMD)"@en ;
+    dcterms:description "Community-contributed disease trajectory data for Duchenne muscular dystrophy (DMD). Contains 1 case submission(s) and 0 gap report(s), contributed during GA4GH BYOD sessions and maintained as FAIR linked data."@en ;
+    dcterms:created    "2026-04-12"^^xsd:date ;
+    dcterms:modified   "2026-04-12"^^xsd:date ;
+    dcterms:hasVersion "c01f7bdbc324" ;
+    dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
+    dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> ;
+    dcat:landingPage   <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/tree/main/diseases/orpha-98895> ;
+    prov:wasGeneratedBy <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/actions> ;
+    dcterms:subject <http://www.orpha.net/ORDO/Orphanet_98895> ;
+    dcterms:subject <https://omim.org/entry/310200> ;
+    dcterms:subject <http://purl.obolibrary.org/obo/MONDO_0010679> ;
+    dcat:keyword "Duchenne Data Platform (Duchenne Parent Project / FAIR Data Systems S.L.)"@en ;
+    dcat:distribution <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/cases.ttl> ,
+                      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/gaps.ttl> .
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/cases.ttl> a dcat:Distribution ;
+    dcterms:title "Case submissions for Duchenne muscular dystrophy (DMD)"@en ;
+    dcterms:format "text/turtle" ;
+    dcat:accessURL  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.ttl> ;
+    dcat:downloadURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.ttl> .
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/gaps.ttl> a dcat:Distribution ;
+    dcterms:title "Ontology and data gaps for Duchenne muscular dystrophy (DMD)"@en ;
+    dcterms:format "text/turtle" ;
+    dcat:accessURL  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895-gaps.ttl> ;
+    dcat:downloadURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895-gaps.ttl> .

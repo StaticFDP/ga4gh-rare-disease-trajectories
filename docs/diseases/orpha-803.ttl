@@ -1,0 +1,26 @@
+@prefix dcat:    <https://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
+@prefix omim:    <https://omim.org/entry/> .
+@prefix hp:      <http://purl.obolibrary.org/obo/HP_> .
+@prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+
+# Case submissions for: Amyotrophic lateral sclerosis (ALS)
+# Source: https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues?q=label%3Adisease-case
+# Auto-generated 2026-04-12
+
+# Case #1
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/case/1> a dcat:Dataset ;
+    dcterms:title "Case #1: Amyotrophic lateral sclerosis (ALS)"@en ;
+    dcat:isPartOf <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/> ;
+    dcterms:description "ALS TDI maintains a comprehensive patient registry tracking disease trajectory for ALS patients. The registry captures longitudinal phenotype data including motor function decline, respiratory measures, and survival outcomes. Data is structured using HPO terms and mapped to Phenopackets v2 format. The disease trajectory spans from initial symptom onset through progression stages, with particular focus on identifying biomarkers of disease progression rate and therapeutic response."@en ;
+    dcterms:created   "2026-04-12"^^xsd:date ;
+    dcterms:source    "GA4GH BYOD web form (ORCID-authenticated)" ;
+    dcat:landingPage  <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/1> ;
+    dcat:keyword "ALS TDI Registry (ALS Therapy Development Institute)"@en ;
+    dcterms:creator [ foaf:name "ALS TDI Data Team" ] .

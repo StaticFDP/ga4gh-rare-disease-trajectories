@@ -1,0 +1,46 @@
+@prefix dcat:    <https://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
+@prefix omim:    <https://omim.org/entry/> .
+@prefix hp:      <http://purl.obolibrary.org/obo/HP_> .
+@prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+
+# Disease dataset: Amyotrophic lateral sclerosis (ALS)
+# Slug: orpha-803
+# Auto-generated 2026-04-12 from GitHub Issues
+# Version: c01f7bdbc324
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/> a dcat:Dataset ;
+    dcterms:title "Amyotrophic lateral sclerosis (ALS)"@en ;
+    dcterms:description "Community-contributed disease trajectory data for Amyotrophic lateral sclerosis (ALS). Contains 1 case submission(s) and 0 gap report(s), contributed during GA4GH BYOD sessions and maintained as FAIR linked data."@en ;
+    dcterms:created    "2026-04-12"^^xsd:date ;
+    dcterms:modified   "2026-04-12"^^xsd:date ;
+    dcterms:hasVersion "c01f7bdbc324" ;
+    dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
+    dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> ;
+    dcat:landingPage   <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/tree/main/diseases/orpha-803> ;
+    prov:wasGeneratedBy <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/actions> ;
+    dcterms:subject <http://www.orpha.net/ORDO/Orphanet_803> ;
+    dcterms:subject <https://omim.org/entry/105400> ;
+    dcterms:subject <http://purl.obolibrary.org/obo/MONDO_0004976> ;
+    dcat:keyword "ALS TDI Registry (ALS Therapy Development Institute)"@en ;
+    dcat:distribution <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/cases.ttl> ,
+                      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/gaps.ttl> .
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/cases.ttl> a dcat:Distribution ;
+    dcterms:title "Case submissions for Amyotrophic lateral sclerosis (ALS)"@en ;
+    dcterms:format "text/turtle" ;
+    dcat:accessURL  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.ttl> ;
+    dcat:downloadURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.ttl> .
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/gaps.ttl> a dcat:Distribution ;
+    dcterms:title "Ontology and data gaps for Amyotrophic lateral sclerosis (ALS)"@en ;
+    dcterms:format "text/turtle" ;
+    dcat:accessURL  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803-gaps.ttl> ;
+    dcat:downloadURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803-gaps.ttl> .

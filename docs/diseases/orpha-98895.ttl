@@ -1,0 +1,26 @@
+@prefix dcat:    <https://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
+@prefix omim:    <https://omim.org/entry/> .
+@prefix hp:      <http://purl.obolibrary.org/obo/HP_> .
+@prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+
+# Case submissions for: Duchenne muscular dystrophy (DMD)
+# Source: https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues?q=label%3Adisease-case
+# Auto-generated 2026-04-12
+
+# Case #2
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/case/2> a dcat:Dataset ;
+    dcterms:title "Case #2: Duchenne muscular dystrophy (DMD)"@en ;
+    dcat:isPartOf <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/> ;
+    dcterms:description "The Duchenne Data Platform (DDP) aggregates longitudinal patient data for Duchenne muscular dystrophy across European patient communities. The platform captures clinical measurements (6-minute walk test, North Star Ambulatory Assessment, pulmonary function tests), genetic data (exon deletions, point mutations, duplications), and treatment history (corticosteroids, exon skipping therapies, gene therapy trials). Disease trajectory modeling focuses on ambulatory to non-ambulatory transition and cardiac/respiratory decline. Data follows EJP-RD data model with FAIR Data Point v1.17.1 for metadata exposure. Disease classification uses ORDO:Orphanet_98895 for DMD and ORDO:Orphanet_98896 for Becker MD."@en ;
+    dcterms:created   "2026-04-12"^^xsd:date ;
+    dcterms:source    "GA4GH BYOD web form (ORCID-authenticated)" ;
+    dcat:landingPage  <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/2> ;
+    dcat:keyword "Duchenne Data Platform (Duchenne Parent Project / FAIR Data Systems S.L.)"@en ;
+    dcterms:creator [ foaf:name "Duchenne Parent Project — World Duchenne Organization" ] .
