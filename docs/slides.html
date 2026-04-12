@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bring Your Own Disease · Welcome Slides · GA4GH April 2026</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -210,6 +211,62 @@
       font-size: .82rem;
       color: rgba(255,255,255,.6);
       line-height: 1.35;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       SLIDE 4 — Map of past hackathons
+    ══════════════════════════════════════════════════════ */
+    #slide-4 {
+      background: #0d1117;
+      color: var(--white);
+      padding: 2.2rem 3.5rem 3.8rem;
+      justify-content: flex-start;
+      gap: 1rem;
+    }
+
+    #slide-4 h2 {
+      font-size: clamp(1.7rem, 3vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      flex-shrink: 0;
+    }
+
+    #slide-4 .map-sub {
+      font-size: .95rem;
+      color: rgba(255,255,255,.45);
+      margin-top: .15rem;
+      flex-shrink: 0;
+    }
+
+    #map {
+      flex: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.1);
+      min-height: 0;
+    }
+
+    .map-legend {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      font-size: .88rem;
+      color: rgba(255,255,255,.65);
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
     }
 
     /* ── Citation ── */
@@ -735,18 +792,106 @@
 
   </div><!-- /slide-3 -->
 
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 4 — Map of past BioHackathons
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-4">
+
+    <div>
+      <h2>BioHackathons around the world</h2>
+      <p class="map-sub">Two decades of collaborative bioinformatics sprints — from Tokyo to Berlin, and Amsterdam today</p>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="map-legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#3b82f6"></div>
+        DBCLS BioHackathon (Japan, 2008–)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#22c55e"></div>
+        ELIXIR BioHackathon Europe (2018–)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#a6ce39;border:2px solid #fff;width:16px;height:16px"></div>
+        This session — Amsterdam, 2026
+      </div>
+      <div style="flex:1"></div>
+      <div class="legend-item" style="font-size:.75rem;">
+        Sources: biohackathon.org · elixir-europe.org · Garcia et al. 2020
+      </div>
+    </div>
+
+  </div><!-- /slide-4 -->
+
 </div><!-- /deck -->
 
 <!-- ── Navigation ── -->
 <div class="nav-strip">
   <button id="btn-prev" onclick="go(-1)" disabled>Previous</button>
-  <span id="slide-counter">1 / 3</span>
+  <span id="slide-counter">1 / 4</span>
   <button id="btn-next" onclick="go(1)">Next</button>
 </div>
 
 <div class="key-hint">Arrow keys · click to advance</div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
+  // ── Map (initialised once, lazily on first visit to slide 4) ──────────────
+  let mapInit = false;
+
+  function initMap() {
+    if (mapInit) return;
+    mapInit = true;
+
+    const map = L.map('map', { zoomControl: true, attributionControl: true })
+                 .setView([42, 42], 3);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 19,
+    }).addTo(map);
+
+    // colours
+    const C = { dbcls: '#3b82f6', elixir: '#22c55e', today: '#a6ce39' };
+
+    function dot(lat, lng, series, label, years) {
+      const isToday = series === 'today';
+      L.circleMarker([lat, lng], {
+        radius:      isToday ? 14 : 10,
+        color:       isToday ? '#fff' : C[series],
+        weight:      isToday ? 3 : 1.5,
+        fillColor:   C[series],
+        fillOpacity: isToday ? 1 : 0.85,
+        opacity:     1,
+      }).addTo(map)
+        .bindPopup(`<strong style="font-size:14px">${label}</strong><br>
+                    <span style="color:#555;font-size:12px">${years}</span>`, {
+          className: 'bh-popup',
+        });
+    }
+
+    // ── DBCLS BioHackathon (Japan) ──
+    dot(35.6762, 139.6503, 'dbcls', 'Tokyo, Japan',      'DBCLS BioHackathon 2008, 2009, 2010, 2013');
+    dot(35.0116, 135.7681, 'dbcls', 'Kyoto, Japan',      'DBCLS BioHackathon 2011');
+    dot(36.6959, 137.2137, 'dbcls', 'Toyama, Japan',     'DBCLS BioHackathon 2012');
+    dot(38.3736, 141.0653, 'dbcls', 'Matsushima, Japan', 'DBCLS BioHackathon 2014');
+    dot(33.5904, 130.4017, 'dbcls', 'Fukuoka, Japan',    'NBDC/DBCLS BioHackathon 2019');
+    dot(37.7503, 140.4675, 'dbcls', 'Fukushima, Japan',  'DBCLS BioHackathon 2024');
+
+    // ── ELIXIR BioHackathon Europe ──
+    dot(48.8566,  2.3522, 'elixir', 'Paris, France',         'ELIXIR BioHackathon Europe 2018, 2019, 2022');
+    dot(41.3851,  2.1734, 'elixir', 'Barcelona area, Spain', 'ELIXIR BioHackathon Europe 2021, 2023, 2024');
+    dot(52.5200, 13.4050, 'elixir', 'Berlin, Germany',       'ELIXIR BioHackathon Europe 2025');
+
+    // ── Today ──
+    dot(52.3676,  4.9041, 'today', 'Amsterdam, Netherlands', 'GA4GH BYOD Session — April 16, 2026');
+  }
+
+  // ── Slide engine ──────────────────────────────────────────────────────────
   const slides = Array.from(document.querySelectorAll('.slide'));
   let cur = 0;
 
@@ -757,6 +902,8 @@
     document.getElementById('slide-counter').textContent = `${cur + 1} / ${slides.length}`;
     document.getElementById('btn-prev').disabled = cur === 0;
     document.getElementById('btn-next').disabled = cur === slides.length - 1;
+    // Initialise map on first visit to slide 4
+    if (slides[cur].id === 'slide-4') initMap();
   }
 
   function go(delta) { show(cur + delta); }
