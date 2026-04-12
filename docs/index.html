@@ -425,6 +425,13 @@
   <div class="spacer"></div>
   <a href="https://koetai.semscape.org" target="_blank">koetai.semscape.org ↗</a>
   <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories" target="_blank">GitHub ↗</a>
+  <a href="https://byod-form-receiver.andra-76d.workers.dev/auth/login"
+     target="_blank" rel="noopener"
+     style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);
+            border-radius:6px;padding:.3rem .85rem;color:#fff;font-weight:600;font-size:.85rem;
+            white-space:nowrap;text-decoration:none;">
+    Sign in →
+  </a>
 </nav>
 
 <header>
@@ -466,6 +473,24 @@
           Use any disease ontology you know: Orphanet, OMIM, ICD, SNOMED, GARD, and more.
           Your submission becomes a GitHub Issue that the team turns into FAIR data.
         </p>
+        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;
+                    padding:10px 14px;margin-bottom:12px;font-size:13px;color:#166534;">
+          <strong>Login required</strong> — sign in once with ORCID or GitHub, then all forms remember you for 24 hours.<br>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+            <a href="https://byod-form-receiver.andra-76d.workers.dev/auth/orcid"
+               target="_blank" rel="noopener"
+               style="background:#a6ce39;color:#000;font-weight:700;font-size:12px;
+                      border-radius:6px;padding:5px 12px;text-decoration:none;white-space:nowrap;">
+              Sign in with ORCID
+            </a>
+            <a href="https://byod-form-receiver.andra-76d.workers.dev/auth/github"
+               target="_blank" rel="noopener"
+               style="background:#24292e;color:#fff;font-weight:700;font-size:12px;
+                      border-radius:6px;padding:5px 12px;text-decoration:none;white-space:nowrap;">
+              Sign in with GitHub
+            </a>
+          </div>
+        </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
           <a class="btn btn-green"
              href="https://byod-form-receiver.andra-76d.workers.dev/forms/disease-case"
@@ -730,6 +755,10 @@ curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl
       <a class="resource-card" href="https://www.orphanet.net/" target="_blank" rel="noopener">
         <span class="r-label">Orphanet / ORDO</span>
         <span class="r-desc">Primary rare disease ontology and classification</span>
+      </a>
+      <a class="resource-card" href="https://www.orphadata.com/" target="_blank" rel="noopener">
+        <span class="r-label">ORPHADATA</span>
+        <span class="r-desc">Free Orphanet datasets — RDF, XML and OWL downloads for rare disease data</span>
       </a>
       <a class="resource-card" href="https://www.omim.org/" target="_blank" rel="noopener">
         <span class="r-label">OMIM</span>
