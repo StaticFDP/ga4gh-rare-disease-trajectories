@@ -264,11 +264,9 @@ function identityBar(session, landing) {
 
 function loginPage(returnTo, env) {
   const landing = env.LANDING_PAGE || '/';
-  const orcidUrl  = `/auth/orcid?return=${encodeURIComponent(returnTo)}`;
-  const githubUrl = `/auth/github?return=${encodeURIComponent(returnTo)}`;
+  const orcidUrl = `/auth/orcid?return=${encodeURIComponent(returnTo)}`;
 
-  const hasOrcid  = !!(env.ORCID_CLIENT_ID  && env.ORCID_CLIENT_SECRET);
-  const hasGithub = !!(env.GH_CLIENT_ID     && env.GH_CLIENT_SECRET);
+  const hasOrcid = !!(env.ORCID_CLIENT_ID && env.ORCID_CLIENT_SECRET);
 
   const orcidBtn = hasOrcid ? `
     <a class="login-btn orcid" href="${orcidUrl}">
@@ -276,18 +274,7 @@ function loginPage(returnTo, env) {
         <circle cx="128" cy="128" r="128" fill="#A6CE39"/>
         <path d="M86 74h28v108H86V74zm56 0h42c39 0 58 22 58 54s-19 54-58 54h-42V74zm28 88h14c19 0 29-11 29-34s-10-34-29-34h-14v68z" fill="#000"/>
       </svg>
-      Sign in with ORCID <span style="font-size:12px;opacity:.7">(preferred)</span>
-    </a>` : '';
-
-  const divider = hasOrcid && hasGithub
-    ? `<div class="login-divider">or</div>` : '';
-
-  const githubBtn = hasGithub ? `
-    <a class="login-btn github" href="${githubUrl}">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.4.6.1.82-.26.82-.58v-2.03c-3.34.73-4.04-1.6-4.04-1.6-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
-      </svg>
-      Sign in with GitHub
+      Sign in with ORCID
     </a>` : '';
 
   const body = `
@@ -299,9 +286,7 @@ function loginPage(returnTo, env) {
       Your identity will be visible on the GitHub Issue created from your submission.
     </p>
     ${orcidBtn}
-    ${divider}
-    ${githubBtn}
-    ${!hasOrcid && !hasGithub ? '<p class="error-box">Authentication is not configured on this server.</p>' : ''}
+    ${!hasOrcid ? '<p class="error-box">Authentication is not configured on this server.</p>' : ''}
     <p class="login-note">
       Don't have ORCID? <a href="https://orcid.org/register" target="_blank" rel="noopener">Register free in 30 seconds</a> —
       it's the standard researcher identifier used worldwide.
@@ -745,6 +730,83 @@ function formDataGap(session, env) {
   return page('Report a data / model gap', 'Gaps in Phenopackets, FHIR, OMOP, rare disease registries, and exchange standards', idBar, body, landing);
 }
 
+function formDiseaseResource(session, env) {
+  const landing = env.LANDING_PAGE || '/';
+  const idBar   = identityBar(session, landing);
+
+  const resourceTypes = [
+    'Scientific paper / preprint',
+    'Systematic review / meta-analysis',
+    'Clinical guideline / protocol',
+    'Expert panel / working group',
+    'Excellence centre / reference centre',
+    'Patient organisation / advocacy group',
+    'Patient registry / database',
+    'Social media community (Facebook, Reddit, Discord, …)',
+    'News article / media coverage',
+    'Documentary / video',
+    'Podcast / audio',
+    'Conference presentation / poster',
+    'Grant / funding programme',
+    'Policy document / white paper',
+    'Other',
+  ];
+
+  const body = `
+<div class="notice">Share any resource relevant to a rare disease — a paper, a patient group, an expert panel, a news article, a social media community, or anything else that adds to the collective knowledge.</div>
+<form method="POST" action="/submit">
+  ${HONEYPOT}
+  <input type="hidden" name="form_type" value="disease-resource">
+
+  <div class="section-title">Disease context <span style="font-weight:400;font-size:.85em;text-transform:none">(leave blank for cross-disease resources)</span></div>
+  <div class="field">
+    <label>Disease name</label>
+    <input type="text" name="disease_name" placeholder="e.g. ALS, Duchenne MD — or leave blank">
+  </div>
+  ${DISEASE_ID_FIELD}
+
+  <div class="section-title" style="margin-top:28px">Resource details</div>
+  <div class="field">
+    <label>Resource type <span class="req">*</span></label>
+    <div class="cb-group">
+      ${resourceTypes.map(t => `<label><input type="checkbox" name="resource_type" value="${t}"> ${t}</label>`).join('\n')}
+    </div>
+  </div>
+  <div class="field">
+    <label>Title or name <span class="req">*</span></label>
+    <input type="text" name="resource_title" required placeholder="e.g. ALS Association, Nature 2023 — Smith et al., ALS Warriors Facebook Group">
+  </div>
+  <div class="field">
+    <label>URL / DOI / link</label>
+    <input type="url" name="resource_url" placeholder="https://… or https://doi.org/10.…">
+  </div>
+  <div class="field">
+    <label>Description <span class="req">*</span></label>
+    <div class="hint">What does this resource cover? Why is it relevant to the disease?</div>
+    <textarea name="description" rows="5" required
+      placeholder="e.g. The ALS Association is a US-based patient advocacy organisation providing research funding, patient services, and policy advocacy for ALS. It maintains the ALS Registry and runs the annual Walk to Defeat ALS campaign."></textarea>
+  </div>
+  <div class="field">
+    <label>Language <span style="font-weight:400;color:var(--muted)">(if not English)</span></label>
+    <input type="text" name="language" placeholder="e.g. Dutch, French, Spanish">
+  </div>
+  <div class="field">
+    <label>Contact or maintainer <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+    <input type="text" name="contact" placeholder="e.g. info@alsassociation.org, @ALSAssociation">
+  </div>
+  <div class="field">
+    <label>Additional notes <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+    <textarea name="notes" rows="3"
+      placeholder="Any caveats, related resources, or context worth noting…"></textarea>
+  </div>
+
+  <div class="section-title" style="margin-top:28px">About you</div>
+  ${contributorField(session)}
+  <button type="submit" class="btn-submit">Submit resource →</button>
+</form>`;
+  return page('Submit a disease resource', 'Papers, patient organisations, expert panels, communities — any knowledge about a rare disease', idBar, body, landing);
+}
+
 function formFeedback(session, env) {
   const landing = env.LANDING_PAGE || '/';
   const idBar   = identityBar(session, landing);
@@ -914,6 +976,25 @@ async function handleSubmit(request, env) {
         '\n---\n_Submitted via BYOD web form_',
       ].join(''),
     };
+  } else if (formType === 'disease-resource') {
+    issue = {
+      title:  `[RESOURCE] ${fd.get('resource_title') || 'Untitled resource'}`,
+      labels: ['disease-resource'],
+      body: [
+        identitySection(session),
+        section('Disease name',        fd.get('disease_name')),
+        section('Disease identifiers', fd.get('disease_ids')),
+        section('Resource type',       fd.getAll('resource_type')),
+        section('Title / name',        fd.get('resource_title')),
+        section('URL / DOI',           fd.get('resource_url')),
+        section('Description',         fd.get('description')),
+        section('Language',            fd.get('language')),
+        section('Contact / maintainer',fd.get('contact')),
+        section('Additional notes',    fd.get('notes')),
+        section('Contributor',         fd.get('contributor')),
+        '\n---\n_Submitted via BYOD web form_',
+      ].join(''),
+    };
   } else {
     return html(400, errorPage('Unknown form type.', landing));
   }
@@ -1022,10 +1103,11 @@ export default {
 
     // ── Form routes (session required) ────────────────────────────────────────
     if (request.method === 'GET') {
-      if (path === '/forms/disease-case')  return requireAuth(request, env, s => html(200, formDiseaseCase(s, env)));
-      if (path === '/forms/ontology-gap')  return requireAuth(request, env, s => html(200, formOntologyGap(s, env)));
-      if (path === '/forms/data-gap')      return requireAuth(request, env, s => html(200, formDataGap(s, env)));
-      if (path === '/forms/form-feedback') return requireAuth(request, env, s => html(200, formFeedback(s, env)));
+      if (path === '/forms/disease-case')     return requireAuth(request, env, s => html(200, formDiseaseCase(s, env)));
+      if (path === '/forms/ontology-gap')     return requireAuth(request, env, s => html(200, formOntologyGap(s, env)));
+      if (path === '/forms/data-gap')         return requireAuth(request, env, s => html(200, formDataGap(s, env)));
+      if (path === '/forms/form-feedback')    return requireAuth(request, env, s => html(200, formFeedback(s, env)));
+      if (path === '/forms/disease-resource') return requireAuth(request, env, s => html(200, formDiseaseResource(s, env)));
       if (path === '/' || path === '')     return redirect(landing);
     }
 
