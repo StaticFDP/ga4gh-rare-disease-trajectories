@@ -347,41 +347,46 @@ async function orcidCallback(request, env) {
   const landing  = env.LANDING_PAGE || '/';
 
   if (!code) return html(400, errorPage('ORCID login failed — no code received.', landing));
+  if (!env.SESSION_SECRET) return html(500, errorPage('Server misconfiguration: SESSION_SECRET is not set. Please contact the administrator.', landing));
 
   const redirect = `${url.origin}/auth/orcid/callback`;
 
-  const tokenResp = await fetch(ORCID_TOKEN, {
-    method: 'POST',
-    headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id:     env.ORCID_CLIENT_ID,
-      client_secret: env.ORCID_CLIENT_SECRET,
-      grant_type:    'authorization_code',
-      code,
-      redirect_uri:  redirect,
-    }),
-  });
+  try {
+    const tokenResp = await fetch(ORCID_TOKEN, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id:     env.ORCID_CLIENT_ID,
+        client_secret: env.ORCID_CLIENT_SECRET,
+        grant_type:    'authorization_code',
+        code,
+        redirect_uri:  redirect,
+      }),
+    });
 
-  if (!tokenResp.ok) {
-    const msg = await tokenResp.text();
-    return html(502, errorPage(`ORCID token exchange failed: ${msg}`, landing));
+    if (!tokenResp.ok) {
+      const msg = await tokenResp.text();
+      return html(502, errorPage(`ORCID token exchange failed (${tokenResp.status}): ${msg}`, landing));
+    }
+
+    const data = await tokenResp.json();
+    // ORCID returns orcid iD and name directly in the token response
+    const session = await makeSession({
+      provider: 'orcid',
+      id:       data.orcid || data['orcid-identifier']?.path || 'unknown',
+      name:     data.name  || '',
+    }, env.SESSION_SECRET);
+
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: returnTo || '/forms/disease-case',
+        'Set-Cookie': sessionCookie(session),
+      },
+    });
+  } catch (err) {
+    return html(500, errorPage(`ORCID login error: ${err.message}`, landing));
   }
-
-  const data = await tokenResp.json();
-  // ORCID returns orcid iD and name directly in the token response
-  const session = await makeSession({
-    provider: 'orcid',
-    id:       data.orcid || data['orcid-identifier']?.path || 'unknown',
-    name:     data.name  || '',
-  }, env.SESSION_SECRET);
-
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: returnTo || '/forms/disease-case',
-      'Set-Cookie': sessionCookie(session),
-    },
-  });
 }
 
 // ── GitHub OAuth ──────────────────────────────────────────────────────────────
@@ -413,46 +418,51 @@ async function githubCallback(request, env) {
   const landing  = env.LANDING_PAGE || '/';
 
   if (!code) return html(400, errorPage('GitHub login failed — no code received.', landing));
+  if (!env.SESSION_SECRET) return html(500, errorPage('Server misconfiguration: SESSION_SECRET is not set. Please contact the administrator.', landing));
 
-  const tokenResp = await fetch(GH_TOKEN, {
-    method: 'POST',
-    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      client_id:     env.GH_CLIENT_ID,
-      client_secret: env.GH_CLIENT_SECRET,
-      code,
-      redirect_uri:  `${url.origin}/auth/github/callback`,
-    }),
-  });
+  try {
+    const tokenResp = await fetch(GH_TOKEN, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id:     env.GH_CLIENT_ID,
+        client_secret: env.GH_CLIENT_SECRET,
+        code,
+        redirect_uri:  `${url.origin}/auth/github/callback`,
+      }),
+    });
 
-  const tokenData = await tokenResp.json();
-  if (!tokenData.access_token) {
-    return html(502, errorPage('GitHub token exchange failed.', landing));
+    const tokenData = await tokenResp.json();
+    if (!tokenData.access_token) {
+      return html(502, errorPage(`GitHub token exchange failed: ${tokenData.error_description || tokenData.error || 'no access_token'}`, landing));
+    }
+
+    const userResp = await fetch(GH_USER, {
+      headers: {
+        'Authorization': `Bearer ${tokenData.access_token}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'byod-form-receiver',
+      },
+    });
+
+    const user = await userResp.json();
+    const session = await makeSession({
+      provider: 'github',
+      id:       String(user.id),
+      login:    user.login || '',
+      name:     user.name  || user.login || '',
+    }, env.SESSION_SECRET);
+
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: returnTo || '/forms/disease-case',
+        'Set-Cookie': sessionCookie(session),
+      },
+    });
+  } catch (err) {
+    return html(500, errorPage(`GitHub login error: ${err.message}`, landing));
   }
-
-  const userResp = await fetch(GH_USER, {
-    headers: {
-      'Authorization': `Bearer ${tokenData.access_token}`,
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'byod-form-receiver',
-    },
-  });
-
-  const user = await userResp.json();
-  const session = await makeSession({
-    provider: 'github',
-    id:       String(user.id),
-    login:    user.login || '',
-    name:     user.name  || user.login || '',
-  }, env.SESSION_SECRET);
-
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: returnTo || '/forms/disease-case',
-      'Set-Cookie': sessionCookie(session),
-    },
-  });
 }
 
 // ── Auth middleware ───────────────────────────────────────────────────────────
