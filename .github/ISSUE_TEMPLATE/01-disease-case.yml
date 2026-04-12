@@ -10,31 +10,76 @@ body:
         Fill in as much as you can. Partial entries are welcome — every contribution helps.
         Leave any field blank if you don't know the answer.
 
+  # ── Disease identity ─────────────────────────────────────────────────────────
+
   - type: input
     id: disease_name
     attributes:
       label: Disease name
+      description: "Use the preferred name from the ontology you know best."
       placeholder: "e.g. Amyotrophic Lateral Sclerosis"
     validations:
       required: true
 
-  - type: input
-    id: mondo_id
+  - type: markdown
     attributes:
-      label: Mondo disease ID
-      placeholder: "e.g. MONDO:0004976 — look up at https://mondo.monarchinitiative.org/"
+      value: |
+        ---
+        ### Disease identifiers
+
+        Add as many identifiers as you know — any ontology is welcome, any combination.
+        Use the format `PREFIX:ID`, one per line.
+
+        | Ontology | Scope | Format example | Lookup |
+        |---|---|---|---|
+        | **Orphanet (ORDO)** | Rare diseases — primary classification | `ORPHA:803` | [orphanet.net](https://www.orphanet.net/consor/cgi-bin/index.php) |
+        | **OMIM** | Mendelian / genetic disease + genes | `OMIM:105400` | [omim.org](https://www.omim.org/) |
+        | **GARD** | NIH rare disease catalogue | `GARD:0005765` | [rarediseases.info.nih.gov](https://rarediseases.info.nih.gov/) |
+        | **ICD-11** | WHO clinical classification (current) | `ICD-11:8B60` | [icd.who.int](https://icd.who.int/ct11/icd11_mms/en/release) |
+        | **ICD-10** | WHO clinical classification (legacy) | `ICD-10:G12.2` | [icd.who.int/browse10](https://icd.who.int/browse10/2019/en) |
+        | **SNOMED CT** | Clinical terminology | `SNOMED:37340000` | [browser.ihtsdotools.org](https://browser.ihtsdotools.org/) |
+        | **Mondo** | Harmonised cross-ontology disease terms | `MONDO:0004976` | [monarch-initiative.org](https://monarchinitiative.org/) |
+        | **NANDO** | Neurological & neuromuscular diseases | `NANDO:1200263` | [bioportal](https://bioportal.bioontology.org/ontologies/NANDO) |
+        | **MeSH** | NLM indexing vocabulary | `MESH:D000690` | [meshb.nlm.nih.gov](https://meshb.nlm.nih.gov/) |
+        | **DOID** | Disease Ontology | `DOID:332` | [disease-ontology.org](https://disease-ontology.org/) |
+        | **HP (HPO)** | Phenotype terms for features of the disease | `HP:0003473` | [hpo.jax.org](https://hpo.jax.org/) |
+
+        You don't need all of them. One good identifier (especially an Orphanet or OMIM code) is enough to get started.
+
+  - type: textarea
+    id: disease_ids
+    attributes:
+      label: Disease identifiers
+      description: "One identifier per line, any ontology, any combination. See the table above for formats."
+      placeholder: |
+        ORPHA:803
+        OMIM:105400
+        ICD-11:8B60
+        ICD-10:G12.2
+        SNOMED:37340000
+        GARD:0005765
+
+  # ── Registry or data source ──────────────────────────────────────────────────
 
   - type: input
     id: registry
     attributes:
       label: Registry or data source
-      placeholder: "e.g. ALS TDI Registry, PhenoDB, IAMRARE"
+      placeholder: "e.g. ALS TDI Registry, PhenoDB, IAMRARE, RD-Connect, EUPID, EPIRARE..."
+
+  - type: input
+    id: registry_url
+    attributes:
+      label: Registry URL (if publicly accessible)
+      placeholder: "https://..."
+
+  # ── Clinical narrative ───────────────────────────────────────────────────────
 
   - type: textarea
     id: narrative
     attributes:
       label: Disease narrative (plain language)
-      description: "Describe the typical patient journey: onset, diagnostic odyssey, key events, current state. No patient-identifying information."
+      description: "Describe the typical patient journey: onset, diagnostic odyssey, key events, current management. No patient-identifying information."
       placeholder: |
         Onset: ...
         Diagnostic odyssey: ...
@@ -47,17 +92,19 @@ body:
     id: timeline_events
     attributes:
       label: Key timeline events (one per line)
-      description: "List significant events with approximate timing. Format: [time] — [event]"
+      description: "Significant events with approximate timing. Format: [time from onset or age] — [event]"
       placeholder: |
         age:40y — first symptom (muscle weakness in right hand)
         onset+6mo — EMG confirms lower motor neuron involvement
         onset+8mo — definitive ALS diagnosis
         onset+14mo — PEG tube placed
 
+  # ── Data types ───────────────────────────────────────────────────────────────
+
   - type: dropdown
     id: data_types
     attributes:
-      label: Data types collected in this registry/case (select all that apply)
+      label: Data types collected in this registry or case (select all that apply)
       multiple: true
       options:
         - Structured phenotype terms (HPO)
@@ -70,28 +117,36 @@ body:
         - Family history / pedigree
         - Treatment / medication history
         - Disease progression / longitudinal follow-up
+        - Environmental / exposure history
+        - Facial / dysmorphology features
         - Other
+
+  # ── Phenotype terms ──────────────────────────────────────────────────────────
 
   - type: textarea
     id: hpo_terms
     attributes:
-      label: HPO terms that apply (if known)
-      description: "List HP:XXXXXXX terms, one per line"
+      label: HPO phenotype terms (if known)
+      description: "List HP:XXXXXXX terms, one per line. Look up at hpo.jax.org"
       placeholder: |
         HP:0002360 — Sleep disturbance
         HP:0003473 — Fatigable weakness
 
+  # ── Gaps ─────────────────────────────────────────────────────────────────────
+
   - type: textarea
     id: narrative_gaps
     attributes:
-      label: What clinical nuance is LOST when encoding this case in HPO terms alone?
-      placeholder: "e.g. Rate of progression, caregiver burden, patient's experience of the diagnostic odyssey..."
+      label: What clinical nuance is LOST when encoding this case in structured terms alone?
+      placeholder: "e.g. Rate of progression, caregiver burden, the patient's experience of the diagnostic odyssey..."
 
   - type: textarea
     id: missing_data
     attributes:
       label: What information SHOULD be collected but currently is NOT?
-      placeholder: "e.g. Time from first symptom to first specialist visit is rarely recorded..."
+      placeholder: "e.g. Time from first symptom to first specialist visit is rarely recorded systematically..."
+
+  # ── Contributor ──────────────────────────────────────────────────────────────
 
   - type: input
     id: contributor
