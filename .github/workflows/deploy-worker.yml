@@ -33,9 +33,9 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          GITHUB_ISSUES_TOKEN:   ${{ secrets.GITHUB_ISSUES_TOKEN }}
+          ISSUES_TOKEN: ${{ secrets.ISSUES_TOKEN }}
         run: |
-          echo "$GITHUB_ISSUES_TOKEN" | wrangler secret put GITHUB_TOKEN
+          echo "$ISSUES_TOKEN" | wrangler secret put GITHUB_TOKEN
 
       - name: Deploy Worker
         env:
