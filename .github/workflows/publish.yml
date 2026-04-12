@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write     # needed to commit generated/ back
+      pages:    write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -98,7 +100,20 @@ jobs:
           git commit -m "chore: regenerate derived artifacts [skip ci]"
           git push
 
-      # ── STEP 4: Invalidate Cloudflare Worker cache ───────────────────────────
+      # ── STEP 4: Deploy docs/ to GitHub Pages ────────────────────────────────
+      - name: Enable GitHub Pages (idempotent)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/pages \
+            --method POST \
+            -f "source[branch]=main" \
+            -f "source[path]=/docs" \
+            2>/dev/null \
+            && echo "✓ GitHub Pages enabled (main/docs)" \
+            || echo "ℹ GitHub Pages already configured"
+
+      # ── STEP 6: Invalidate Cloudflare Worker cache ───────────────────────────
       # The Worker reads pre-generated files from GitHub raw.
       # Writing a sentinel key to KV tells the Worker to re-fetch.
       - name: Invalidate Cloudflare Worker cache
@@ -119,7 +134,7 @@ jobs:
           && echo "✓ Cloudflare cache invalidated" \
           || echo "⚠ Cloudflare invalidation failed (non-fatal)"
 
-      # ── STEP 5: Ping FDP index via GitHub Repository Dispatch ────────────────
+      # ── STEP 7: Ping FDP index via GitHub Repository Dispatch ────────────────
       # This triggers the fdp-index crawl workflow without any server.
       # Requires a fine-grained PAT (FDPINDEX_DISPATCH_TOKEN) with
       # contents:write on StaticFDP/fdp-index.
