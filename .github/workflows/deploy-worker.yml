@@ -1,0 +1,44 @@
+name: Deploy Cloudflare Worker
+
+# Deploys the BYOD form receiver Worker on every push to main
+# that touches the worker/ directory.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'worker/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: worker
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Wrangler
+        run: npm install -g wrangler
+
+      # Push the GITHUB_TOKEN secret to the Worker's secret store.
+      # This is idempotent — safe to run on every deploy.
+      - name: Set GITHUB_TOKEN secret on Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          GITHUB_ISSUES_TOKEN:   ${{ secrets.GITHUB_ISSUES_TOKEN }}
+        run: |
+          echo "$GITHUB_ISSUES_TOKEN" | wrangler secret put GITHUB_TOKEN
+
+      - name: Deploy Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: wrangler deploy

@@ -1,0 +1,11 @@
+name            = "byod-form-receiver"
+main            = "src/index.js"
+compatibility_date = "2024-09-23"
+
+[vars]
+GITHUB_REPO   = "StaticFDP/ga4gh-rare-disease-trajectories"
+LANDING_PAGE  = "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/"
+
+# Secrets (set once via: wrangler secret put GITHUB_TOKEN)
+# GITHUB_TOKEN — fine-grained PAT, scope: Issues: Read & Write
+#                on StaticFDP/ga4gh-rare-disease-trajectories only
