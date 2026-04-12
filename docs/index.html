@@ -38,6 +38,17 @@
     /* ── Layout ───────────────────────────────────────────────────────── */
     .container { max-width: var(--max); margin: 0 auto; padding: 0 20px; }
 
+    /* ── Koetai nav ──────────────────────────────────────────────────── */
+    .koetai-nav { background: #1a4a8a; color: #fff; padding: 0 1.5rem;
+                  display: flex; align-items: center; gap: 1.25rem; height: 50px; }
+    .koetai-nav a { color: rgba(255,255,255,.8); text-decoration: none; font-size: .88rem; }
+    .koetai-nav a:hover { color: #fff; }
+    .koetai-nav .brand { font-weight: 700; color: #fff; font-size: 1rem;
+                          display: flex; align-items: center; gap: .45rem; }
+    .koetai-nav .brand img { height: 28px; border-radius: 4px; }
+    .koetai-nav .brand span { color: rgba(255,255,255,.65); font-weight: 400; font-size: .86em; }
+    .koetai-nav .spacer { flex: 1; }
+
     /* ── Header ───────────────────────────────────────────────────────── */
     header {
       background: linear-gradient(135deg, #0f4c3a 0%, #1a6b5a 60%, #2563eb 100%);
@@ -406,6 +417,16 @@
 <body>
 
 <!-- ── Header ────────────────────────────────────────────────────────────── -->
+<nav class="koetai-nav">
+  <a class="brand" href="/"><img src="https://koetai.semscape.org/static/anableps.jpg" alt="Koetai">Koetai <span>FAIR Data Points</span></a>
+  <a href="/">Home</a>
+  <a href="/sparql-demo/">SPARQL</a>
+  <a href="/ga4gh-rare-disease-trajectories/diseases/">Disease Datasets</a>
+  <div class="spacer"></div>
+  <a href="https://koetai.semscape.org" target="_blank">koetai.semscape.org ↗</a>
+  <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories" target="_blank">GitHub ↗</a>
+</nav>
+
 <header>
   <div class="container">
     <div class="event-badge">GA4GH Session · April 16, 2026</div>

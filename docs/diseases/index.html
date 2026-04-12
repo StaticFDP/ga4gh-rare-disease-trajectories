@@ -65,12 +65,14 @@
           color:var(--gray-9);background:#fff;line-height:1.5}
     a{color:var(--blue);text-decoration:none}
     a:hover{text-decoration:underline}
-    nav{background:var(--gray-9);color:#fff;padding:0 1.5rem;
+    nav{background:#1a4a8a;color:#fff;padding:0 1.5rem;
          display:flex;align-items:center;gap:1.25rem;height:52px}
-    nav a{color:#ccc;font-size:.88rem}
+    nav a{color:rgba(255,255,255,.8);font-size:.88rem}
     nav a:hover{color:#fff}
-    nav .brand{font-weight:700;color:#fff;font-size:1rem}
-    nav .brand span{color:var(--green)}
+    nav .brand{font-weight:700;color:#fff;font-size:1rem;
+               display:flex;align-items:center;gap:.45rem}
+    nav .brand img{height:28px;border-radius:4px}
+    nav .brand span{color:rgba(255,255,255,.65);font-weight:400;font-size:.86em}
     nav .spacer{flex:1}
     .band{background:linear-gradient(135deg,#0d1117,#161b22);
            color:#fff;padding:2.5rem 1.5rem 2rem}
@@ -149,7 +151,7 @@
 <body>
 
 <nav>
-  <a class="brand" href="/"><span>Static</span>FDP</a>
+  <a class="brand" href="/"><img src="https://koetai.semscape.org/static/anableps.jpg" alt="Koetai">Koetai <span>FAIR Data Points</span></a>
   <a href="/">Home</a>
   <a href="/sparql-demo/">SPARQL</a>
   <a href="/ga4gh-rare-disease-trajectories/">BYOD Event</a>
