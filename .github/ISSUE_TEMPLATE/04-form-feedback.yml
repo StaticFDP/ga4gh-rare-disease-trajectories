@@ -1,0 +1,173 @@
+name: "Feedback on these forms — or propose a new one"
+description: "Tell us what is missing, wrong, or unclear in the submission forms, or propose an entirely new form to capture aspects of rare disease not yet covered."
+title: "[FORM] "
+labels: ["form-feedback", "meta"]
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        These forms are a living instrument. They were designed collaboratively,
+        but no small group captures every perspective — clinician, patient advocate,
+        bioinformatician, registry manager, ontologist.
+
+        Use this template to flag anything that does not fit, is missing,
+        is confusing, or could be captured better.
+        You can also propose a completely new form.
+
+  # ── Which form(s) does this feedback apply to ────────────────────────────────
+
+  - type: dropdown
+    id: target_form
+    attributes:
+      label: Which form(s) does this feedback apply to?
+      multiple: true
+      options:
+        - "01 — Submit a disease case"
+        - "02 — Report an ontology gap"
+        - "03 — Report a data / model gap"
+        - All forms (applies across the board)
+        - None — I am proposing a new form
+    validations:
+      required: true
+
+  # ── Type of feedback ─────────────────────────────────────────────────────────
+
+  - type: dropdown
+    id: feedback_type
+    attributes:
+      label: What kind of feedback is this?
+      multiple: true
+      options:
+        - Missing field — something important cannot be captured at all
+        - Field is incomplete — options or scope are too narrow
+        - Field is wrong — incorrect framing, label, or assumption
+        - Field is confusing — wording unclear; I was not sure what to fill in
+        - Field is missing for my perspective — works for others but not for me
+        - Ontology or standard missing from a list
+        - Too many fields — form is overwhelming; suggest what to cut
+        - Proposing a new form entirely
+        - Other
+    validations:
+      required: true
+
+  # ── Your perspective ─────────────────────────────────────────────────────────
+
+  - type: dropdown
+    id: perspective
+    attributes:
+      label: What is your primary perspective?
+      description: "Helps us understand which angle is underrepresented in the current forms."
+      multiple: true
+      options:
+        - Clinician / physician
+        - Clinical geneticist
+        - Genetic counsellor
+        - Nurse / allied health professional
+        - Patient or family member / carer
+        - Patient advocacy organisation
+        - Rare disease registry manager
+        - Biomedical informatician / data engineer
+        - Ontologist / terminology expert
+        - Researcher / scientist
+        - Bioinformatician / computational biologist
+        - Software developer / data architect
+        - Public health / epidemiology
+        - Other
+
+  # ── The feedback ─────────────────────────────────────────────────────────────
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Your feedback
+
+  - type: textarea
+    id: what_is_wrong
+    attributes:
+      label: What is missing, wrong, or confusing?
+      description: "Be as specific as you can — quote the field label if it helps."
+      placeholder: |
+        The disease case form has no field for:
+          - Whether the disease has a known genetic cause (monogenic / polygenic / unknown)
+          - Prevalence or estimated number of cases worldwide
+          - Whether a natural history study exists
+          - Patient advocacy group or foundation URL
+
+        The ontology gap form assumes gaps are always about existing ontologies —
+        it has no way to flag that a disease is not in Orphanet at all (i.e. no ORPHA code).
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_fix
+    attributes:
+      label: Proposed fix or new field(s)
+      description: "If you have a concrete suggestion — new field label, new options, different wording — write it here."
+      placeholder: |
+        Add to the disease case form:
+          Field: "Genetic basis"
+          Type: dropdown
+          Options: Monogenic (single gene), Oligogenic, Polygenic / complex,
+                   Chromosomal / copy number variant, Mitochondrial, Unknown / unclear
+
+          Field: "Estimated global prevalence"
+          Type: input (free text)
+          Placeholder: "e.g. <1 in 1,000,000 — or unknown"
+
+          Field: "Patient advocacy group or foundation"
+          Type: input (URL)
+
+  # ── Proposing a new form ─────────────────────────────────────────────────────
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Proposing a new form
+        *(Skip this section if you are giving feedback on an existing form.)*
+
+  - type: input
+    id: new_form_title
+    attributes:
+      label: Proposed new form — working title
+      placeholder: "e.g. Submit a natural history study · Report a missing patient registry · Flag a gene–disease association gap"
+
+  - type: textarea
+    id: new_form_purpose
+    attributes:
+      label: What aspect of rare disease would this form capture?
+      description: "Who would fill it in, and what would they be reporting that none of the existing forms cover?"
+      placeholder: |
+        Who: Rare disease researchers and patient foundations
+        Purpose: To capture that a disease has no natural history study and
+                 no longitudinal cohort data — a gap that is structural
+                 (not an ontology gap and not a data model gap) and has direct
+                 implications for drug development and trial design.
+        Key fields it would need:
+          - Disease identifiers (as in other forms)
+          - Whether a natural history study exists (yes / in progress / no)
+          - Existing longitudinal data sources (if any)
+          - What the absence of natural history data blocks (trial endpoints, outcome measures, etc.)
+
+  - type: textarea
+    id: new_form_fields
+    attributes:
+      label: Draft field list for the proposed new form
+      description: "List the fields you think the form should have. Format: Field name — type — what it captures."
+      placeholder: |
+        Disease name — text input — preferred name
+        Disease identifiers — textarea — ORPHA / OMIM / ICD codes
+        Natural history study exists — dropdown (Yes / In progress / Planned / No / Unknown)
+        Existing cohort or registry — textarea — name + URL
+        Key clinical endpoints lacking validation — textarea
+        Proposed next step — textarea
+
+  # ── Contributor ──────────────────────────────────────────────────────────────
+
+  - type: input
+    id: contributor
+    attributes:
+      label: Your name / affiliation (optional)
+      placeholder: "e.g. Zohreh Kalhor, Leiden University Medical Centre"
