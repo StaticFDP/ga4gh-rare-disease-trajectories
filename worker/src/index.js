@@ -971,6 +971,33 @@ function errorPage(msg, landing) {
   </div></body></html>`;
 }
 
+// ── Auth status (cross-origin, credentialed) ──────────────────────────────────
+
+async function authStatus(request, env) {
+  const session = await readSession(request.headers.get('Cookie'), env.SESSION_SECRET);
+  const origin  = request.headers.get('Origin') || '';
+  // Allow credentialed reads from the landing page origin
+  const allowed = env.LANDING_PAGE
+    ? new URL(env.LANDING_PAGE).origin
+    : 'https://fdp.semscape.org';
+  const body = session
+    ? JSON.stringify({
+        loggedIn:  true,
+        name:      session.name || session.login || session.id || '',
+        provider:  session.provider,
+        id:        session.id || session.login || '',
+      })
+    : JSON.stringify({ loggedIn: false });
+  return new Response(body, {
+    headers: {
+      'Content-Type':                'application/json',
+      'Access-Control-Allow-Origin': allowed,
+      'Access-Control-Allow-Credentials': 'true',
+      'Cache-Control':               'no-store',
+    },
+  });
+}
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 export default {
@@ -980,6 +1007,7 @@ export default {
     const landing = env.LANDING_PAGE || '/';
 
     // ── Auth routes (no session required) ────────────────────────────────────
+    if (path === '/auth/status')          return authStatus(request, env);
     if (path === '/auth/login')           return html(200, loginPage(url.searchParams.get('return') || env.LANDING_PAGE || '/', env));
     if (path === '/auth/orcid')           return orcidStart(request, env);
     if (path === '/auth/orcid/callback')  return orcidCallback(request, env);

@@ -425,7 +425,8 @@
   <div class="spacer"></div>
   <a href="https://koetai.semscape.org" target="_blank">koetai.semscape.org ↗</a>
   <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories" target="_blank">GitHub ↗</a>
-  <a href="https://byod-form-receiver.andra-76d.workers.dev/auth/login"
+  <a id="signin-nav-btn"
+     href="https://byod-form-receiver.andra-76d.workers.dev/auth/login"
      target="_blank" rel="noopener"
      style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);
             border-radius:6px;padding:.3rem .85rem;color:#fff;font-weight:600;font-size:.85rem;
@@ -473,7 +474,7 @@
           Use any disease ontology you know: Orphanet, OMIM, ICD, SNOMED, GARD, and more.
           Your submission becomes a GitHub Issue that the team turns into FAIR data.
         </p>
-        <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;
+        <div id="login-callout" style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;
                     padding:10px 14px;margin-bottom:12px;font-size:13px;color:#166534;">
           <strong>Login required</strong> — sign in once with ORCID or GitHub, then all forms remember you for 24 hours.<br>
           <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
@@ -871,6 +872,33 @@ curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl
     </div>
   </div>
 </footer>
+
+<script>
+// ── Check login status from the Worker session ──────────────────────────────
+(async () => {
+  try {
+    const res  = await fetch('https://byod-form-receiver.andra-76d.workers.dev/auth/status',
+                             { credentials: 'include' });
+    const data = await res.json();
+    const btn  = document.getElementById('signin-nav-btn');
+    if (!btn) return;
+
+    if (data.loggedIn) {
+      const icon = data.provider === 'orcid' ? '🔬' : '🐙';
+      btn.textContent = `${icon} ${data.name}`;
+      btn.style.background    = 'rgba(166,206,57,.25)';
+      btn.style.borderColor   = 'rgba(166,206,57,.5)';
+      btn.style.color         = '#d4f08a';
+      btn.href = 'https://byod-form-receiver.andra-76d.workers.dev/auth/logout';
+      btn.title = 'Click to sign out';
+
+      // Also hide the login callout in the Path A card
+      const callout = document.getElementById('login-callout');
+      if (callout) callout.style.display = 'none';
+    }
+  } catch { /* silently ignore — worker may be unavailable */ }
+})();
+</script>
 
 </body>
 </html>
