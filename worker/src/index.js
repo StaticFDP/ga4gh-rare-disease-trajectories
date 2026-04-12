@@ -325,7 +325,7 @@ const ORCID_TOKEN = 'https://orcid.org/oauth/token';
 
 function orcidStart(request, env) {
   const url      = new URL(request.url);
-  const returnTo = url.searchParams.get('return') || '/forms/disease-case';
+  const returnTo = url.searchParams.get('return') || env.LANDING_PAGE || '/';
   const state    = makeState(returnTo);
   const redirect = `${url.origin}/auth/orcid/callback`;
 
@@ -397,7 +397,7 @@ const GH_USER  = 'https://api.github.com/user';
 
 function githubStart(request, env) {
   const url      = new URL(request.url);
-  const returnTo = url.searchParams.get('return') || '/forms/disease-case';
+  const returnTo = url.searchParams.get('return') || env.LANDING_PAGE || '/';
   const state    = makeState(returnTo);
   const redirect = `${url.origin}/auth/github/callback`;
 
@@ -980,7 +980,7 @@ export default {
     const landing = env.LANDING_PAGE || '/';
 
     // ── Auth routes (no session required) ────────────────────────────────────
-    if (path === '/auth/login')           return html(200, loginPage(url.searchParams.get('return') || '/forms/disease-case', env));
+    if (path === '/auth/login')           return html(200, loginPage(url.searchParams.get('return') || env.LANDING_PAGE || '/', env));
     if (path === '/auth/orcid')           return orcidStart(request, env);
     if (path === '/auth/orcid/callback')  return orcidCallback(request, env);
     if (path === '/auth/github')          return githubStart(request, env);
