@@ -12,8 +12,17 @@ Disease identification uses whichever ontology the contributor knows: **Orphanet
 
 ## How to contribute
 
-**No GitHub account?** Use the web forms at the session landing page — no login needed:
-👉 **https://staticfdp.github.io/ga4gh-rare-disease-trajectories/**
+**No GitHub account?** Use the web forms directly — no login needed:
+
+| Form | Direct link |
+|------|-------------|
+| Submit a disease case | https://byod-form-receiver.andra-76d.workers.dev/forms/disease-case |
+| Report an ontology gap | https://byod-form-receiver.andra-76d.workers.dev/forms/ontology-gap |
+| Report a data / model gap | https://byod-form-receiver.andra-76d.workers.dev/forms/data-gap |
+| Feedback on these forms | https://byod-form-receiver.andra-76d.workers.dev/forms/form-feedback |
+
+Or start at the session landing page:
+👉 **https://fdp.semscape.org/ga4gh-rare-disease-trajectories/**
 
 **Have a GitHub account?** Use the issue templates directly (fastest during the live session):
 
