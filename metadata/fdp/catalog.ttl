@@ -39,7 +39,8 @@ Includes community-submitted disease cases contributed via ORCID-authenticated w
     dcat:themeTaxonomy  <http://www.orpha.net/ontology/orphanet.owl> ,
                         <http://purl.obolibrary.org/obo/hp.owl> ,
                         <http://purl.obolibrary.org/obo/mondo.owl> ;
-    dcat:dataset        :dataset-als-tdi ,
+    dcat:dataset        :dataset-disease-index ,
+                        :dataset-als-tdi ,
                         :dataset-rare-x ,
                         :dataset-iamrare ,
                         :dataset-phenodb ,
@@ -49,6 +50,39 @@ Includes community-submitted disease cases contributed via ORCID-authenticated w
 :publisher a foaf:Organization ;
     foaf:name  "GA4GH Rare Disease Phenotyping Working Group" ;
     foaf:page  <https://www.ga4gh.org/> .
+
+# ─── Disease index (auto-generated per-disease datasets) ──────────────────────
+
+:dataset-disease-index a dcat:Dataset ;
+    dcterms:title       "Per-Disease FAIR Dataset Index"@en ;
+    dcterms:description """Auto-generated index of per-disease FAIR datasets. Each disease reported
+during GA4GH BYOD sessions gets its own versioned folder (diseases/{slug}/) containing
+case submissions, ontology gaps, and data model gaps as RDF Turtle. This dataset links
+the catalog entry to the live HTML/TTL/JSON-LD index."""@en ;
+    dcat:keyword        "disease index"@en, "FAIR datasets"@en, "biohackathon"@en, "rare disease"@en ;
+    dcterms:issued      "2026-04-16"^^xsd:date ;
+    dcterms:license     <https://creativecommons.org/licenses/by/4.0/> ;
+    dcat:landingPage    <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> ;
+    dcat:distribution   :dist-disease-index-html ,
+                        :dist-disease-index-ttl ,
+                        :dist-disease-index-jsonld .
+
+:dist-disease-index-html a dcat:Distribution ;
+    dcterms:title    "Disease index — HTML landing page"@en ;
+    dcterms:format   "text/html" ;
+    dcat:accessURL   <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> .
+
+:dist-disease-index-ttl a dcat:Distribution ;
+    dcterms:title    "Disease index — RDF Turtle"@en ;
+    dcterms:format   "text/turtle" ;
+    dcat:accessURL   <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl> ;
+    dcat:downloadURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl> .
+
+:dist-disease-index-jsonld a dcat:Distribution ;
+    dcterms:title    "Disease index — JSON-LD"@en ;
+    dcterms:format   "application/ld+json" ;
+    dcat:accessURL   <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.jsonld> ;
+    dcat:downloadURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.jsonld> .
 
 # ─── Curated datasets ─────────────────────────────────────────────────────────
 

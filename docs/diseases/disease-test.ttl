@@ -10,14 +10,17 @@
 @prefix schema:  <https://schema.org/> .
 
 
-# Flat community submissions index
-# Auto-generated 2026-04-12 | 1 case(s)
+# Case submissions for: test
 # Source: https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues?q=label%3Adisease-case
+# Auto-generated 2026-04-12
 
-<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions/1> a dcat:Dataset ;
-    dcterms:title "test"@en ;
+# Case #1
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/case/1> a dcat:Dataset ;
+    dcterms:title "Case #1: test"@en ;
+    dcat:isPartOf <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/> ;
     dcterms:description "test"@en ;
-    dcterms:created "2026-04-12"^^xsd:date ;
-    dcat:landingPage <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/1> ;
+    dcterms:created   "2026-04-12"^^xsd:date ;
+    dcterms:source    "GA4GH BYOD web form (ORCID-authenticated)" ;
+    dcat:landingPage  <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/1> ;
     dcat:keyword "sdfdgf"@en ;
     dcterms:creator [ foaf:name "Andra Waagmeester" ] .

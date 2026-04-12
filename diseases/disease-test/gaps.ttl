@@ -1,0 +1,16 @@
+@prefix dcat:    <https://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
+@prefix omim:    <https://omim.org/entry/> .
+@prefix hp:      <http://purl.obolibrary.org/obo/HP_> .
+@prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+
+# Ontology and data gaps for: test
+# Auto-generated 2026-04-12
+
+# No gaps reported yet for this disease.

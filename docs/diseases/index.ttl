@@ -1,0 +1,29 @@
+@prefix dcat:    <https://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
+@prefix omim:    <https://omim.org/entry/> .
+@prefix hp:      <http://purl.obolibrary.org/obo/HP_> .
+@prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+
+# Disease Dataset Index — GA4GH Rare Disease Trajectories
+# Auto-generated 2026-04-12 | 1 disease dataset(s)
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> a dcat:Catalog ;
+    dcterms:title "GA4GH Rare Disease Trajectory Datasets"@en ;
+    dcterms:description "Community-contributed, FAIR-compliant disease trajectory datasets from GA4GH biohackathon sessions. Each dataset covers one disease: case submissions, phenotype data, and identified ontology/data gaps."@en ;
+    dcterms:modified   "2026-04-12"^^xsd:date ;
+    dcterms:hasVersion "2026-04-12" ;
+    dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
+    dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
+    dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog/> ;
+    dcat:dataset <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/> .
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/> a dcat:Dataset ;
+    dcterms:title "test"@en ;
+    dcterms:modified "2026-04-12"^^xsd:date ;
+    dcat:accessURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl> .

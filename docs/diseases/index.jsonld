@@ -1,0 +1,28 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "DataCatalog",
+  "name": "GA4GH Rare Disease Trajectory Datasets",
+  "description": "Community-contributed FAIR disease trajectory datasets from GA4GH biohackathon sessions.",
+  "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/",
+  "dateModified": "2026-04-12",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "publisher": {
+    "@type": "Organization",
+    "name": "GA4GH Rare Disease Phenotyping Working Group",
+    "url": "https://www.ga4gh.org/"
+  },
+  "dataset": [
+    {
+      "@type": "Dataset",
+      "name": "test",
+      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/",
+      "dateModified": "2026-04-12",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "text/turtle",
+        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl"
+      }
+    }
+  ]
+}

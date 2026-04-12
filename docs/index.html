@@ -551,21 +551,71 @@
         </p>
         <div class="fdp-links">
           <a class="fdp-link"
-             href="https://staticfdp.github.io/fdp-index/"
+             href="https://fdp.semscape.org/fdp-index/"
              target="_blank" rel="noopener">
             Browse the index ↗
           </a>
           <a class="fdp-link"
-             href="https://staticfdp.github.io/fdp-index/index.jsonld"
+             href="https://fdp.semscape.org/fdp-index/index.jsonld"
              target="_blank" rel="noopener">
             index.jsonld ↗
           </a>
           <a class="fdp-link"
-             href="https://staticfdp.github.io/fdp-index/index.ttl"
+             href="https://fdp.semscape.org/fdp-index/index.ttl"
              target="_blank" rel="noopener">
             index.ttl ↗
           </a>
         </div>
+      </div>
+    </div>
+
+    <!-- Disease dataset index — key new section -->
+    <div class="fdp-panel" style="margin-top:1.25rem; border: 2px solid var(--brand);">
+      <div class="fdp-text" style="flex:2">
+        <h3>🧬 Per-Disease FAIR Dataset Index</h3>
+        <p>
+          Every disease submitted during this and future sessions becomes its own
+          versioned FAIR dataset — <code>diseases/{slug}/</code> in this repository.
+          Each folder contains RDF Turtle, JSON-LD, a human-readable README, and
+          linked ontology/data gap reports. The index below is the entry point for
+          other biohackathons to discover and reuse this data.
+        </p>
+        <div class="fdp-links">
+          <a class="fdp-link"
+             href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/"
+             target="_blank" rel="noopener"
+             style="background:var(--brand);color:#fff;font-weight:700;">
+            🧬 Disease index ↗
+          </a>
+          <a class="fdp-link"
+             href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl"
+             target="_blank" rel="noopener">
+            index.ttl ↗
+          </a>
+          <a class="fdp-link"
+             href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.jsonld"
+             target="_blank" rel="noopener">
+            index.jsonld ↗
+          </a>
+          <a class="fdp-link"
+             href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/tree/main/diseases"
+             target="_blank" rel="noopener">
+            Browse on GitHub ↗
+          </a>
+        </div>
+      </div>
+      <div class="fdp-text" style="flex:1; background:var(--brand-light); border-radius:8px; padding:.9rem;">
+        <h3 style="color:var(--brand);">How to use</h3>
+        <pre style="font-size:.75rem; background:#fff; border-radius:6px; padding:.6rem; overflow-x:auto; line-height:1.5;"><code># Python
+from rdflib import Graph
+g = Graph()
+g.parse("https://fdp.semscape.org/"
+  "ga4gh-rare-disease-trajectories/"
+  "diseases/index.ttl")</code></pre>
+        <pre style="font-size:.75rem; background:#fff; border-radius:6px; padding:.6rem; overflow-x:auto; line-height:1.5; margin-top:.5rem;"><code># curl
+curl https://fdp.semscape.org/
+  ga4gh-rare-disease-trajectories/
+  diseases/index.ttl</code></pre>
       </div>
     </div>
   </section>

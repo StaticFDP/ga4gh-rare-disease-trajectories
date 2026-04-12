@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rare Disease Datasets — GA4GH BYOD</title>
+  <meta name="description" content="1 community-contributed, FAIR-compliant rare disease trajectory datasets from GA4GH biohackathon sessions. Machine-readable RDF/Turtle and JSON-LD." />
+  <link rel="alternate" type="text/turtle"    href="index.ttl" />
+  <link rel="alternate" type="application/ld+json" href="index.jsonld" />
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "DataCatalog",
+  "name": "GA4GH Rare Disease Trajectory Datasets",
+  "description": "Community-contributed FAIR disease trajectory datasets from GA4GH biohackathon sessions.",
+  "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/",
+  "dateModified": "2026-04-12",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "publisher": {
+    "@type": "Organization",
+    "name": "GA4GH Rare Disease Phenotyping Working Group",
+    "url": "https://www.ga4gh.org/"
+  },
+  "dataset": [
+    {
+      "@type": "Dataset",
+      "name": "test",
+      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/",
+      "dateModified": "2026-04-12",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "text/turtle",
+        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl"
+      }
+    }
+  ]
+}
+  </script>
+
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --green:#2ea44f;--green-d:#22863a;--blue:#0969da;
+      --gray-1:#f6f8fa;--gray-2:#eaeef2;--gray-3:#d0d7de;
+      --gray-7:#57606a;--gray-9:#1f2328;--purple:#8250df;
+      --radius:10px;
+    }
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+          color:var(--gray-9);background:#fff;line-height:1.5}
+    a{color:var(--blue);text-decoration:none}
+    a:hover{text-decoration:underline}
+    nav{background:var(--gray-9);color:#fff;padding:0 1.5rem;
+         display:flex;align-items:center;gap:1.25rem;height:52px}
+    nav a{color:#ccc;font-size:.88rem}
+    nav a:hover{color:#fff}
+    nav .brand{font-weight:700;color:#fff;font-size:1rem}
+    nav .brand span{color:var(--green)}
+    nav .spacer{flex:1}
+    .band{background:linear-gradient(135deg,#0d1117,#161b22);
+           color:#fff;padding:2.5rem 1.5rem 2rem}
+    .band h1{font-size:1.7rem;font-weight:800;margin-bottom:.5rem}
+    .band .lead{color:#8b949e;max-width:680px;font-size:.95rem;line-height:1.7;margin-bottom:1.25rem}
+    .badges{display:flex;gap:.6rem;flex-wrap:wrap}
+    .badge{display:inline-block;border-radius:20px;font-size:.78rem;
+            font-weight:600;padding:.2rem .7rem;letter-spacing:.02em}
+    .badge-green{background:rgba(46,164,79,.2);color:#3fb950;border:1px solid rgba(46,164,79,.3)}
+    .badge-blue{background:rgba(9,105,218,.2);color:#79c0ff;border:1px solid rgba(9,105,218,.3)}
+    .badge-gray{background:rgba(110,118,129,.2);color:#8b949e;border:1px solid rgba(110,118,129,.3)}
+    .page{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+    h2{font-size:1.15rem;font-weight:700;margin-bottom:.5rem}
+    .section-intro{color:var(--gray-7);font-size:.9rem;margin-bottom:1.5rem}
+
+    /* access panel */
+    .access-panel{background:var(--gray-9);color:#fff;border-radius:var(--radius);
+                   padding:1.5rem;margin-bottom:2.5rem;display:grid;
+                   grid-template-columns:1fr 1fr;gap:1.5rem}
+    @media(max-width:640px){.access-panel{grid-template-columns:1fr}}
+    .access-panel h3{font-size:.95rem;color:#fff;margin-bottom:.75rem}
+    .access-panel pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
+                        padding:.75rem 1rem;font-size:.78rem;overflow-x:auto;
+                        color:#e6edf3;line-height:1.6;margin-bottom:.5rem}
+    .access-links{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
+    .btn-dl{display:inline-block;padding:.4rem .9rem;border-radius:6px;font-size:.82rem;
+             font-weight:600;color:#fff;text-decoration:none}
+    .btn-ttl{background:#6639ba}
+    .btn-jsonld{background:#0969da}
+    .btn-sparql{background:var(--green)}
+
+    /* disease cards */
+    .disease-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+                   gap:1.1rem;margin-top:1.25rem}
+    .disease-card{border:1px solid var(--gray-3);border-radius:var(--radius);
+                   padding:1.2rem;background:#fff;
+                   transition:border-color .15s,box-shadow .15s}
+    .disease-card:hover{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,164,79,.1)}
+    .dc-header{display:flex;align-items:flex-start;justify-content:space-between;
+                gap:.5rem;margin-bottom:.6rem}
+    .dc-name{font-weight:700;font-size:1rem}
+    .id-badge{font-size:.75rem;font-weight:600;background:#f0fff4;
+               border:1px solid #aef4c5;color:#116329;border-radius:12px;
+               padding:.15rem .55rem;white-space:nowrap;text-decoration:none}
+    .id-badge:hover{background:#d1f7dc}
+    .dc-stats{display:flex;gap:1rem;font-size:.82rem;color:var(--gray-7);margin-bottom:.5rem}
+    .dc-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem}
+    .chip{font-size:.72rem;font-weight:600;background:var(--gray-2);
+           border-radius:12px;padding:.15rem .5rem;color:var(--gray-7)}
+    .dc-meta{font-size:.75rem;color:var(--gray-7);margin-bottom:.85rem}
+    .dc-actions{display:flex;gap:.4rem;flex-wrap:wrap}
+    .btn{display:inline-block;padding:.35rem .75rem;border-radius:6px;
+          font-size:.78rem;font-weight:600;text-decoration:none;color:#fff}
+    .btn-ttl{background:#6639ba}
+    .btn-jsonld{background:#0969da}
+    .btn-gh{background:var(--gray-9)}
+    .btn-sparql{background:var(--green)}
+    .empty-state{padding:2rem;text-align:center;color:var(--gray-7);
+                  border:1px dashed var(--gray-3);border-radius:var(--radius)}
+
+    /* contribute CTA */
+    .cta{background:var(--gray-1);border:1px solid var(--gray-3);border-radius:var(--radius);
+          padding:1.5rem;margin-top:2.5rem;display:flex;gap:1rem;align-items:center;flex-wrap:wrap}
+    .cta p{flex:1;min-width:200px;font-size:.9rem;color:var(--gray-7)}
+    .btn-cta{background:var(--green);color:#fff;padding:.55rem 1.2rem;border-radius:6px;
+              font-weight:600;font-size:.9rem;text-decoration:none;white-space:nowrap}
+    .btn-cta:hover{background:var(--green-d);text-decoration:none}
+
+    footer{border-top:1px solid var(--gray-3);margin-top:3rem;padding:1.25rem;
+            text-align:center;font-size:.81rem;color:var(--gray-7)}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="brand" href="/"><span>Static</span>FDP</a>
+  <a href="/">Home</a>
+  <a href="/sparql-demo/">SPARQL</a>
+  <a href="/ga4gh-rare-disease-trajectories/">BYOD Event</a>
+  <div class="spacer"></div>
+  <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories" target="_blank">GitHub ↗</a>
+</nav>
+
+<div class="band">
+  <h1>🧬 Rare Disease Datasets</h1>
+  <p class="lead">
+    Community-contributed, FAIR-compliant disease trajectory datasets from GA4GH biohackathon sessions.
+    Each disease gets its own versioned dataset — machine-readable in RDF Turtle and JSON-LD,
+    queryable via SPARQL, and ready to use as input for your hackathon.
+  </p>
+  <div class="badges">
+    <span class="badge badge-green">1 disease dataset</span>
+    <span class="badge badge-blue">CC BY 4.0</span>
+    <span class="badge badge-gray">Updated 2026-04-12</span>
+    <span class="badge badge-gray">git-versioned</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- machine-readable access -->
+  <div class="access-panel">
+    <div>
+      <h3>📥 Load this index</h3>
+      <pre><code># Python (rdflib)
+from rdflib import Graph
+g = Graph()
+g.parse("https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl")</code></pre>
+      <pre><code># R (rdflib)
+library(rdflib)
+rdf &lt;- rdf_parse("https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl",
+                 format="turtle")</code></pre>
+      <pre><code># curl
+curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl</code></pre>
+      <div class="access-links">
+        <a href="index.ttl"     class="btn-dl btn-ttl">⬇ index.ttl</a>
+        <a href="index.jsonld"  class="btn-dl btn-jsonld">⬇ index.jsonld</a>
+        <a href="/sparql-demo/" class="btn-dl btn-sparql">▶ Open SPARQL demo</a>
+      </div>
+    </div>
+    <div>
+      <h3>🔎 Query all diseases at once</h3>
+      <pre><code>PREFIX dcat:    &lt;https://www.w3.org/ns/dcat#&gt;
+PREFIX dcterms: &lt;http://purl.org/dc/terms/&gt;
+PREFIX ordo:    &lt;http://www.orpha.net/ORDO/Orphanet_&gt;
+
+# List all diseases + their ORDO ID
+SELECT ?disease ?title ?ordo WHERE {
+  ?disease a dcat:Dataset ;
+           dcterms:title ?title .
+  OPTIONAL { ?disease dcterms:subject ?ordo .
+    FILTER(STRSTARTS(STR(?ordo),
+      "http://www.orpha.net")) }
+}</code></pre>
+      <div class="access-links">
+        <a href="/sparql-demo/" class="btn-dl btn-sparql">Run in SPARQL demo →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- disease cards -->
+  <h2>Disease datasets (1)</h2>
+  <p class="section-intro">Each card links to a standalone, versioned FAIR dataset for that disease.</p>
+  <div class="disease-grid">
+
+      <div class="disease-card" id="disease-test">
+        <div class="dc-header">
+          <div class="dc-name">test</div>
+          
+        </div>
+        <div class="dc-stats">
+          <span title="Case submissions">📋 1 case</span>
+          <span title="Ontology gaps">🔍 0 ontology gaps</span>
+          <span title="Data gaps">📊 0 data gaps</span>
+        </div>
+        <div class="dc-chips"><span class="chip">sdfdgf</span></div>
+        <div class="dc-meta">First contributed: 2026-04-12 · Updated: 2026-04-12</div>
+        <div class="dc-actions">
+          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl" class="btn btn-ttl">⬇ TTL</a>
+          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.jsonld" class="btn btn-jsonld">⬇ JSON-LD</a>
+          <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/tree/main/diseases/disease-test" target="_blank" class="btn btn-gh">GitHub ↗</a>
+          <a href="https://fdp.semscape.org/sparql-demo/" target="_blank" class="btn btn-sparql">SPARQL ↗</a>
+        </div>
+      </div>
+  </div>
+
+  <!-- contribute CTA -->
+  <div class="cta">
+    <p>Missing a disease? Submit a case via the BYOD web form — it takes 5 minutes and no GitHub account is needed. Your submission becomes a versioned FAIR dataset within 60 seconds.</p>
+    <a href="https://byod-form-receiver.andra-76d.workers.dev/forms/disease-case" class="btn-cta">
+      🦠 Submit a disease case →
+    </a>
+  </div>
+
+</div>
+
+<footer>
+  <a href="/">StaticFDP</a> ·
+  <a href="/ga4gh-rare-disease-trajectories/">BYOD Event</a> ·
+  <a href="/sparql-demo/">SPARQL Demo</a> ·
+  <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories" target="_blank">GitHub</a> ·
+  Data under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>
+</footer>
+
+</body>
+</html>
