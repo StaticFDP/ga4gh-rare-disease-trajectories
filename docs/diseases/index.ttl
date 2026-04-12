@@ -17,7 +17,7 @@
     dcterms:title "GA4GH Rare Disease Trajectory Datasets"@en ;
     dcterms:description "Community-contributed, FAIR-compliant disease trajectory datasets from GA4GH biohackathon sessions. Each dataset covers one disease: case submissions, phenotype data, and identified ontology/data gaps."@en ;
     dcterms:modified   "2026-04-12"^^xsd:date ;
-    dcterms:hasVersion "c01f7bdbc324" ;
+    dcterms:hasVersion "7397c1ccf20e" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog/> ;
