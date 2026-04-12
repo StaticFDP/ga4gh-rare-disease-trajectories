@@ -1,9 +1,0 @@
-{
-  "@context": "https://schema.org/",
-  "@type": "Dataset",
-  "name": "test",
-  "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/",
-  "identifier": null,
-  "dateModified": "2026-04-12",
-  "license": "https://creativecommons.org/licenses/by/4.0/"
-}
