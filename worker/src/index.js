@@ -2,22 +2,94 @@
  * BYOD Form Receiver — Cloudflare Worker
  *
  * Routes:
- *   GET  /forms/disease-case   → disease case submission form
- *   GET  /forms/ontology-gap   → ontology gap form
- *   GET  /forms/data-gap       → data / model gap form
- *   GET  /forms/form-feedback  → feedback on forms / propose new form
- *   POST /submit               → create GitHub Issue, return thank-you page
- *   GET  /                     → redirect to landing page
+ *   GET  /auth/login              → login page (ORCID preferred, GitHub fallback)
+ *   GET  /auth/orcid              → start ORCID OAuth flow
+ *   GET  /auth/orcid/callback     → handle ORCID redirect
+ *   GET  /auth/github             → start GitHub OAuth flow
+ *   GET  /auth/github/callback    → handle GitHub redirect
+ *   GET  /auth/logout             → clear session
+ *   GET  /forms/disease-case      → disease case form (auth required)
+ *   GET  /forms/ontology-gap      → ontology gap form (auth required)
+ *   GET  /forms/data-gap          → data / model gap form (auth required)
+ *   GET  /forms/form-feedback     → form feedback (auth required)
+ *   POST /submit                  → create GitHub Issue (auth required)
+ *   GET  /                        → redirect to landing page
  *
- * Secrets required (wrangler secret put):
- *   GITHUB_TOKEN  — fine-grained PAT with Issues: Read & Write
+ * Secrets (wrangler secret put):
+ *   GITHUB_TOKEN      — fine-grained PAT, Issues: Read & Write
+ *   ORCID_CLIENT_ID   — from orcid.org/developer-tools
+ *   ORCID_CLIENT_SECRET
+ *   GH_CLIENT_ID      — from github.com/settings/developers OAuth App
+ *   GH_CLIENT_SECRET
+ *   SESSION_SECRET    — any random 32+ char string
  *
  * Vars (wrangler.toml):
  *   GITHUB_REPO   — e.g. "StaticFDP/ga4gh-rare-disease-trajectories"
  *   LANDING_PAGE  — e.g. "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/"
  */
 
-// ── Shared styles ────────────────────────────────────────────────────────────
+// ── Session helpers (Web Crypto — no external deps) ───────────────────────────
+
+const SESSION_COOKIE = 'byod_session';
+const SESSION_TTL    = 60 * 60 * 24; // 24 hours in seconds
+
+async function makeSession(payload, secret) {
+  const data    = JSON.stringify({ ...payload, exp: Date.now() + SESSION_TTL * 1000 });
+  const key     = await importHmacKey(secret);
+  const sigBuf  = await crypto.subtle.sign('HMAC', key, enc(data));
+  const sig     = b64(sigBuf);
+  return b64(enc(data)) + '.' + sig;
+}
+
+async function readSession(cookieHeader, secret) {
+  if (!cookieHeader || !secret) return null;
+  const raw = cookieHeader.split(';')
+    .map(c => c.trim())
+    .find(c => c.startsWith(SESSION_COOKIE + '='));
+  if (!raw) return null;
+  const value = raw.slice(SESSION_COOKIE.length + 1);
+  try {
+    const [datab64, sigb64] = value.split('.');
+    if (!datab64 || !sigb64) return null;
+    const dataBytes = decb64(datab64);
+    const key       = await importHmacKey(secret);
+    const valid     = await crypto.subtle.verify('HMAC', key, decb64(sigb64), dataBytes);
+    if (!valid) return null;
+    const payload = JSON.parse(new TextDecoder().decode(dataBytes));
+    if (payload.exp < Date.now()) return null;
+    return payload;
+  } catch { return null; }
+}
+
+async function importHmacKey(secret) {
+  return crypto.subtle.importKey(
+    'raw', enc(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false, ['sign', 'verify']
+  );
+}
+
+function enc(s)    { return new TextEncoder().encode(s); }
+function b64(buf)  { return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function decb64(s) { return Uint8Array.from(atob(s), c => c.charCodeAt(0)); }
+
+function sessionCookie(value, maxAge = SESSION_TTL) {
+  return `${SESSION_COOKIE}=${value}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${maxAge}`;
+}
+
+// ── OAuth state (anti-CSRF) ───────────────────────────────────────────────────
+
+function makeState(returnTo) {
+  const rand = b64(crypto.getRandomValues(new Uint8Array(16)));
+  return encodeURIComponent(JSON.stringify({ rand, returnTo }));
+}
+
+function parseState(raw) {
+  try { return JSON.parse(decodeURIComponent(raw)); }
+  catch { return { returnTo: '/forms/disease-case' }; }
+}
+
+// ── Shared CSS ────────────────────────────────────────────────────────────────
 
 const CSS = `
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -98,6 +170,48 @@ textarea { resize: vertical; min-height: 90px; }
 }
 .btn-submit:hover { filter: brightness(.92); transform: translateY(-1px); }
 .honeypot { display: none !important; }
+/* ── Identity chip (auto-filled contributor) ── */
+.identity-chip {
+  display: flex; align-items: center; gap: 10px;
+  background: #f0fdf4; border: 1px solid #86efac;
+  border-radius: 8px; padding: 10px 14px; font-size: 14px;
+}
+.identity-chip .id-icon { font-size: 18px; flex-shrink: 0; }
+.identity-chip .id-name { font-weight: 700; color: #15803d; }
+.identity-chip .id-via  { font-size: 12px; color: var(--muted); margin-left: 4px; }
+/* ── Auth page ── */
+.login-page { max-width: 460px; margin: 48px auto; padding: 0 20px; text-align: center; }
+.login-page h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+.login-page .sub { color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+.login-btn {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  width: 100%; padding: 14px 20px; border-radius: 10px;
+  font-size: 15px; font-weight: 700; text-decoration: none;
+  margin-bottom: 12px; transition: filter .15s, transform .1s; border: none; cursor: pointer;
+}
+.login-btn:hover { filter: brightness(.93); transform: translateY(-1px); text-decoration: none; }
+.login-btn.orcid  { background: #a6ce39; color: #000; }
+.login-btn.github { background: #24292e; color: #fff; }
+.login-btn svg { flex-shrink: 0; }
+.login-divider {
+  font-size: 12px; color: var(--muted); text-align: center;
+  margin: 16px 0; position: relative;
+}
+.login-divider::before, .login-divider::after {
+  content: ''; position: absolute; top: 50%;
+  width: 42%; height: 1px; background: var(--border);
+}
+.login-divider::before { left: 0; }
+.login-divider::after  { right: 0; }
+.login-note { font-size: 12px; color: var(--muted); margin-top: 20px; }
+/* ── Identity bar ── */
+.id-bar {
+  background: var(--brand-light); border-bottom: 1px solid #a7d9ce;
+  padding: 8px 20px; font-size: 13px; color: var(--brand-dark);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.id-bar a { color: var(--brand-dark); font-weight: 600; }
+/* ── Thank-you / error ── */
 .thankyou { text-align: center; padding: 72px 20px; }
 .thankyou .icon { font-size: 56px; margin-bottom: 16px; }
 .thankyou h1 { font-size: 26px; font-weight: 800; margin-bottom: 10px; }
@@ -114,31 +228,245 @@ textarea { resize: vertical; min-height: 90px; }
 }
 `;
 
-// ── HTML page shell ──────────────────────────────────────────────────────────
+// ── HTML helpers ──────────────────────────────────────────────────────────────
 
-function page(title, subtitle, body, landingPage) {
-  return `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} · Bring Your Own Disease · GA4GH 2026</title>
-  <style>${CSS}</style>
-</head>
-<body>
-<header>
-  <div class="container">
-    <a class="back" href="${landingPage}">← Back to session page</a>
-    <h1>${title}</h1>
-    ${subtitle ? `<p>${subtitle}</p>` : ''}
-  </div>
-</header>
-<div class="container">${body}</div>
-</body>
-</html>`;
+function html(status, body) {
+  return new Response(body, { status, headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
 }
 
-// ── Shared field fragments ───────────────────────────────────────────────────
+function redirect(url, status = 302) {
+  return new Response(null, { status, headers: { Location: url } });
+}
+
+function page(title, subtitle, idBar, body, landing) {
+  return `<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>${title} · Bring Your Own Disease</title>
+  <style>${CSS}</style></head><body>
+  ${idBar}
+  <header><div class="container">
+    <a class="back" href="${landing}">← Back to session page</a>
+    <h1>${title}</h1>${subtitle ? `<p>${subtitle}</p>` : ''}
+  </div></header>
+  <div class="container">${body}</div>
+  </body></html>`;
+}
+
+function identityBar(session, landing) {
+  if (!session) return '';
+  const label = session.provider === 'orcid'
+    ? `✓ Signed in via ORCID &nbsp;·&nbsp; <strong>${session.name || session.id}</strong> <span style="font-family:monospace;font-size:11px">(${session.id})</span>`
+    : `✓ Signed in via GitHub &nbsp;·&nbsp; <strong>${session.name || session.login}</strong>`;
+  return `<div class="id-bar">${label}<a href="/auth/logout">Sign out</a></div>`;
+}
+
+// ── Login page ────────────────────────────────────────────────────────────────
+
+function loginPage(returnTo, env) {
+  const landing = env.LANDING_PAGE || '/';
+  const orcidUrl  = `/auth/orcid?return=${encodeURIComponent(returnTo)}`;
+  const githubUrl = `/auth/github?return=${encodeURIComponent(returnTo)}`;
+
+  const hasOrcid  = !!(env.ORCID_CLIENT_ID  && env.ORCID_CLIENT_SECRET);
+  const hasGithub = !!(env.GH_CLIENT_ID     && env.GH_CLIENT_SECRET);
+
+  const orcidBtn = hasOrcid ? `
+    <a class="login-btn orcid" href="${orcidUrl}">
+      <svg width="24" height="24" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="128" cy="128" r="128" fill="#A6CE39"/>
+        <path d="M86 74h28v108H86V74zm56 0h42c39 0 58 22 58 54s-19 54-58 54h-42V74zm28 88h14c19 0 29-11 29-34s-10-34-29-34h-14v68z" fill="#000"/>
+      </svg>
+      Sign in with ORCID <span style="font-size:12px;opacity:.7">(preferred)</span>
+    </a>` : '';
+
+  const divider = hasOrcid && hasGithub
+    ? `<div class="login-divider">or</div>` : '';
+
+  const githubBtn = hasGithub ? `
+    <a class="login-btn github" href="${githubUrl}">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.4.6.1.82-.26.82-.58v-2.03c-3.34.73-4.04-1.6-4.04-1.6-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.8 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.82.57C20.56 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/>
+      </svg>
+      Sign in with GitHub
+    </a>` : '';
+
+  const body = `
+  <div class="login-page">
+    <div style="font-size:48px;margin-bottom:16px">🔐</div>
+    <h1>Sign in to contribute</h1>
+    <p class="sub">
+      A quick sign-in prevents spam and makes your submission attributable.
+      Your identity will be visible on the GitHub Issue created from your submission.
+    </p>
+    ${orcidBtn}
+    ${divider}
+    ${githubBtn}
+    ${!hasOrcid && !hasGithub ? '<p class="error-box">Authentication is not configured on this server.</p>' : ''}
+    <p class="login-note">
+      Don't have ORCID? <a href="https://orcid.org/register" target="_blank" rel="noopener">Register free in 30 seconds</a> —
+      it's the standard researcher identifier used worldwide.
+    </p>
+  </div>`;
+
+  return `<!DOCTYPE html><html lang="en"><head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sign in · Bring Your Own Disease</title>
+  <style>${CSS}</style></head><body>
+  <div style="background:linear-gradient(135deg,#0f4c3a,#1a6b5a 60%,#2563eb);padding:16px 20px;">
+    <a href="${landing}" style="color:rgba(255,255,255,.8);font-size:13px;text-decoration:none;">← Back to session page</a>
+  </div>
+  ${body}</body></html>`;
+}
+
+// ── ORCID OAuth ───────────────────────────────────────────────────────────────
+
+const ORCID_AUTH  = 'https://orcid.org/oauth/authorize';
+const ORCID_TOKEN = 'https://orcid.org/oauth/token';
+
+function orcidStart(request, env) {
+  const url      = new URL(request.url);
+  const returnTo = url.searchParams.get('return') || '/forms/disease-case';
+  const state    = makeState(returnTo);
+  const redirect = `${url.origin}/auth/orcid/callback`;
+
+  const auth = new URL(ORCID_AUTH);
+  auth.searchParams.set('client_id',     env.ORCID_CLIENT_ID);
+  auth.searchParams.set('response_type', 'code');
+  auth.searchParams.set('scope',         '/authenticate');
+  auth.searchParams.set('redirect_uri',  redirect);
+  auth.searchParams.set('state',         state);
+
+  return Response.redirect(auth.toString(), 302);
+}
+
+async function orcidCallback(request, env) {
+  const url      = new URL(request.url);
+  const code     = url.searchParams.get('code');
+  const rawState = url.searchParams.get('state') || '';
+  const { returnTo } = parseState(rawState);
+  const landing  = env.LANDING_PAGE || '/';
+
+  if (!code) return html(400, errorPage('ORCID login failed — no code received.', landing));
+
+  const redirect = `${url.origin}/auth/orcid/callback`;
+
+  const tokenResp = await fetch(ORCID_TOKEN, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      client_id:     env.ORCID_CLIENT_ID,
+      client_secret: env.ORCID_CLIENT_SECRET,
+      grant_type:    'authorization_code',
+      code,
+      redirect_uri:  redirect,
+    }),
+  });
+
+  if (!tokenResp.ok) {
+    const msg = await tokenResp.text();
+    return html(502, errorPage(`ORCID token exchange failed: ${msg}`, landing));
+  }
+
+  const data = await tokenResp.json();
+  // ORCID returns orcid iD and name directly in the token response
+  const session = await makeSession({
+    provider: 'orcid',
+    id:       data.orcid || data['orcid-identifier']?.path || 'unknown',
+    name:     data.name  || '',
+  }, env.SESSION_SECRET);
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: returnTo || '/forms/disease-case',
+      'Set-Cookie': sessionCookie(session),
+    },
+  });
+}
+
+// ── GitHub OAuth ──────────────────────────────────────────────────────────────
+
+const GH_AUTH  = 'https://github.com/login/oauth/authorize';
+const GH_TOKEN = 'https://github.com/login/oauth/access_token';
+const GH_USER  = 'https://api.github.com/user';
+
+function githubStart(request, env) {
+  const url      = new URL(request.url);
+  const returnTo = url.searchParams.get('return') || '/forms/disease-case';
+  const state    = makeState(returnTo);
+  const redirect = `${url.origin}/auth/github/callback`;
+
+  const auth = new URL(GH_AUTH);
+  auth.searchParams.set('client_id',    env.GH_CLIENT_ID);
+  auth.searchParams.set('redirect_uri', redirect);
+  auth.searchParams.set('scope',        'read:user');
+  auth.searchParams.set('state',        state);
+
+  return Response.redirect(auth.toString(), 302);
+}
+
+async function githubCallback(request, env) {
+  const url      = new URL(request.url);
+  const code     = url.searchParams.get('code');
+  const rawState = url.searchParams.get('state') || '';
+  const { returnTo } = parseState(rawState);
+  const landing  = env.LANDING_PAGE || '/';
+
+  if (!code) return html(400, errorPage('GitHub login failed — no code received.', landing));
+
+  const tokenResp = await fetch(GH_TOKEN, {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      client_id:     env.GH_CLIENT_ID,
+      client_secret: env.GH_CLIENT_SECRET,
+      code,
+      redirect_uri:  `${url.origin}/auth/github/callback`,
+    }),
+  });
+
+  const tokenData = await tokenResp.json();
+  if (!tokenData.access_token) {
+    return html(502, errorPage('GitHub token exchange failed.', landing));
+  }
+
+  const userResp = await fetch(GH_USER, {
+    headers: {
+      'Authorization': `Bearer ${tokenData.access_token}`,
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'byod-form-receiver',
+    },
+  });
+
+  const user = await userResp.json();
+  const session = await makeSession({
+    provider: 'github',
+    id:       String(user.id),
+    login:    user.login || '',
+    name:     user.name  || user.login || '',
+  }, env.SESSION_SECRET);
+
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: returnTo || '/forms/disease-case',
+      'Set-Cookie': sessionCookie(session),
+    },
+  });
+}
+
+// ── Auth middleware ───────────────────────────────────────────────────────────
+
+async function requireAuth(request, env, next) {
+  const session = await readSession(request.headers.get('Cookie'), env.SESSION_SECRET);
+  if (!session) {
+    const returnTo = new URL(request.url).pathname;
+    return redirect(`/auth/login?return=${encodeURIComponent(returnTo)}`);
+  }
+  return next(session);
+}
+
+// ── Shared field fragments ────────────────────────────────────────────────────
 
 const DISEASE_ID_FIELD = `
 <div class="field">
@@ -152,28 +480,38 @@ const DISEASE_ID_FIELD = `
     placeholder="One identifier per line, e.g.&#10;ORPHA:803&#10;OMIM:105400&#10;ICD-10:G12.2"></textarea>
 </div>`;
 
-const CONTRIBUTOR_FIELD = `
+function contributorField(session) {
+  const name     = session?.name  || session?.login || session?.id || '';
+  const isOrcid  = session?.provider === 'orcid';
+  const icon     = isOrcid ? '🔬' : '🐙';
+  const via      = isOrcid
+    ? `ORCID — ${session.id}`
+    : `GitHub — @${session?.login || session?.id || ''}`;
+  return `
 <div class="field">
-  <label>Your name / affiliation <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-  <input type="text" name="contributor" placeholder="e.g. Ada Hamosh, Johns Hopkins">
+  <label>Contributor — <span style="font-weight:400;color:var(--muted)">collected automatically from your login</span></label>
+  <div class="identity-chip">
+    <span class="id-icon">${icon}</span>
+    <span class="id-name">${name}</span>
+    <span class="id-via">via ${via}</span>
+  </div>
+  <input type="hidden" name="contributor" value="${name}">
 </div>`;
+}
 
 const HONEYPOT = `<div class="honeypot"><input type="text" name="h_confirm" tabindex="-1" autocomplete="off"></div>`;
 
-// ── Form: disease case ───────────────────────────────────────────────────────
+// ── Form renderers ────────────────────────────────────────────────────────────
 
-function formDiseaseCase(landingPage) {
+function formDiseaseCase(session, env) {
+  const landing = env.LANDING_PAGE || '/';
+  const idBar   = identityBar(session, landing);
   const body = `
-<div class="notice">
-  Fill in as much as you can — partial entries are welcome. No GitHub account needed.
-</div>
-
+<div class="notice">Fill in as much as you can — partial entries are welcome.</div>
 <form method="POST" action="/submit">
   ${HONEYPOT}
   <input type="hidden" name="form_type" value="disease-case">
-
   <div class="section-title">Disease identity</div>
-
   <div class="field">
     <label>Disease name <span class="req">*</span></label>
     <input type="text" name="disease_name" required placeholder="e.g. Amyotrophic Lateral Sclerosis">
@@ -187,9 +525,7 @@ function formDiseaseCase(landingPage) {
     <label>Registry URL</label>
     <input type="url" name="registry_url" placeholder="https://…">
   </div>
-
   <div class="section-title" style="margin-top:28px">Clinical narrative</div>
-
   <div class="field">
     <label>Disease narrative — plain language <span class="req">*</span></label>
     <div class="hint">Describe the typical patient journey. No patient-identifying information.</div>
@@ -201,30 +537,18 @@ function formDiseaseCase(landingPage) {
     <textarea name="timeline_events" rows="4"
       placeholder="age:40y — first symptom&#10;onset+8mo — definitive diagnosis"></textarea>
   </div>
-
   <div class="section-title" style="margin-top:28px">Data types collected</div>
   <div class="field">
     <div class="cb-group">
-      ${[
-        'Structured phenotype terms (HPO)',
-        'Clinical narrative / free text',
-        'Genetic / genomic data',
-        'Lab results / biomarkers',
-        'Patient-reported outcomes (PROs)',
-        'Imaging',
-        'Functional assessments',
-        'Family history / pedigree',
-        'Treatment / medication history',
-        'Disease progression / longitudinal follow-up',
-        'Environmental / exposure history',
-        'Facial / dysmorphology features',
-        'Other',
-      ].map(o => `<label><input type="checkbox" name="data_types" value="${o}"> ${o}</label>`).join('\n      ')}
+      ${['Structured phenotype terms (HPO)','Clinical narrative / free text','Genetic / genomic data',
+         'Lab results / biomarkers','Patient-reported outcomes (PROs)','Imaging',
+         'Functional assessments','Family history / pedigree','Treatment / medication history',
+         'Disease progression / longitudinal follow-up','Environmental / exposure history',
+         'Facial / dysmorphology features','Other']
+        .map(o => `<label><input type="checkbox" name="data_types" value="${o}"> ${o}</label>`).join('\n')}
     </div>
   </div>
-
   <div class="section-title" style="margin-top:28px">Phenotype &amp; gaps</div>
-
   <div class="field">
     <label>HPO phenotype terms <span style="font-weight:400;color:var(--muted)">(if known)</span></label>
     <div class="hint">One per line — look up at <a href="https://hpo.jax.org/" target="_blank">hpo.jax.org</a></div>
@@ -233,77 +557,54 @@ function formDiseaseCase(landingPage) {
   <div class="field">
     <label>What clinical nuance is LOST when encoding this case in structured terms alone?</label>
     <textarea name="narrative_gaps" rows="3"
-      placeholder="e.g. Rate of progression, caregiver burden, diagnostic odyssey experience…"></textarea>
+      placeholder="e.g. Rate of progression, caregiver burden…"></textarea>
   </div>
   <div class="field">
     <label>What information SHOULD be collected but currently is NOT?</label>
     <textarea name="missing_data" rows="3"
-      placeholder="e.g. Time from first symptom to first specialist visit is rarely recorded…"></textarea>
+      placeholder="e.g. Time from first symptom to first specialist visit…"></textarea>
   </div>
-
   <div class="section-title" style="margin-top:28px">About you</div>
-  ${CONTRIBUTOR_FIELD}
-
+  ${contributorField(session)}
   <button type="submit" class="btn-submit">Submit disease case →</button>
 </form>`;
-  return page('Submit a disease case', 'Rare disease narrative, timeline, ontology identifiers', body, landingPage);
+  return page('Submit a disease case', 'Rare disease narrative, timeline, ontology identifiers', idBar, body, landing);
 }
 
-// ── Form: ontology gap ───────────────────────────────────────────────────────
-
-function formOntologyGap(landingPage) {
-  const ontologies = [
-    'Orphanet (ORDO) — rare disease classification',
-    'OMIM — Mendelian / genetic disease',
-    'GARD — NIH rare disease catalogue',
-    'HPO (Human Phenotype Ontology)',
-    'ECTO (Environmental Conditions and Treatments)',
-    'ICD-11 — WHO clinical classification (current)',
-    'ICD-10 — WHO clinical classification (legacy)',
-    'SNOMED CT — clinical terminology',
-    'Mondo — cross-ontology harmonisation',
-    'NANDO — neurological & neuromuscular diseases',
-    'MeSH — NLM indexing vocabulary',
-    'DOID — Disease Ontology',
-    'Other / multiple not listed',
-  ];
-  const gapTypes = [
-    'Missing term — concept does not exist in any relevant ontology',
-    'Term too broad — no sufficiently specific term',
-    'Term too narrow — existing term is over-specified',
+function formOntologyGap(session, env) {
+  const landing = env.LANDING_PAGE || '/';
+  const idBar   = identityBar(session, landing);
+  const ontologies = ['Orphanet (ORDO) — rare disease classification','OMIM — Mendelian / genetic disease',
+    'GARD — NIH rare disease catalogue','HPO (Human Phenotype Ontology)',
+    'ECTO (Environmental Conditions and Treatments)','ICD-11 — WHO clinical classification (current)',
+    'ICD-10 — WHO clinical classification (legacy)','SNOMED CT — clinical terminology',
+    'Mondo — cross-ontology harmonisation','NANDO — neurological & neuromuscular diseases',
+    'MeSH — NLM indexing vocabulary','DOID — Disease Ontology','Other / multiple not listed'];
+  const gapTypes = ['Missing term — concept does not exist in any relevant ontology',
+    'Term too broad — no sufficiently specific term','Term too narrow — existing term is over-specified',
     'Wrong axis — concept modelled under incorrect parent',
     'Modifier missing — no qualifier for severity / laterality / progression',
     'Temporal dimension missing — cannot express change over time',
     'Cross-ontology misalignment — same concept modelled inconsistently',
     'Rare disease not represented — disease in ORDO but absent elsewhere',
-    'PRO / patient-reported concept out of scope',
-    'Caregiver / family impact not modelled',
-    'Other',
-  ];
+    'PRO / patient-reported concept out of scope','Caregiver / family impact not modelled','Other'];
   const body = `
-<div class="notice">
-  Flag concepts that cannot be adequately expressed using current ontology terms.
-  No GitHub account needed.
-</div>
-
+<div class="notice">Flag concepts that cannot be adequately expressed using current ontology terms.</div>
 <form method="POST" action="/submit">
   ${HONEYPOT}
   <input type="hidden" name="form_type" value="ontology-gap">
-
   <div class="section-title">Disease context</div>
   <div class="field">
     <label>Disease name <span style="font-weight:400;color:var(--muted)">(if disease-specific)</span></label>
     <input type="text" name="disease_name" placeholder="e.g. ALS, Stargardt — or leave blank for cross-disease gap">
   </div>
   ${DISEASE_ID_FIELD}
-
   <div class="section-title" style="margin-top:28px">Which ontology has the gap? <span class="req">*</span></div>
   <div class="field">
     <div class="cb-group">
-      ${ontologies.map(o => `<label><input type="checkbox" name="ontology" value="${o}"> ${o}</label>`).join('\n      ')}
+      ${ontologies.map(o => `<label><input type="checkbox" name="ontology" value="${o}"> ${o}</label>`).join('\n')}
     </div>
   </div>
-
   <div class="field">
     <label>Is this a cross-ontology gap?</label>
     <div class="cb-group">
@@ -317,9 +618,7 @@ function formOntologyGap(landingPage) {
     <textarea name="cross_ontology_detail" rows="3"
       placeholder="Has it: ORPHA:803 (well-defined)&#10;Missing: ICD-11 — no equivalent code"></textarea>
   </div>
-
   <div class="section-title" style="margin-top:28px">Describing the gap</div>
-
   <div class="field">
     <label>Clinical concept that cannot be adequately expressed <span class="req">*</span></label>
     <textarea name="concept" rows="4" required
@@ -329,20 +628,17 @@ function formOntologyGap(landingPage) {
     <label>Type of gap</label>
     <select name="gap_type">
       <option value="">— select —</option>
-      ${gapTypes.map(t => `<option>${t}</option>`).join('\n      ')}
+      ${gapTypes.map(t => `<option>${t}</option>`).join('\n')}
     </select>
   </div>
   <div class="field">
     <label>Concrete clinical examples</label>
-    <textarea name="concrete_examples" rows="3"
-      placeholder="e.g. A patient with ALS whose weakness progresses distally to proximally — no HPO term for progression direction…"></textarea>
+    <textarea name="concrete_examples" rows="3" placeholder="e.g. A patient with ALS whose weakness progresses distally to proximally…"></textarea>
   </div>
   <div class="field">
     <label>Proposed solution <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-    <textarea name="proposed_solution" rows="3"
-      placeholder="Suggested new term: …&#10;Suggested parent: HP:XXXXXXX&#10;Definition: …"></textarea>
+    <textarea name="proposed_solution" rows="3" placeholder="Suggested new term: …&#10;Suggested parent: HP:XXXXXXX&#10;Definition: …"></textarea>
   </div>
-
   <div class="field">
     <label>Priority</label>
     <select name="priority">
@@ -353,134 +649,70 @@ function formOntologyGap(landingPage) {
       <option>Low — minor nuance lost</option>
     </select>
   </div>
-
   <div class="section-title" style="margin-top:28px">About you</div>
-  ${CONTRIBUTOR_FIELD}
-
+  ${contributorField(session)}
   <button type="submit" class="btn-submit">Submit ontology gap →</button>
 </form>`;
-  return page('Report an ontology gap', 'Missing or misaligned terms across ORDO, HPO, ICD, SNOMED, Mondo and others', body, landingPage);
+  return page('Report an ontology gap', 'Missing or misaligned terms across ORDO, HPO, ICD, SNOMED, Mondo and others', idBar, body, landing);
 }
 
-// ── Form: data / model gap ───────────────────────────────────────────────────
-
-function formDataGap(landingPage) {
+function formDataGap(session, env) {
+  const landing = env.LANDING_PAGE || '/';
+  const idBar   = identityBar(session, landing);
   const standards = {
-    'Exchange formats & data models': [
-      'Phenopackets (GA4GH)',
-      'FHIR (HL7) — core resources',
-      'FHIR — Genomics Reporting IG',
-      'OMOP CDM',
-      'openEHR',
-    ],
-    'International rare disease platforms': [
-      'RD-Connect / GPAP',
-      'EUPID (European Platform for Rare Disease Registries)',
-      'EPIRARE',
-      'ERDRI (European Rare Disease Registry Infrastructure)',
-      'ERN (European Reference Network) registry',
-    ],
-    'National & disease-specific registries': [
-      'IAMRARE (Global Genes / NORD)',
-      'RARE-X patient registry',
-      'ALS TDI Registry',
-      'PhenoDB',
-      'DECIPHER',
-      'NORD Patient Registry',
-    ],
-    'Ontology-adjacent data models': [
-      'Orphanet data model (ORDO / clinical entity structure)',
-      'GA4GH Variant Representation Specification (VRS)',
-      'GA4GH Pedigree Standard',
-    ],
+    'Exchange formats & data models': ['Phenopackets (GA4GH)','FHIR (HL7) — core resources','FHIR — Genomics Reporting IG','OMOP CDM','openEHR'],
+    'International rare disease platforms': ['RD-Connect / GPAP','EUPID','EPIRARE','ERDRI','ERN (European Reference Network) registry'],
+    'National & disease-specific registries': ['IAMRARE (Global Genes / NORD)','RARE-X patient registry','ALS TDI Registry','PhenoDB','DECIPHER','NORD Patient Registry'],
+    'Ontology-adjacent data models': ['Orphanet data model (ORDO)','GA4GH Variant Representation Specification (VRS)','GA4GH Pedigree Standard'],
   };
   const categories = {
-    'Temporal / longitudinal': [
-      'Longitudinal / trajectory data — change over time',
-      'Disease progression rate or slope',
-      'Age of onset / diagnostic delay',
-      'Time from symptom to diagnosis (diagnostic odyssey duration)',
-    ],
-    'Patient experience': [
-      'Patient-reported outcomes (PROs) not linkable to clinical terms',
-      'Quality of life / functional status / disability',
-      'Caregiver or family impact',
-      'Patient-reported diagnostic odyssey narrative',
-    ],
-    'Clinical data elements': [
-      'Diagnostic uncertainty or evolving diagnosis',
-      'Treatment response / lack of response',
-      'Off-label or compassionate use therapies',
-      'Imaging findings not mapped to structured terms',
-      'Biomarker / lab result without standard code',
-    ],
-    'Structural / interoperability': [
-      'Cross-registry linkage — same patient in multiple registries',
-      'Cross-border data harmonisation',
-      'Rare disease not representable in ICD-10 (too granular)',
-      'Social determinants of health',
-      'Environmental / exposure history',
-      'Genetic variant — phenotype correlation not capturable',
-    ],
-    'Rare disease specific': [
-      'Ultra-rare disease — model too coarse (<10 known cases)',
-      'Natural history data missing (disease too rare)',
-      'No validated outcome measure exists for this disease',
-    ],
+    'Temporal / longitudinal': ['Longitudinal / trajectory data — change over time','Disease progression rate or slope','Age of onset / diagnostic delay','Time from symptom to diagnosis'],
+    'Patient experience': ['Patient-reported outcomes not linkable to clinical terms','Quality of life / functional status / disability','Caregiver or family impact','Patient-reported diagnostic odyssey narrative'],
+    'Clinical data elements': ['Diagnostic uncertainty or evolving diagnosis','Treatment response / lack of response','Off-label or compassionate use therapies','Imaging findings not mapped to structured terms','Biomarker / lab result without standard code'],
+    'Structural / interoperability': ['Cross-registry linkage — same patient in multiple registries','Cross-border data harmonisation','Rare disease not representable in ICD-10','Social determinants of health','Environmental / exposure history','Genetic variant — phenotype correlation not capturable'],
+    'Rare disease specific': ['Ultra-rare disease — model too coarse (<10 known cases)','Natural history data missing','No validated outcome measure exists for this disease'],
   };
-
-  const renderGroup = (groups) => Object.entries(groups).map(([heading, items]) => `
-    <div class="cb-subhead">${heading}</div>
-    ${items.map(i => `<label><input type="checkbox" name="${heading.toLowerCase().replace(/\W+/g,'_')}_items" value="${i}"> ${i}</label>`).join('\n    ')}
-  `).join('');
+  const renderGroups = (groups, prefix) => Object.entries(groups).map(([h, items]) =>
+    `<div class="cb-subhead">${h}</div>` +
+    items.map(i => `<label><input type="checkbox" name="${prefix}" value="${i}"> ${i}</label>`).join('\n')
+  ).join('\n');
 
   const body = `
-<div class="notice">
-  Flag structural or coverage gaps in data models, registries, or standards.
-  For missing <em>ontology terms</em> use the ontology gap form. No GitHub account needed.
-</div>
-
+<div class="notice">Flag structural or coverage gaps in data models, registries, or standards. For missing <em>ontology terms</em>, use the ontology gap form.</div>
 <form method="POST" action="/submit">
   ${HONEYPOT}
   <input type="hidden" name="form_type" value="data-gap">
-
   <div class="section-title">Disease context</div>
   <div class="field">
     <label>Disease name <span style="font-weight:400;color:var(--muted)">(if disease-specific)</span></label>
-    <input type="text" name="disease_name" placeholder="e.g. ALS, Stargardt — or leave blank for cross-disease gap">
+    <input type="text" name="disease_name" placeholder="e.g. ALS, Stargardt — or leave blank">
   </div>
   ${DISEASE_ID_FIELD}
-
   <div class="section-title" style="margin-top:28px">Affected standard or system <span class="req">*</span></div>
   <div class="field">
     <div class="cb-group">
-      ${renderGroup(standards)}
+      ${renderGroups(standards, 'standards')}
       <div class="cb-subhead">Other</div>
-      <label><input type="checkbox" name="standard_other_items" value="Other / multiple not listed"> Other / multiple not listed</label>
+      <label><input type="checkbox" name="standards" value="Other / multiple not listed"> Other / multiple not listed</label>
     </div>
   </div>
-
   <div class="section-title" style="margin-top:28px">Describing the gap</div>
-
   <div class="field">
     <label>What cannot be captured and why? <span class="req">*</span></label>
     <textarea name="gap_description" rows="5" required
       placeholder="I am trying to represent: …&#10;The current model handles this by: …&#10;What is lost: …"></textarea>
   </div>
-
   <div class="section-title" style="margin-top:28px">Category of gap</div>
   <div class="field">
     <div class="cb-group">
-      ${renderGroup(categories)}
+      ${renderGroups(categories, 'categories')}
       <div class="cb-subhead">Other</div>
-      <label><input type="checkbox" name="other_items" value="Other"> Other</label>
+      <label><input type="checkbox" name="categories" value="Other"> Other</label>
     </div>
   </div>
-
   <div class="field">
-    <label>Proposed solution or workaround <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-    <textarea name="proposed_solution" rows="3"
-      placeholder="e.g. Add a Measurement element with LOINC code for ALSFRS-R total score…"></textarea>
+    <label>Proposed solution <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+    <textarea name="proposed_solution" rows="3" placeholder="e.g. Add a Measurement element with LOINC code…"></textarea>
   </div>
   <div class="field">
     <label>Priority</label>
@@ -494,320 +726,272 @@ function formDataGap(landingPage) {
   </div>
   <div class="field">
     <label>Evidence or prior discussion <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-    <textarea name="evidence" rows="2"
-      placeholder="Links to papers, GitHub issues, working group outputs…"></textarea>
+    <textarea name="evidence" rows="2" placeholder="Links to papers, GitHub issues, working group outputs…"></textarea>
   </div>
-
   <div class="section-title" style="margin-top:28px">About you</div>
-  ${CONTRIBUTOR_FIELD}
-
+  ${contributorField(session)}
   <button type="submit" class="btn-submit">Submit data gap →</button>
 </form>`;
-  return page('Report a data / model gap', 'Gaps in Phenopackets, FHIR, OMOP, rare disease registries, and exchange standards', body, landingPage);
+  return page('Report a data / model gap', 'Gaps in Phenopackets, FHIR, OMOP, rare disease registries, and exchange standards', idBar, body, landing);
 }
 
-// ── Form: form feedback ──────────────────────────────────────────────────────
-
-function formFeedback(landingPage) {
+function formFeedback(session, env) {
+  const landing = env.LANDING_PAGE || '/';
+  const idBar   = identityBar(session, landing);
   const body = `
-<div class="notice">
-  These forms are a living instrument. Tell us what is missing, wrong, or confusing —
-  or propose an entirely new form. No GitHub account needed.
-</div>
-
+<div class="notice">Tell us what is missing, wrong, or confusing — or propose an entirely new form.</div>
 <form method="POST" action="/submit">
   ${HONEYPOT}
   <input type="hidden" name="form_type" value="form-feedback">
-
-  <div class="section-title">Which form does this apply to? <span class="req">*</span></div>
+  <div class="section-title">Which form? <span class="req">*</span></div>
   <div class="field">
     <div class="cb-group">
-      ${[
-        '01 — Submit a disease case',
-        '02 — Report an ontology gap',
-        '03 — Report a data / model gap',
-        'All forms (applies across the board)',
-        'None — I am proposing a new form',
-      ].map(o => `<label><input type="checkbox" name="target_form" value="${o}"> ${o}</label>`).join('\n      ')}
+      ${['01 — Submit a disease case','02 — Report an ontology gap','03 — Report a data / model gap',
+         'All forms (applies across the board)','None — I am proposing a new form']
+        .map(o => `<label><input type="checkbox" name="target_form" value="${o}"> ${o}</label>`).join('\n')}
     </div>
   </div>
-
   <div class="section-title" style="margin-top:28px">Type of feedback <span class="req">*</span></div>
   <div class="field">
     <div class="cb-group">
-      ${[
-        'Missing field — something important cannot be captured at all',
-        'Field is incomplete — options or scope are too narrow',
-        'Field is wrong — incorrect framing, label, or assumption',
-        'Field is confusing — wording unclear',
-        'Ontology or standard missing from a list',
-        'Too many fields — form is overwhelming',
-        'Proposing a new form entirely',
-        'Other',
-      ].map(o => `<label><input type="checkbox" name="feedback_type" value="${o}"> ${o}</label>`).join('\n      ')}
+      ${['Missing field','Field is incomplete','Field is wrong','Field is confusing',
+         'Ontology or standard missing from a list','Too many fields','Proposing a new form','Other']
+        .map(o => `<label><input type="checkbox" name="feedback_type" value="${o}"> ${o}</label>`).join('\n')}
     </div>
   </div>
-
   <div class="section-title" style="margin-top:28px">Your perspective</div>
   <div class="field">
     <div class="cb-group">
-      ${[
-        'Clinician / physician', 'Clinical geneticist', 'Genetic counsellor',
-        'Nurse / allied health professional', 'Patient or family member / carer',
-        'Patient advocacy organisation', 'Rare disease registry manager',
-        'Biomedical informatician / data engineer', 'Ontologist / terminology expert',
-        'Researcher / scientist', 'Bioinformatician / computational biologist',
-        'Software developer / data architect', 'Other',
-      ].map(o => `<label><input type="checkbox" name="perspective" value="${o}"> ${o}</label>`).join('\n      ')}
+      ${['Clinician / physician','Clinical geneticist','Genetic counsellor',
+         'Nurse / allied health professional','Patient or family member / carer',
+         'Patient advocacy organisation','Rare disease registry manager',
+         'Biomedical informatician / data engineer','Ontologist / terminology expert',
+         'Researcher / scientist','Bioinformatician / computational biologist',
+         'Software developer / data architect','Other']
+        .map(o => `<label><input type="checkbox" name="perspective" value="${o}"> ${o}</label>`).join('\n')}
     </div>
   </div>
-
   <div class="section-title" style="margin-top:28px">Your feedback</div>
-
   <div class="field">
     <label>What is missing, wrong, or confusing? <span class="req">*</span></label>
-    <textarea name="what_is_wrong" rows="5" required
-      placeholder="The disease case form has no field for:&#10;  - Whether the disease has a known genetic cause&#10;  - Estimated global prevalence&#10;…"></textarea>
+    <textarea name="what_is_wrong" rows="5" required placeholder="The disease case form has no field for: …"></textarea>
   </div>
   <div class="field">
-    <label>Proposed fix or new field(s) <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-    <textarea name="proposed_fix" rows="4"
-      placeholder="Add field: 'Genetic basis'&#10;Type: dropdown&#10;Options: Monogenic, Polygenic, Chromosomal, Mitochondrial, Unknown…"></textarea>
+    <label>Proposed fix <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+    <textarea name="proposed_fix" rows="4" placeholder="Add field: 'Genetic basis'&#10;Type: dropdown&#10;Options: Monogenic, Polygenic…"></textarea>
   </div>
-
   <div class="section-title" style="margin-top:28px">Proposing a new form? (optional)</div>
   <div class="field">
-    <label>Working title for the new form</label>
-    <input type="text" name="new_form_title"
-      placeholder="e.g. Submit a natural history study · Flag a missing patient registry">
+    <label>Working title</label>
+    <input type="text" name="new_form_title" placeholder="e.g. Submit a natural history study">
   </div>
   <div class="field">
-    <label>What aspect of rare disease would it capture?</label>
-    <textarea name="new_form_purpose" rows="4"
-      placeholder="Who: …&#10;Purpose: …&#10;Key fields it would need: …"></textarea>
+    <label>What would it capture?</label>
+    <textarea name="new_form_purpose" rows="4" placeholder="Who: …&#10;Purpose: …&#10;Key fields: …"></textarea>
   </div>
-
   <div class="section-title" style="margin-top:28px">About you</div>
-  ${CONTRIBUTOR_FIELD}
-
+  ${contributorField(session)}
   <button type="submit" class="btn-submit">Submit feedback →</button>
 </form>`;
-  return page('Feedback on these forms', 'Missing fields, wrong framing, or a proposal for an entirely new form', body, landingPage);
+  return page('Feedback on these forms', 'Missing fields, wrong framing, or a proposal for an entirely new form', idBar, body, landing);
 }
 
-// ── Issue body builders ──────────────────────────────────────────────────────
-
-function multiVal(fd, name) {
-  return fd.getAll(name).filter(Boolean);
-}
+// ── Issue body builders ───────────────────────────────────────────────────────
 
 function section(heading, value) {
   if (!value || (Array.isArray(value) && value.length === 0)) return '';
-  const content = Array.isArray(value) ? value.map(v => `- ${v}`).join('\n') : value;
+  const content = Array.isArray(value) ? value.map(v => `- ${v}`).join('\n') : String(value).trim();
+  if (!content) return '';
   return `\n### ${heading}\n${content}\n`;
 }
 
-function buildIssueDiseaseCase(fd) {
-  const title = `[CASE] ${fd.get('disease_name') || 'Unnamed disease'}`;
-  const body = [
-    section('Disease name', fd.get('disease_name')),
-    section('Disease identifiers', fd.get('disease_ids')),
-    section('Registry or data source', fd.get('registry')),
-    section('Registry URL', fd.get('registry_url')),
-    section('Disease narrative', fd.get('narrative')),
-    section('Key timeline events', fd.get('timeline_events')),
-    section('Data types collected', multiVal(fd, 'data_types')),
-    section('HPO phenotype terms', fd.get('hpo_terms')),
-    section('Clinical nuance lost in structured encoding', fd.get('narrative_gaps')),
-    section('Information that should be collected but is not', fd.get('missing_data')),
-    section('Contributor', fd.get('contributor')),
-    '\n---\n_Submitted via BYOD web form (no GitHub account required)_',
-  ].join('');
-  return { title, body, labels: ['disease-case', 'needs-mapping'] };
+function identitySection(session) {
+  if (!session) return '';
+  if (session.provider === 'orcid') {
+    return `\n### Submitted by\nORCID: [${session.id}](https://orcid.org/${session.id})${session.name ? ` — ${session.name}` : ''}\n`;
+  }
+  return `\n### Submitted by\nGitHub: @${session.login || session.id}${session.name ? ` (${session.name})` : ''}\n`;
 }
-
-function buildIssueOntologyGap(fd) {
-  const disease = fd.get('disease_name') || 'unspecified';
-  const title = `[GAP-ONTOLOGY] ${disease}`;
-  // Collect all checkbox groups
-  const ontology = multiVal(fd, 'ontology');
-  const crossOntology = fd.get('cross_ontology') === 'yes';
-  const body = [
-    section('Disease name', fd.get('disease_name')),
-    section('Disease identifiers', fd.get('disease_ids')),
-    section('Ontology / terminology with the gap', ontology),
-    crossOntology ? section('Cross-ontology gap', 'Yes — concept exists in one ontology but missing or misaligned in another') : '',
-    crossOntology ? section('Cross-ontology detail', fd.get('cross_ontology_detail')) : '',
-    section('Clinical concept that cannot be expressed', fd.get('concept')),
-    section('Type of gap', fd.get('gap_type')),
-    section('Concrete clinical examples', fd.get('concrete_examples')),
-    section('Proposed solution', fd.get('proposed_solution')),
-    section('Priority', fd.get('priority')),
-    section('Contributor', fd.get('contributor')),
-    '\n---\n_Submitted via BYOD web form (no GitHub account required)_',
-  ].join('');
-  return { title, body, labels: ['ontology-gap'] };
-}
-
-function buildIssueDataGap(fd) {
-  const disease = fd.get('disease_name') || 'unspecified';
-  const title = `[GAP-DATA] ${disease}`;
-  // Collect all standard/category checkbox groups (dynamic names)
-  const allKeys = [...fd.keys()];
-  const standardKeys = allKeys.filter(k => k.endsWith('_items') && !k.startsWith('other'));
-  const categoryKeys = allKeys.filter(k => k.endsWith('_items') && k.startsWith('other') === false && standardKeys.includes(k) === false);
-  const allStandards = standardKeys.flatMap(k => multiVal(fd, k));
-  const allCategories = [...new Set(allKeys
-    .filter(k => k.includes('_items'))
-    .filter(k => !standardKeys.includes(k))
-    .flatMap(k => multiVal(fd, k))
-  )];
-
-  const body = [
-    section('Disease name', fd.get('disease_name')),
-    section('Disease identifiers', fd.get('disease_ids')),
-    section('Affected standards / systems', allStandards.length ? allStandards : multiVal(fd, 'standard_other_items')),
-    section('What cannot be captured and why', fd.get('gap_description')),
-    section('Category of gap', allCategories.length ? allCategories : multiVal(fd, 'other_items')),
-    section('Proposed solution', fd.get('proposed_solution')),
-    section('Priority', fd.get('priority')),
-    section('Evidence / prior discussion', fd.get('evidence')),
-    section('Contributor', fd.get('contributor')),
-    '\n---\n_Submitted via BYOD web form (no GitHub account required)_',
-  ].join('');
-  return { title, body, labels: ['data-gap'] };
-}
-
-function buildIssueFormFeedback(fd) {
-  const title = `[FORM] ${fd.get('new_form_title') || 'Form feedback'}`;
-  const body = [
-    section('Target form(s)', multiVal(fd, 'target_form')),
-    section('Type of feedback', multiVal(fd, 'feedback_type')),
-    section('Perspective', multiVal(fd, 'perspective')),
-    section('What is missing, wrong, or confusing', fd.get('what_is_wrong')),
-    section('Proposed fix', fd.get('proposed_fix')),
-    section('New form — working title', fd.get('new_form_title')),
-    section('New form — purpose', fd.get('new_form_purpose')),
-    section('Contributor', fd.get('contributor')),
-    '\n---\n_Submitted via BYOD web form (no GitHub account required)_',
-  ].join('');
-  return { title, body, labels: ['form-feedback', 'meta'] };
-}
-
-// ── Submit handler ───────────────────────────────────────────────────────────
 
 async function handleSubmit(request, env) {
-  const landingPage = env.LANDING_PAGE || '/';
+  const landing = env.LANDING_PAGE || '/';
+  const session = await readSession(request.headers.get('Cookie'), env.SESSION_SECRET);
+
+  if (!session) return redirect('/auth/login');
 
   let fd;
-  try {
-    fd = await request.formData();
-  } catch {
-    return htmlResponse(errorPage('Could not read form data.', landingPage));
-  }
+  try { fd = await request.formData(); }
+  catch { return html(400, errorPage('Could not read form data.', landing)); }
 
-  // Honeypot — silent drop if filled (bot)
-  if (fd.get('h_confirm')) {
-    return htmlResponse(thankyouPage(null, landingPage));
-  }
+  if (fd.get('h_confirm')) return html(200, thankyouPage(null, landing)); // honeypot
 
   const formType = fd.get('form_type');
   let issue;
-  if      (formType === 'disease-case')  issue = buildIssueDiseaseCase(fd);
-  else if (formType === 'ontology-gap')  issue = buildIssueOntologyGap(fd);
-  else if (formType === 'data-gap')      issue = buildIssueDataGap(fd);
-  else if (formType === 'form-feedback') issue = buildIssueFormFeedback(fd);
-  else return htmlResponse(errorPage('Unknown form type.', landingPage));
 
-  if (!env.GITHUB_TOKEN) {
-    return htmlResponse(errorPage('Server is not configured (missing GITHUB_TOKEN secret).', landingPage));
+  if (formType === 'disease-case') {
+    issue = {
+      title:  `[CASE] ${fd.get('disease_name') || 'Unnamed disease'}`,
+      labels: ['disease-case', 'needs-mapping'],
+      body: [
+        identitySection(session),
+        section('Disease name',          fd.get('disease_name')),
+        section('Disease identifiers',   fd.get('disease_ids')),
+        section('Registry',              fd.get('registry')),
+        section('Registry URL',          fd.get('registry_url')),
+        section('Disease narrative',     fd.get('narrative')),
+        section('Timeline events',       fd.get('timeline_events')),
+        section('Data types collected',  fd.getAll('data_types')),
+        section('HPO terms',             fd.get('hpo_terms')),
+        section('Clinical nuance lost',  fd.get('narrative_gaps')),
+        section('Missing information',   fd.get('missing_data')),
+        section('Contributor',           fd.get('contributor')),
+        '\n---\n_Submitted via BYOD web form_',
+      ].join(''),
+    };
+  } else if (formType === 'ontology-gap') {
+    const crossOntology = fd.get('cross_ontology') === 'yes';
+    issue = {
+      title:  `[GAP-ONTOLOGY] ${fd.get('disease_name') || 'unspecified'}`,
+      labels: ['ontology-gap'],
+      body: [
+        identitySection(session),
+        section('Disease name',        fd.get('disease_name')),
+        section('Disease identifiers', fd.get('disease_ids')),
+        section('Ontology with gap',   fd.getAll('ontology')),
+        crossOntology ? section('Cross-ontology gap', 'Yes — concept exists in one ontology but missing or misaligned in another') : '',
+        crossOntology ? section('Cross-ontology detail', fd.get('cross_ontology_detail')) : '',
+        section('Clinical concept',    fd.get('concept')),
+        section('Type of gap',         fd.get('gap_type')),
+        section('Clinical examples',   fd.get('concrete_examples')),
+        section('Proposed solution',   fd.get('proposed_solution')),
+        section('Priority',            fd.get('priority')),
+        section('Contributor',         fd.get('contributor')),
+        '\n---\n_Submitted via BYOD web form_',
+      ].join(''),
+    };
+  } else if (formType === 'data-gap') {
+    issue = {
+      title:  `[GAP-DATA] ${fd.get('disease_name') || 'unspecified'}`,
+      labels: ['data-gap'],
+      body: [
+        identitySection(session),
+        section('Disease name',            fd.get('disease_name')),
+        section('Disease identifiers',     fd.get('disease_ids')),
+        section('Affected standards',      fd.getAll('standards')),
+        section('What cannot be captured', fd.get('gap_description')),
+        section('Gap categories',          fd.getAll('categories')),
+        section('Proposed solution',       fd.get('proposed_solution')),
+        section('Priority',                fd.get('priority')),
+        section('Evidence',                fd.get('evidence')),
+        section('Contributor',             fd.get('contributor')),
+        '\n---\n_Submitted via BYOD web form_',
+      ].join(''),
+    };
+  } else if (formType === 'form-feedback') {
+    issue = {
+      title:  `[FORM] ${fd.get('new_form_title') || 'Form feedback'}`,
+      labels: ['form-feedback', 'meta'],
+      body: [
+        identitySection(session),
+        section('Target form(s)',      fd.getAll('target_form')),
+        section('Type of feedback',    fd.getAll('feedback_type')),
+        section('Perspective',         fd.getAll('perspective')),
+        section('What is wrong',       fd.get('what_is_wrong')),
+        section('Proposed fix',        fd.get('proposed_fix')),
+        section('New form title',      fd.get('new_form_title')),
+        section('New form purpose',    fd.get('new_form_purpose')),
+        section('Contributor',         fd.get('contributor')),
+        '\n---\n_Submitted via BYOD web form_',
+      ].join(''),
+    };
+  } else {
+    return html(400, errorPage('Unknown form type.', landing));
   }
 
-  const resp = await fetch(
-    `https://api.github.com/repos/${env.GITHUB_REPO}/issues`,
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json',
-        'User-Agent': 'byod-form-receiver/1.0',
-      },
-      body: JSON.stringify(issue),
-    }
-  );
+  if (!env.GITHUB_TOKEN) return html(500, errorPage('Server not configured (missing GITHUB_TOKEN).', landing));
+
+  const resp = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/issues`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${env.GITHUB_TOKEN}`,
+      'Accept':        'application/vnd.github.v3+json',
+      'Content-Type':  'application/json',
+      'User-Agent':    'byod-form-receiver/1.0',
+    },
+    body: JSON.stringify(issue),
+  });
 
   if (!resp.ok) {
     const msg = await resp.text();
     console.error('GitHub API error', resp.status, msg);
-    return htmlResponse(errorPage(`GitHub API returned ${resp.status}. Please try again or contact a session organiser.`, landingPage));
+    return html(502, errorPage(`GitHub API returned ${resp.status}. Please try again.`, landing));
   }
 
   const created = await resp.json();
-  return htmlResponse(thankyouPage(created.html_url, landingPage));
+  return html(200, thankyouPage(created.html_url, landing));
 }
 
-// ── Thank-you & error pages ──────────────────────────────────────────────────
+// ── Result pages ──────────────────────────────────────────────────────────────
 
-function thankyouPage(issueUrl, landingPage) {
+function thankyouPage(issueUrl, landing) {
   const issueLink = issueUrl
-    ? `<p>Your submission is publicly visible at:<br>
-       <a href="${issueUrl}" target="_blank" rel="noopener">${issueUrl}</a></p>`
+    ? `<p>Your submission is publicly visible at:<br><a href="${issueUrl}" target="_blank" rel="noopener">${issueUrl}</a></p>`
     : '';
-  return `<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Submitted — Bring Your Own Disease</title>
-    <style>${CSS}</style></head><body>
-    <div class="thankyou">
-      <div class="icon">✅</div>
-      <h1>Thank you!</h1>
-      <p>Your contribution has been received and added to the session repository.</p>
-      ${issueLink}
-      <p style="margin-top:12px;font-size:13px;color:var(--muted)">
-        The session team will review and convert it to FAIR data.
-      </p>
-      <a class="btn-back" href="${landingPage}">← Back to session page</a>
-    </div>
-  </body></html>`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Submitted · Bring Your Own Disease</title><style>${CSS}</style></head><body>
+  <div class="thankyou">
+    <div class="icon">✅</div>
+    <h1>Thank you!</h1>
+    <p>Your contribution has been received and added to the session repository.</p>
+    ${issueLink}
+    <p style="margin-top:12px;font-size:13px;color:var(--muted)">The session team will review and convert it to FAIR data.</p>
+    <a class="btn-back" href="${landing}">← Back to session page</a>
+  </div></body></html>`;
 }
 
-function errorPage(msg, landingPage) {
-  return `<!DOCTYPE html><html lang="en"><head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Error — Bring Your Own Disease</title>
-    <style>${CSS}</style></head><body>
-    <div class="thankyou">
-      <div class="icon">⚠️</div>
-      <h1>Something went wrong</h1>
-      <div class="error-box">${msg}</div>
-      <a class="btn-back" href="${landingPage}">← Back to session page</a>
-    </div>
-  </body></html>`;
+function errorPage(msg, landing) {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Error · Bring Your Own Disease</title><style>${CSS}</style></head><body>
+  <div class="thankyou">
+    <div class="icon">⚠️</div><h1>Something went wrong</h1>
+    <div class="error-box">${msg}</div>
+    <a class="btn-back" href="${landing}">← Back to session page</a>
+  </div></body></html>`;
 }
 
-function htmlResponse(html, status = 200) {
-  return new Response(html, { status, headers: { 'Content-Type': 'text/html;charset=UTF-8' } });
-}
-
-// ── Router ───────────────────────────────────────────────────────────────────
+// ── Router ────────────────────────────────────────────────────────────────────
 
 export default {
   async fetch(request, env) {
-    const url = new URL(request.url);
-    const path = url.pathname;
+    const url     = new URL(request.url);
+    const path    = url.pathname;
     const landing = env.LANDING_PAGE || '/';
 
-    if (request.method === 'POST' && path === '/submit') {
-      return handleSubmit(request, env);
+    // ── Auth routes (no session required) ────────────────────────────────────
+    if (path === '/auth/login')           return html(200, loginPage(url.searchParams.get('return') || '/forms/disease-case', env));
+    if (path === '/auth/orcid')           return orcidStart(request, env);
+    if (path === '/auth/orcid/callback')  return orcidCallback(request, env);
+    if (path === '/auth/github')          return githubStart(request, env);
+    if (path === '/auth/github/callback') return githubCallback(request, env);
+    if (path === '/auth/logout') {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: landing, 'Set-Cookie': sessionCookie('', 0) },
+      });
     }
 
+    // ── Form routes (session required) ────────────────────────────────────────
     if (request.method === 'GET') {
-      if (path === '/forms/disease-case')  return htmlResponse(formDiseaseCase(landing));
-      if (path === '/forms/ontology-gap')  return htmlResponse(formOntologyGap(landing));
-      if (path === '/forms/data-gap')      return htmlResponse(formDataGap(landing));
-      if (path === '/forms/form-feedback') return htmlResponse(formFeedback(landing));
-      if (path === '/' || path === '')     return Response.redirect(landing, 302);
+      if (path === '/forms/disease-case')  return requireAuth(request, env, s => html(200, formDiseaseCase(s, env)));
+      if (path === '/forms/ontology-gap')  return requireAuth(request, env, s => html(200, formOntologyGap(s, env)));
+      if (path === '/forms/data-gap')      return requireAuth(request, env, s => html(200, formDataGap(s, env)));
+      if (path === '/forms/form-feedback') return requireAuth(request, env, s => html(200, formFeedback(s, env)));
+      if (path === '/' || path === '')     return redirect(landing);
     }
+
+    if (request.method === 'POST' && path === '/submit') return handleSubmit(request, env);
 
     return new Response('Not found', { status: 404 });
   },
