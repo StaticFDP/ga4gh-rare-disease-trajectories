@@ -1,5 +1,5 @@
 name: "Report a data or model gap"
-description: "Flag a gap in Phenopackets, registries, PRO instruments, or data standards that prevents capturing a part of the rare disease story."
+description: "Flag a gap in data standards, registries, or exchange formats that prevents capturing part of the rare disease story."
 title: "[GAP-DATA] "
 labels: ["data-gap"]
 body:
@@ -7,36 +7,82 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use this form to flag structural or coverage gaps in data models, registries, or standards (not ontology term gaps — use the ontology gap form for those).
+        Use this form to flag structural or coverage gaps in data models, registries, or standards.
+        For missing *ontology terms*, use the **ontology gap** form instead.
+        Partial reports are welcome — describe what you can.
+
+  # ── Disease context ──────────────────────────────────────────────────────────
+
+  - type: input
+    id: disease_name
+    attributes:
+      label: Disease name (if gap is disease-specific)
+      placeholder: "e.g. ALS, Stargardt, or leave blank for a cross-disease structural gap"
+
+  - type: textarea
+    id: disease_ids
+    attributes:
+      label: Disease identifiers (any ontology, any combination)
+      description: "One per line. See formats: ORPHA:803 · OMIM:105400 · ICD-11:8B60 · ICD-10:G12.2 · SNOMED:37340000 · GARD:0005765 · MONDO:0004976"
+      placeholder: |
+        ORPHA:803
+        OMIM:105400
+
+  # ── Affected standard or system ──────────────────────────────────────────────
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Affected standard, model, or registry
 
   - type: dropdown
     id: affected_standard
     attributes:
-      label: Affected standard or system
+      label: Affected standard or system (select all that apply)
       multiple: true
       options:
+        # ── Exchange formats & data models ──────────────────────────────────
         - Phenopackets (GA4GH)
-        - FHIR (HL7)
+        - FHIR (HL7) — core resources
+        - FHIR — Genomics Reporting IG
         - OMOP CDM
-        - IAMRARE registry model
-        - RARE-X data model
+        - openEHR
+        # ── International rare disease platforms ───────────────────────────
+        - RD-Connect / GPAP
+        - EUPID (European Platform for Rare Disease Registries)
+        - EPIRARE
+        - ERDRI (European Rare Disease Registry Infrastructure)
+        - ERN (European Reference Network) registry
+        # ── National & disease-specific registries ──────────────────────────
+        - IAMRARE (Global Genes / NORD)
+        - RARE-X patient registry
         - ALS TDI Registry
         - PhenoDB
-        - Other / multiple
+        - DECIPHER
+        - NORD Patient Registry
+        # ── Ontology-adjacent data models ──────────────────────────────────
+        - Orphanet data model (ORDO / clinical entity structure)
+        - GA4GH Variant Representation Specification (VRS)
+        - GA4GH Pedigree Standard
+        # ── Other ──────────────────────────────────────────────────────────
+        - Other / multiple not listed
     validations:
       required: true
 
-  - type: input
-    id: disease_context
+  # ── The gap ──────────────────────────────────────────────────────────────────
+
+  - type: markdown
     attributes:
-      label: Disease context
-      placeholder: "e.g. ALS, Stargardt, any rare disease"
+      value: |
+        ---
+        ### Describing the gap
 
   - type: textarea
     id: gap_description
     attributes:
       label: What cannot be captured and why?
-      description: "Be specific about what clinical information is missing and which model element (or absence thereof) is responsible."
+      description: "Be specific: what clinical information is missing and which model element (or its absence) is responsible?"
       placeholder: |
         I am trying to represent: ...
         The current model handles this by: ...
@@ -47,38 +93,72 @@ body:
   - type: dropdown
     id: gap_category
     attributes:
-      label: Category of gap
+      label: Category of gap (select all that apply)
       multiple: true
       options:
-        - Longitudinal / trajectory data (change over time)
+        # ── Temporal / longitudinal ──────────────────────────────────────
+        - Longitudinal / trajectory data — change over time
         - Disease progression rate or slope
-        - Patient-reported outcomes not linkable to clinical terms
-        - Caregiver / family impact
-        - Social determinants of health
-        - Diagnostic uncertainty or revision
+        - Age of onset / diagnostic delay
+        - Time from symptom to diagnosis (diagnostic odyssey duration)
+        # ── Patient experience ──────────────────────────────────────────
+        - Patient-reported outcomes (PROs) not linkable to clinical terms
+        - Quality of life / functional status / disability
+        - Caregiver or family impact
+        - Patient-reported diagnostic odyssey narrative
+        # ── Clinical data elements ──────────────────────────────────────
+        - Diagnostic uncertainty or evolving diagnosis
         - Treatment response / lack of response
-        - Functional status / disability
-        - Imaging findings not mapped to terms
+        - Off-label or compassionate use therapies
+        - Imaging findings not mapped to structured terms
+        - Biomarker / lab result without standard code
+        # ── Structural / interoperability ───────────────────────────────
+        - Cross-registry linkage — same patient in multiple registries
+        - Cross-border data harmonisation
+        - Rare disease not representable in ICD-10 (too granular for a code)
+        - Social determinants of health
         - Environmental / exposure history
+        - Genetic variant — phenotype correlation not capturable
+        # ── Rare disease specific ───────────────────────────────────────
+        - Ultra-rare disease with fewer than 10 known cases — model too coarse
+        - Natural history data missing (disease too rare to have population data)
+        - No validated outcome measure exists for this disease
+        # ── Other ───────────────────────────────────────────────────────
         - Other
 
   - type: textarea
     id: proposed_solution
     attributes:
       label: Proposed solution or workaround (optional)
-      placeholder: "e.g. Add a Measurement element with LOINC code for ALSFRS-R total score..."
+      placeholder: |
+        e.g. Add a Measurement element with LOINC code for ALSFRS-R total score...
+        or: Extend Phenopackets TimeElement to support trajectory slope...
 
   - type: dropdown
     id: priority
     attributes:
       label: How critical is this gap to rare disease phenotyping?
       options:
-        - Critical — blocks meaningful data sharing
-        - High — significant information loss
-        - Medium — workarounds exist but are imperfect
-        - Low — minor nuance lost
+        - Critical — blocks meaningful data sharing or cross-registry linkage
+        - High — significant information loss; no good workaround
+        - Medium — workarounds exist but introduce ambiguity or data loss
+        - Low — minor nuance lost; workarounds adequate
+
+  # ── Evidence ─────────────────────────────────────────────────────────────────
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or prior discussion (optional)
+      description: "Links to papers, GitHub issues, working group outputs, or standards discussions that document this gap."
+      placeholder: |
+        https://github.com/phenopackets/phenopacket-schema/issues/XXX
+        https://doi.org/...
+
+  # ── Contributor ──────────────────────────────────────────────────────────────
 
   - type: input
     id: contributor
     attributes:
       label: Your name / affiliation (optional)
+      placeholder: "e.g. Danielle Goldbeck, RARE-X"

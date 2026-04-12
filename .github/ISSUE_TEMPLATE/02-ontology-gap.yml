@@ -1,5 +1,5 @@
 name: "Report an ontology gap"
-description: "Flag a clinical concept that is missing, imprecise, or poorly scoped in HPO, Mondo, ECTO, or related ontologies."
+description: "Flag a clinical concept that is missing, imprecise, or poorly scoped in any rare disease ontology or terminology."
 title: "[GAP-ONTOLOGY] "
 labels: ["ontology-gap"]
 body:
@@ -8,34 +8,90 @@ body:
     attributes:
       value: |
         Use this form to flag concepts that cannot be adequately expressed using current ontology terms.
+        Partial reports are welcome — describe what you can.
+
+  # ── Disease context ──────────────────────────────────────────────────────────
+
+  - type: input
+    id: disease_name
+    attributes:
+      label: Disease name (if gap is disease-specific)
+      placeholder: "e.g. ALS, Stargardt disease — or leave blank for a cross-disease gap"
+
+  - type: textarea
+    id: disease_ids
+    attributes:
+      label: Disease identifiers (any ontology, any combination)
+      description: "One per line. See formats: ORPHA:803 · OMIM:105400 · ICD-11:8B60 · ICD-10:G12.2 · SNOMED:37340000 · GARD:0005765 · MONDO:0004976"
+      placeholder: |
+        ORPHA:803
+        OMIM:105400
+        ICD-10:G12.2
+
+  # ── Which ontology/ontologies have the gap ───────────────────────────────────
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Ontology / terminology scope
 
   - type: dropdown
     id: ontology
     attributes:
-      label: Which ontology has the gap?
+      label: Which ontology or terminology has the gap? (select all that apply)
       multiple: true
       options:
-        - HPO (Human Phenotype Ontology)
-        - Mondo (Disease Ontology)
-        - ECTO (Environmental conditions and Treatments Ontology)
-        - Other / multiple
+        - Orphanet (ORDO) — rare disease classification
+        - OMIM — Mendelian / genetic disease
+        - GARD — NIH rare disease catalogue
+        - HPO (Human Phenotype Ontology) — phenotype features
+        - ECTO (Environmental Conditions and Treatments Ontology)
+        - ICD-11 — WHO clinical classification (current)
+        - ICD-10 — WHO clinical classification (legacy)
+        - SNOMED CT — clinical terminology
+        - Mondo — cross-ontology harmonisation
+        - NANDO — neurological & neuromuscular diseases
+        - MeSH — NLM indexing vocabulary
+        - DOID — Disease Ontology
+        - Other / multiple not listed
     validations:
       required: true
 
-  - type: input
-    id: disease_context
+  - type: checkboxes
+    id: cross_ontology
     attributes:
-      label: Disease context
-      placeholder: "e.g. ALS, Stargardt disease, unspecified rare disease"
+      label: Is this a cross-ontology coverage gap?
+      description: "Check if the concept exists in one ontology but is missing or misaligned in another."
+      options:
+        - label: "Yes — the concept exists in one ontology but not in another (describe below)"
+
+  - type: textarea
+    id: cross_ontology_detail
+    attributes:
+      label: Cross-ontology detail (if applicable)
+      description: "Which ontology has it? Which one is missing it? Are the definitions consistent?"
+      placeholder: |
+        Has it:   ORPHA:803 (Orphanet) — well-defined entry
+        Missing:  ICD-11 — no equivalent code; closest is a broad category that also covers unrelated conditions
+        Mondo:    MONDO:0004976 — maps to the Orphanet entry but HPO terms for key features are absent
+
+  # ── The gap itself ───────────────────────────────────────────────────────────
+
+  - type: markdown
+    attributes:
+      value: |
+        ---
+        ### Describing the gap
 
   - type: textarea
     id: concept
     attributes:
       label: Clinical concept that cannot be adequately expressed
-      description: "Describe what you are trying to capture and why current terms don't work."
+      description: "Describe what you are trying to capture and why current terms do not work."
       placeholder: |
         I am trying to represent: ...
-        The closest existing term is: HP:XXXXXXX (label)
+        The closest existing term is: ORPHA:XXXX / HP:XXXX / SNOMED:XXXX (label)
         Why it is insufficient: ...
     validations:
       required: true
@@ -45,14 +101,25 @@ body:
     attributes:
       label: Type of gap
       options:
-        - Missing term (concept does not exist at all)
-        - Term too broad (no sufficiently specific term)
-        - Term too narrow (existing term is over-specified)
-        - Wrong axis (concept modeled under wrong parent)
-        - Modifier missing (need a qualifier/severity/laterality that doesn't exist)
-        - Temporal dimension missing (cannot express change over time)
-        - PRO / patient-reported concept not in scope of HPO
+        - Missing term — concept does not exist in any relevant ontology
+        - Term too broad — no sufficiently specific term
+        - Term too narrow — existing term is over-specified
+        - Wrong axis — concept modelled under incorrect parent
+        - Modifier missing — no qualifier for severity / laterality / progression
+        - Temporal dimension missing — cannot express change over time
+        - Cross-ontology misalignment — same concept modelled inconsistently
+        - Rare disease not represented — disease exists in ORDO but absent elsewhere
+        - PRO / patient-reported concept out of scope
+        - Caregiver / family impact not modelled
         - Other
+
+  - type: textarea
+    id: concrete_examples
+    attributes:
+      label: Concrete clinical examples
+      placeholder: |
+        A patient with ALS whose weakness progresses distally to proximally —
+        there is no HPO term for progression pattern or direction of spread.
 
   - type: textarea
     id: proposed_solution
@@ -60,16 +127,26 @@ body:
       label: Proposed solution (optional)
       placeholder: |
         Suggested new term: ...
-        Suggested parent: ...
-        Definition: ...
+        Suggested parent: HP:XXXXXXX / ORPHA:XXXXX
+        Suggested definition: ...
+        Mapping to existing terms in other ontologies: ...
 
-  - type: textarea
-    id: examples
+  # ── Impact ───────────────────────────────────────────────────────────────────
+
+  - type: dropdown
+    id: priority
     attributes:
-      label: Concrete clinical examples
-      placeholder: "e.g. A patient with ALS whose weakness progresses from distal to proximal — there is no HPO term for progression pattern..."
+      label: How critical is this gap to rare disease phenotyping?
+      options:
+        - Critical — blocks meaningful data sharing or patient identification
+        - High — significant clinical information lost in encoding
+        - Medium — workarounds exist but introduce ambiguity
+        - Low — minor nuance lost
+
+  # ── Contributor ──────────────────────────────────────────────────────────────
 
   - type: input
     id: contributor
     attributes:
       label: Your name / affiliation (optional)
+      placeholder: "e.g. Nicole Vasilevsky, Monarch Initiative"
