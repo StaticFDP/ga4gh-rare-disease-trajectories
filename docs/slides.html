@@ -87,6 +87,141 @@
       letter-spacing: .04em;
     }
 
+    /* ══════════════════════════════════════════════════════
+       SLIDE 3 — What is a BioHackathon
+    ══════════════════════════════════════════════════════ */
+    #slide-3 {
+      background: #0f1923;
+      color: var(--white);
+      padding: 2.8rem 5rem 4rem;
+      justify-content: space-between;
+    }
+
+    .slide-3-header {
+      margin-bottom: 1.6rem;
+    }
+
+    .slide-3-header h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: .3rem;
+    }
+
+    .slide-3-header .definition {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,.55);
+      max-width: 820px;
+      line-height: 1.5;
+    }
+
+    .slide-3-header .definition em {
+      color: rgba(255,255,255,.8);
+      font-style: italic;
+    }
+
+    /* ── Two-column layout ── */
+    .bh-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem;
+      flex: 1;
+    }
+
+    .bh-card {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 12px;
+      padding: 1.25rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: .7rem;
+    }
+
+    .bh-card-label {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+    }
+
+    .bh-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    .bh-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+    }
+
+    .bh-card ul li {
+      font-size: .95rem;
+      color: rgba(255,255,255,.72);
+      padding-left: 1rem;
+      position: relative;
+      line-height: 1.45;
+    }
+
+    .bh-card ul li::before {
+      content: '—';
+      position: absolute;
+      left: 0;
+      color: rgba(255,255,255,.22);
+    }
+
+    .bh-card ul li strong { color: rgba(255,255,255,.9); }
+
+    /* ── Timeline strip ── */
+    .bh-timeline {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 1.1rem;
+    }
+
+    .bh-era {
+      flex: 1;
+      padding: .8rem 1.1rem;
+      border-right: 1px solid rgba(255,255,255,.07);
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+
+    .bh-era:last-child { border-right: none; }
+
+    .bh-era .era-year {
+      font-size: .8rem;
+      font-weight: 700;
+      color: #a6ce39;
+    }
+
+    .bh-era .era-text {
+      font-size: .82rem;
+      color: rgba(255,255,255,.6);
+      line-height: 1.35;
+    }
+
+    /* ── Citation ── */
+    .slide-cite {
+      font-size: .72rem;
+      color: rgba(255,255,255,.3);
+      margin-top: .8rem;
+      line-height: 1.4;
+    }
+
+    .slide-cite a { color: rgba(255,255,255,.4); text-decoration: underline; }
+
     /* ── Presenter credit ── */
     .presenter {
       font-size: .82rem;
@@ -522,12 +657,90 @@
 
   </div><!-- /slide-2 -->
 
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 3 — What is a BioHackathon
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-3">
+
+    <div class="slide-3-header">
+      <h2>What is a BioHackathon?</h2>
+      <p class="definition">
+        <em>"A special kind of unconference in which people come together to state, discuss,
+        and solve problems by means of collaborative brainstorming, modeling, design,
+        coding, testing, and documenting."</em>
+        &nbsp;— Garcia et al., 2020
+      </p>
+    </div>
+
+    <div class="bh-cols">
+
+      <div class="bh-card">
+        <div class="bh-card-label">What it is</div>
+        <h3>Collaborative problem-solving sprint</h3>
+        <ul>
+          <li><strong>Not a conference</strong> — the goal is outputs, not presentations</li>
+          <li><strong>Not only for developers</strong> — clinicians, ontologists, patient advocates, and informaticians all contribute</li>
+          <li>Participants self-organise around problems they care about</li>
+          <li>Open-source outputs hosted in public repositories from day one</li>
+          <li>Collaborations formed here often outlast the event itself</li>
+        </ul>
+      </div>
+
+      <div class="bh-card">
+        <div class="bh-card-label">What comes out</div>
+        <h3>Tangible, lasting outputs</h3>
+        <ul>
+          <li>Working code, prototypes, and pipelines</li>
+          <li>Standards proposals and ontology improvements</li>
+          <li>FAIR datasets and interoperability bridges</li>
+          <li>Preprints on BioHackrXiv — a dedicated preprint server launched in 2019</li>
+          <li>New professional networks across disciplines and institutions</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Timeline -->
+    <div class="bh-timeline">
+      <div class="bh-era">
+        <span class="era-year">2002</span>
+        <span class="era-text">First BioHackathon — Open Bioinformatics Foundation</span>
+      </div>
+      <div class="bh-era">
+        <span class="era-year">2008+</span>
+        <span class="era-text">DBCLS BioHackathon series — annual, Japan</span>
+      </div>
+      <div class="bh-era">
+        <span class="era-year">2014+</span>
+        <span class="era-text">ELIXIR BioHackathon — annual, Europe</span>
+      </div>
+      <div class="bh-era">
+        <span class="era-year">2019</span>
+        <span class="era-text">BioHackrXiv launched — dedicated preprint server</span>
+      </div>
+      <div class="bh-era">
+        <span class="era-year">Today</span>
+        <span class="era-text">This GA4GH session — FAIR rare disease data sprint</span>
+      </div>
+    </div>
+
+    <p class="slide-cite">
+      Garcia L, Antezana E, Garcia A, et al. (2020) Ten simple rules to run a successful BioHackathon.
+      <em>PLoS Comput Biol</em> 16(5): e1007808.
+      <a href="https://doi.org/10.1371/journal.pcbi.1007808" target="_blank" rel="noopener">doi:10.1371/journal.pcbi.1007808</a>
+      &nbsp;·&nbsp;
+      <a href="https://biohackathon.org" target="_blank" rel="noopener">biohackathon.org</a>
+    </p>
+
+  </div><!-- /slide-3 -->
+
 </div><!-- /deck -->
 
 <!-- ── Navigation ── -->
 <div class="nav-strip">
   <button id="btn-prev" onclick="go(-1)" disabled>Previous</button>
-  <span id="slide-counter">1 / 2</span>
+  <span id="slide-counter">1 / 3</span>
   <button id="btn-next" onclick="go(1)">Next</button>
 </div>
 
