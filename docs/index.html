@@ -707,6 +707,62 @@
     </div>
   </section>
 
+  <!-- ── Live Demos ──────────────────────────────────────────────────────── -->
+  <section id="demos">
+    <h2>Live demonstrations</h2>
+    <p class="section-intro">Two interactive demos showing what becomes possible once disease data is FAIR.</p>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap:1.25rem; margin-top:1.25rem;">
+
+      <div style="border:2px solid var(--brand); border-radius:var(--radius); overflow:hidden;">
+        <div style="background:var(--brand); color:#fff; padding:1.1rem 1.25rem;">
+          <div style="font-size:1.4rem; margin-bottom:.3rem;">🔎</div>
+          <strong style="font-size:1rem;">Demo 1 — SPARQL across FDPs</strong>
+          <p style="font-size:.82rem; opacity:.85; margin-top:.3rem;">
+            Query RDF metadata from all registered FDPs in your browser — no server needed.
+          </p>
+        </div>
+        <div style="padding:1.1rem 1.25rem; background:#fff;">
+          <p style="font-size:.87rem; color:var(--muted); margin-bottom:1rem;">
+            Powered by <strong>Comunica</strong> — a W3C-compliant SPARQL engine running entirely in the browser.
+            Pre-loaded queries: list all datasets, find by ORDO/OMIM disease term, show distributions, list community submissions.
+          </p>
+          <a href="https://fdp.semscape.org/sparql-demo/"
+             target="_blank" rel="noopener"
+             class="btn btn-green" style="display:inline-block; padding:.55rem 1.1rem;">
+            Open SPARQL demo →
+          </a>
+        </div>
+      </div>
+
+      <div style="border:2px solid var(--accent); border-radius:var(--radius); overflow:hidden;">
+        <div style="background:var(--accent); color:#fff; padding:1.1rem 1.25rem;">
+          <div style="font-size:1.4rem; margin-bottom:.3rem;">🔄</div>
+          <strong style="font-size:1rem;">Demo 2 — Form → RDF pipeline</strong>
+          <p style="font-size:.82rem; opacity:.85; margin-top:.3rem;">
+            Watch a web-form submission become machine-readable linked data in real time.
+          </p>
+        </div>
+        <div style="padding:1.1rem 1.25rem; background:#fff;">
+          <p style="font-size:.87rem; color:var(--muted); margin-bottom:.6rem;">
+            The pipeline runs automatically: submit a disease case → GitHub Issue → GitHub Actions converts it to RDF Turtle → committed to <code>docs/fdp/submissions.ttl</code> → served via GitHub Pages → queryable in Demo 1.
+          </p>
+          <ol style="font-size:.84rem; color:var(--muted); padding-left:1.2rem; margin-bottom:1rem;">
+            <li>Submit a case via the form above (ORCID login required)</li>
+            <li>Watch the <a href="https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/actions" target="_blank">Actions tab</a> convert it to Turtle (&lt;60 s)</li>
+            <li>Run "Community submissions" query in Demo 1 to see it appear</li>
+          </ol>
+          <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions.ttl"
+             target="_blank" rel="noopener"
+             class="btn" style="display:inline-block; padding:.55rem 1.1rem; background:var(--accent); color:#fff; border-radius:8px; font-weight:600; font-size:.9rem;">
+            View submissions.ttl →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
 </main>
 
 <!-- ── Footer ────────────────────────────────────────────────────────────── -->

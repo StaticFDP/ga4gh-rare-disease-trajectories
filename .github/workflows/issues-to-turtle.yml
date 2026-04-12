@@ -1,0 +1,77 @@
+name: Issues → Turtle
+
+# Converts GitHub Issues labelled "disease-case" to RDF Turtle and commits
+# the result to docs/fdp/submissions.ttl, which is served by GitHub Pages.
+# This closes the loop:  web form → GitHub Issue → RDF → FDP → SPARQL queryable.
+
+on:
+  # ── Fires whenever an issue is created, labelled, or edited ─────────────────
+  issues:
+    types: [opened, labeled, edited, closed, reopened]
+
+  # ── Daily refresh (catches manual Issue edits, label changes, etc.) ──────────
+  schedule:
+    - cron: '25 4 * * *'
+
+  # ── Manual run from Actions tab ──────────────────────────────────────────────
+  workflow_dispatch:
+
+permissions:
+  contents: write    # needed to commit submissions.ttl back to main
+  issues:   read
+
+jobs:
+  convert:
+    # Only run for the disease-case label (or non-issue triggers)
+    if: >
+      github.event_name != 'issues' ||
+      contains(github.event.issue.labels.*.name, 'disease-case') ||
+      github.event.label.name == 'disease-case'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # No extra pip deps — script uses stdlib only
+
+      - name: Convert issues to Turtle
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPO:  ${{ github.repository }}
+        run: python3 scripts/issues_to_turtle.py
+
+      - name: Commit submissions.ttl
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/fdp/submissions.ttl
+          git diff --staged --quiet && echo "No changes to commit" && exit 0
+
+          TRIGGER="${{ github.event_name }}"
+          if [ "$TRIGGER" = "issues" ]; then
+            MSG="data: regenerate submissions.ttl (issue #${{ github.event.issue.number }} ${{ github.event.action }}) [skip ci]"
+          else
+            MSG="data: regenerate submissions.ttl (${TRIGGER}) [skip ci]"
+          fi
+
+          git commit -m "$MSG"
+          git push
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Issues → Turtle" >> $GITHUB_STEP_SUMMARY
+          if [ -f docs/fdp/submissions.ttl ]; then
+            COUNT=$(grep -c "a dcat:Dataset" docs/fdp/submissions.ttl 2>/dev/null || echo 0)
+            echo "- **${COUNT}** disease case(s) written to \`docs/fdp/submissions.ttl\`" >> $GITHUB_STEP_SUMMARY
+            echo "- Live at: https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions.ttl" >> $GITHUB_STEP_SUMMARY
+          fi
