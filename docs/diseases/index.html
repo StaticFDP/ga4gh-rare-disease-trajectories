@@ -15,7 +15,7 @@
   "name": "GA4GH Rare Disease Trajectory Datasets",
   "description": "Community-contributed FAIR disease trajectory datasets from GA4GH biohackathon sessions.",
   "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/",
-  "dateModified": "2026-04-12",
+  "dateModified": "2026-04-13",
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "publisher": {
     "@type": "Organization",
@@ -27,7 +27,7 @@
       "@type": "Dataset",
       "name": "Amyotrophic lateral sclerosis (ALS)",
       "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/",
-      "dateModified": "2026-04-12",
+      "dateModified": "2026-04-13",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
@@ -40,7 +40,7 @@
       "@type": "Dataset",
       "name": "Duchenne muscular dystrophy (DMD)",
       "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/",
-      "dateModified": "2026-04-12",
+      "dateModified": "2026-04-13",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
@@ -70,7 +70,7 @@
     nav a{color:rgba(255,255,255,.8);font-size:.88rem}
     nav a:hover{color:#fff}
     nav .brand{font-weight:700;color:#fff;font-size:1rem;
-               display:flex;align-items:center;gap:.45rem}
+                display:flex;align-items:center;gap:.45rem}
     nav .brand img{height:28px;border-radius:4px}
     nav .brand span{color:rgba(255,255,255,.65);font-weight:400;font-size:.86em}
     nav .spacer{flex:1}
@@ -91,15 +91,12 @@
     /* access panel */
     .access-panel{background:var(--gray-9);color:#fff;border-radius:var(--radius);
                    padding:1.5rem;margin-bottom:2.5rem;display:grid;
-                   grid-template-columns:3fr 2fr;gap:1.5rem}
-    @media(max-width:780px){.access-panel{grid-template-columns:1fr}}
-    /* min-width:0 is required so overflow-x:auto works inside grid cells */
-    .access-panel > div{min-width:0}
+                   grid-template-columns:1fr 1fr;gap:1.5rem}
+    @media(max-width:640px){.access-panel{grid-template-columns:1fr}}
     .access-panel h3{font-size:.95rem;color:#fff;margin-bottom:.75rem}
     .access-panel pre{background:#0d1117;border:1px solid #30363d;border-radius:6px;
                         padding:.75rem 1rem;font-size:.78rem;overflow-x:auto;
-                        color:#e6edf3;line-height:1.6;margin-bottom:.5rem;
-                        white-space:pre;word-break:normal}
+                        color:#e6edf3;line-height:1.6;margin-bottom:.5rem}
     .access-links{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
     .btn-dl{display:inline-block;padding:.4rem .9rem;border-radius:6px;font-size:.82rem;
              font-weight:600;color:#fff;text-decoration:none}
@@ -169,7 +166,7 @@
   <div class="badges">
     <span class="badge badge-green">2 disease datasets</span>
     <span class="badge badge-blue">CC BY 4.0</span>
-    <span class="badge badge-gray">Updated 2026-04-12</span>
+    <span class="badge badge-gray">Updated 2026-04-13</span>
     <span class="badge badge-gray">git-versioned</span>
   </div>
 </div>
@@ -186,8 +183,8 @@ g = Graph()
 g.parse("https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl")</code></pre>
       <pre><code># R (rdflib)
 library(rdflib)
-url &lt;- "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl"
-rdf &lt;- rdf_parse(url, format="turtle")</code></pre>
+rdf &lt;- rdf_parse("https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl",
+                 format="turtle")</code></pre>
       <pre><code># curl
 curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl</code></pre>
       <div class="access-links">
@@ -232,7 +229,7 @@ SELECT ?disease ?title ?ordo WHERE {
           <span title="Data gaps">0 data gaps</span>
         </div>
         <div class="dc-chips"><span class="chip">ALS TDI Registry (ALS Therapy Development Institute)</span></div>
-        <div class="dc-meta">First contributed: 2026-04-12 · Updated: 2026-04-12</div>
+        <div class="dc-meta">First contributed: 2026-04-12 · Updated: 2026-04-13</div>
         <div class="dc-actions">
           <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.ttl" class="btn btn-ttl">TTL</a>
           <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803.jsonld" class="btn btn-jsonld">JSON-LD</a>
@@ -252,7 +249,7 @@ SELECT ?disease ?title ?ordo WHERE {
           <span title="Data gaps">0 data gaps</span>
         </div>
         <div class="dc-chips"><span class="chip">Duchenne Data Platform (Duchenne Parent Project / FAIR Data Systems S.L.)</span></div>
-        <div class="dc-meta">First contributed: 2026-04-12 · Updated: 2026-04-12</div>
+        <div class="dc-meta">First contributed: 2026-04-12 · Updated: 2026-04-13</div>
         <div class="dc-actions">
           <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.ttl" class="btn btn-ttl">TTL</a>
           <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895.jsonld" class="btn btn-jsonld">JSON-LD</a>
