@@ -405,7 +405,14 @@
     footer a { color: rgba(255,255,255,0.8); text-decoration: underline; }
 
     .footer-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 8px; }
+  #qr-login { margin-top: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+  #qr-login canvas, #qr-login img { border-radius: 6px; border: 3px solid #fff;
+    box-shadow: 0 1px 6px rgba(0,0,0,.15); }
+  #qr-login .qr-label { font-size: 11px; color: #4b7a3a; letter-spacing: .02em; }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+          integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSe3Ah15oqYIDMVQJ4PLLS9Nl2PqfNTUVAyg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
 
@@ -478,6 +485,9 @@
                       border-radius:6px;padding:5px 12px;text-decoration:none;white-space:nowrap;">
               Sign in with ORCID →
             </a>
+          </div>
+          <div id="qr-login">
+            <span class="qr-label">Or scan to sign in on your phone</span>
           </div>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
@@ -877,11 +887,37 @@ curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl
       btn.href = 'https://byod-form-receiver.andra-76d.workers.dev/auth/logout';
       btn.title = 'Click to sign out';
 
-      // Also hide the login callout in the Path A card
+      // Also hide the login callout (incl. QR code) in the Path A card
       const callout = document.getElementById('login-callout');
       if (callout) callout.style.display = 'none';
+    } else {
+      // Render QR code for login URL so audience can scan from a projector
+      const qrEl = document.getElementById('qr-login');
+      if (qrEl && typeof QRCode !== 'undefined') {
+        new QRCode(qrEl, {
+          text:         'https://byod-form-receiver.andra-76d.workers.dev/auth/login',
+          width:        160,
+          height:       160,
+          colorDark:    '#166534',
+          colorLight:   '#f0fdf4',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      }
     }
-  } catch { /* silently ignore — worker may be unavailable */ }
+  } catch {
+    // silently ignore — worker may be unavailable; still try to render QR
+    const qrEl = document.getElementById('qr-login');
+    if (qrEl && typeof QRCode !== 'undefined') {
+      new QRCode(qrEl, {
+        text:         'https://byod-form-receiver.andra-76d.workers.dev/auth/login',
+        width:        160,
+        height:       160,
+        colorDark:    '#166534',
+        colorLight:   '#f0fdf4',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+  }
 })();
 </script>
 
