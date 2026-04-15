@@ -873,12 +873,53 @@
 
   </div><!-- /slide-4 -->
 
+
+  <!-- ══════════════════════════════════════════════════
+       SLIDE 5 — Go to session page
+  ══════════════════════════════════════════════════ -->
+  <div class="slide" id="slide-5"
+       style="display:flex;flex-direction:column;justify-content:center;align-items:center;
+              gap:2.2rem;text-align:center;background:linear-gradient(135deg,#0f4c3a 0%,#1a6b5a 60%,#2563eb 100%);">
+
+    <div>
+      <p style="font-size:1rem;letter-spacing:.12em;text-transform:uppercase;
+                opacity:.65;margin-bottom:.6rem;">Ready to contribute?</p>
+      <h1 style="font-size:clamp(2.4rem,6vw,4.2rem);font-weight:800;line-height:1.1;
+                 letter-spacing:-.02em;color:#fff;">
+        Bring Your Own Disease
+      </h1>
+      <p style="font-size:1.25rem;opacity:.8;margin-top:.8rem;color:#fff;">
+        Sign in with ORCID and fill in a form — your submission becomes FAIR data in 60 seconds.
+      </p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1rem;">
+      <div id="qr-session"
+           style="border-radius:10px;border:4px solid rgba(255,255,255,.8);
+                  box-shadow:0 4px 24px rgba(0,0,0,.45);overflow:hidden;display:inline-block;"></div>
+      <p style="font-size:.9rem;opacity:.7;color:#fff;">Scan or click below</p>
+    </div>
+
+    <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/"
+       target="_blank" rel="noopener"
+       style="background:#a6ce39;color:#000;font-size:1.35rem;font-weight:800;
+              padding:.85rem 2.8rem;border-radius:10px;text-decoration:none;
+              box-shadow:0 4px 18px rgba(0,0,0,.35);letter-spacing:.01em;">
+      Open session page →
+    </a>
+
+    <p style="font-size:.85rem;opacity:.5;color:#fff;font-family:monospace;">
+      https://fdp.semscape.org/ga4gh-rare-disease-trajectories/
+    </p>
+
+  </div><!-- /slide-5 -->
+
 </div><!-- /deck -->
 
 <!-- ── Navigation ── -->
 <div class="nav-strip">
   <button id="btn-prev" onclick="go(-1)" disabled>Previous</button>
-  <span id="slide-counter">1 / 4</span>
+  <span id="slide-counter">1 / 5</span>
   <button id="btn-next" onclick="go(1)">Next</button>
 </div>
 
@@ -993,7 +1034,7 @@
     go(1);
   });
 
-  // ── QR code — slides URL ──────────────────────────────────────────────────
+  // ── QR code — slides URL (slide 1) ───────────────────────────────────────
   (function () {
     const el = document.getElementById('qr-slides-canvas');
     if (el && typeof QRCode !== 'undefined') {
@@ -1001,6 +1042,21 @@
         text:         'https://fdp.semscape.org/ga4gh-rare-disease-trajectories/slides.html',
         width:        140,
         height:       140,
+        colorDark:    '#0f4c3a',
+        colorLight:   '#f0fdf4',
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+  })();
+
+  // ── QR code — session landing page (slide 5) ─────────────────────────────
+  (function () {
+    const el = document.getElementById('qr-session');
+    if (el && typeof QRCode !== 'undefined') {
+      new QRCode(el, {
+        text:         'https://fdp.semscape.org/ga4gh-rare-disease-trajectories/',
+        width:        200,
+        height:       200,
         colorDark:    '#0f4c3a',
         colorLight:   '#f0fdf4',
         correctLevel: QRCode.CorrectLevel.M,
