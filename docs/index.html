@@ -451,6 +451,21 @@
       <span>All backgrounds welcome</span>
       <span>Data stays open</span>
     </div>
+
+    <!-- Slides QR — scannable from the projector -->
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:24px;">
+      <div id="qr-slides-index"
+           style="border-radius:8px;border:3px solid rgba(255,255,255,.75);
+                  box-shadow:0 2px 14px rgba(0,0,0,.35);overflow:hidden;display:inline-block;"></div>
+      <span style="font-size:12px;opacity:.7;letter-spacing:.03em;">
+        Scan for slides &nbsp;·&nbsp;
+        <a href="/ga4gh-rare-disease-trajectories/slides.html"
+           style="color:rgba(255,255,255,.85);text-decoration:underline;">
+          or open directly
+        </a>
+      </span>
+    </div>
+
   </div>
 </header>
 
@@ -917,6 +932,21 @@ curl https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/index.ttl
         correctLevel: QRCode.CorrectLevel.M
       });
     }
+  }
+})();
+
+// ── Slides QR (always render — no auth dependency) ────────────────────────
+(function () {
+  const el = document.getElementById('qr-slides-index');
+  if (el && typeof QRCode !== 'undefined') {
+    new QRCode(el, {
+      text:         'https://fdp.semscape.org/ga4gh-rare-disease-trajectories/slides.html',
+      width:        140,
+      height:       140,
+      colorDark:    '#0f4c3a',
+      colorLight:   'rgba(255,255,255,0.92)',
+      correctLevel: QRCode.CorrectLevel.M,
+    });
   }
 })();
 </script>

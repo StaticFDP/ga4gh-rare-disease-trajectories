@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bring Your Own Disease · Welcome Slides · GA4GH April 2026</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+          integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSe3Ah15oqYIDMVQJ4PLLS9Nl2PqfNTUVAyg=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -560,6 +563,29 @@
     .demo-btn-blue  { background: #2563eb; color: #fff; }
     .demo-btn-gray  { background: rgba(255,255,255,.1); color: rgba(255,255,255,.85);
                       border: 1px solid rgba(255,255,255,.18); }
+
+    /* ── QR code corner block ── */
+    .slide-qr {
+      position: absolute;
+      bottom: 4.5rem; /* above nav strip */
+      right: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .4rem;
+      z-index: 10;
+    }
+    .slide-qr canvas, .slide-qr img {
+      border-radius: 6px;
+      border: 3px solid rgba(255,255,255,.85);
+      box-shadow: 0 2px 12px rgba(0,0,0,.5);
+    }
+    .slide-qr .qr-cap {
+      font-size: .72rem;
+      color: rgba(255,255,255,.6);
+      letter-spacing: .03em;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -616,6 +642,11 @@
           </p>
         </div>
       </div>
+    </div>
+
+    <div class="slide-qr" id="qr-slides">
+      <div id="qr-slides-canvas"></div>
+      <span class="qr-cap">Scan for slides</span>
     </div>
 
   </div><!-- /slide-1 -->
@@ -807,8 +838,24 @@
 
     <div class="map-legend">
       <div class="legend-item">
+        <div class="legend-dot" style="background:#f97316"></div>
+        O|B|F BioHackathon (2002–)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#eab308"></div>
+        NESCent Hackathon (2006–)
+      </div>
+      <div class="legend-item">
         <div class="legend-dot" style="background:#3b82f6"></div>
-        DBCLS BioHackathon (Japan, 2008–)
+        DBCLS/NBDC BioHackathon (Japan, 2008–)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#a855f7"></div>
+        BOSC Codefest (2010–)
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#06b6d4"></div>
+        EU Codefest (2012–)
       </div>
       <div class="legend-item">
         <div class="legend-dot" style="background:#22c55e"></div>
@@ -856,7 +903,15 @@
     }).addTo(map);
 
     // colours
-    const C = { dbcls: '#3b82f6', elixir: '#22c55e', today: '#a6ce39' };
+    const C = {
+      dbcls:      '#3b82f6',   // blue   — DBCLS/NBDC Japan
+      elixir:     '#22c55e',   // green  — ELIXIR Europe
+      obf:        '#f97316',   // orange — O|B|F BioHackathon
+      codefest:   '#a855f7',   // purple — BOSC Codefest
+      eucodefest: '#06b6d4',   // cyan   — EU Codefest
+      nescent:    '#eab308',   // yellow — NESCent Hackathon
+      today:      '#a6ce39',   // ORCID green — this session
+    };
 
     function dot(lat, lng, series, label, years) {
       const isToday = series === 'today';
@@ -874,13 +929,33 @@
         });
     }
 
-    // ── DBCLS BioHackathon (Japan) ──
+    // ── O|B|F BioHackathon (2002–2003) ──
+    dot(53.5461, -113.4938, 'obf', 'Edmonton, Canada',          'O|B|F BioHackathon #1, 2002 (with BOSC/ISMB)');
+    dot(-33.9249,  18.4241, 'obf', 'Cape Town, South Africa',   'O|B|F BioHackathon #2, 2002');
+    dot(-27.4705,  153.026, 'obf', 'Brisbane, Australia',       'O|B|F BioHackathon #3, 2003 (with ISMB)');
+
+    // ── NESCent Hackathon (2006–) ──
+    dot(35.9940,  -78.8986, 'nescent', 'Durham, NC, USA', 'NESCent Hackathon 2006–');
+
+    // ── DBCLS / NBDC BioHackathon (Japan) ──
     dot(35.6762, 139.6503, 'dbcls', 'Tokyo, Japan',      'DBCLS BioHackathon 2008, 2009, 2010, 2013');
     dot(35.0116, 135.7681, 'dbcls', 'Kyoto, Japan',      'DBCLS BioHackathon 2011');
     dot(36.6959, 137.2137, 'dbcls', 'Toyama, Japan',     'DBCLS BioHackathon 2012');
-    dot(38.3736, 141.0653, 'dbcls', 'Matsushima, Japan', 'DBCLS BioHackathon 2014');
+    dot(38.3736, 141.0653, 'dbcls', 'Matsushima, Japan', 'NBDC/DBCLS BioHackathon 2014');
     dot(33.5904, 130.4017, 'dbcls', 'Fukuoka, Japan',    'NBDC/DBCLS BioHackathon 2019');
     dot(37.7503, 140.4675, 'dbcls', 'Fukushima, Japan',  'DBCLS BioHackathon 2024');
+
+    // ── BOSC Codefest (alongside ISMB) ──
+    dot(42.3601,  -71.0589, 'codefest', 'Boston, MA, USA',       'BOSC Codefest 2010, 2014');
+    dot(48.2082,   16.3738, 'codefest', 'Vienna, Austria',        'BOSC Codefest 2011');
+    dot(33.7701, -118.1937, 'codefest', 'Long Beach, CA, USA',    'BOSC Codefest 2012');
+    dot(52.5200,   13.4050, 'codefest', 'Berlin, Germany',        'BOSC Codefest 2013');
+    dot(53.3498,   -6.2603, 'codefest', 'Dublin, Ireland',        'BOSC Codefest 2015');
+    dot(28.5383,  -81.3792, 'codefest', 'Orlando, FL, USA',       'BOSC Codefest 2016');
+
+    // ── EU Codefest ──
+    dot(51.5074,   -0.1278, 'eucodefest', 'London / Hinxton, UK',  'EU Codefest 2014');
+    dot(52.3676,    4.9041, 'eucodefest', 'Amsterdam, Netherlands', 'EU Codefest 2012');
 
     // ── ELIXIR BioHackathon Europe ──
     dot(48.8566,  2.3522, 'elixir', 'Paris, France',         'ELIXIR BioHackathon Europe 2018, 2019, 2022');
@@ -917,6 +992,21 @@
     if (e.target.closest('a, button')) return;
     go(1);
   });
+
+  // ── QR code — slides URL ──────────────────────────────────────────────────
+  (function () {
+    const el = document.getElementById('qr-slides-canvas');
+    if (el && typeof QRCode !== 'undefined') {
+      new QRCode(el, {
+        text:         'https://fdp.semscape.org/ga4gh-rare-disease-trajectories/slides.html',
+        width:        140,
+        height:       140,
+        colorDark:    '#0f4c3a',
+        colorLight:   '#f0fdf4',
+        correctLevel: QRCode.CorrectLevel.M,
+      });
+    }
+  })();
 </script>
 
 </body>
