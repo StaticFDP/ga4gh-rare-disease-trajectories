@@ -1,0 +1,25 @@
+@prefix dcat:    <https://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
+@prefix omim:    <https://omim.org/entry/> .
+@prefix hp:      <http://purl.obolibrary.org/obo/HP_> .
+@prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
+@prefix prov:    <http://www.w3.org/ns/prov#> .
+@prefix schema:  <https://schema.org/> .
+
+
+# Case submissions for: Norrie's Disease
+# Source: https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues?q=label%3Adisease-case
+# Auto-generated 2026-04-16
+
+# Case #5
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease/case/5> a dcat:Dataset ;
+    dcterms:title "Case #5: Norrie's Disease"@en ;
+    dcat:isPartOf <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease/> ;
+    dcterms:description "First months: atypical eye appearance, no apparent vision. Imaging studies conducted to narrow diagnosis and eliminate childhood cancers such as RB. Eye exams conducted by specialist MDs lead to elimination of various known congenital causes of blindness. Genetic tests suggested, which should lead to conclusive diagnosis for this monogenic trait."@en ;
+    dcterms:created   "2026-04-16"^^xsd:date ;
+    dcterms:source    "GA4GH BYOD web form (ORCID-authenticated)" ;
+    dcat:landingPage  <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/5> ;
+    dcterms:creator <https://orcid.org/0000-0001-9205-3828> .

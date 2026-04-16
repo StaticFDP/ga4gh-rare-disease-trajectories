@@ -11,8 +11,15 @@
 
 
 # Flat community submissions index
-# Auto-generated 2026-04-16 | 3 case(s)
+# Auto-generated 2026-04-16 | 4 case(s)
 # Source: https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues?q=label%3Adisease-case
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions/5> a dcat:Dataset ;
+    dcterms:title "Norrie's Disease"@en ;
+    dcterms:description "First months: atypical eye appearance, no apparent vision. Imaging studies conducted to narrow diagnosis and eliminate childhood cancers such as RB. Eye exams conducted by specialist MDs lead to elimination of various known congenital causes of blindness. Genetic tests suggested, which should lead to conclusive diagnosis for this monogenic trait."@en ;
+    dcterms:created "2026-04-16"^^xsd:date ;
+    dcat:landingPage <https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues/5> ;
+    dcterms:creator <https://orcid.org/0000-0001-9205-3828> .
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions/3> a dcat:Dataset ;
     dcterms:title "test"@en ;

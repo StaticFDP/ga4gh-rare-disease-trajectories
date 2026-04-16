@@ -14,6 +14,18 @@
   "dataset": [
     {
       "@type": "Dataset",
+      "name": "Norrie's Disease",
+      "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease/",
+      "dateModified": "2026-04-16",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "distribution": {
+        "@type": "DataDownload",
+        "encodingFormat": "text/turtle",
+        "contentUrl": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease.ttl"
+      }
+    },
+    {
+      "@type": "Dataset",
       "name": "test",
       "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/",
       "dateModified": "2026-04-16",
