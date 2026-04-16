@@ -11,13 +11,13 @@
 
 
 # Disease Dataset Index — GA4GH Rare Disease Trajectories
-# Auto-generated 2026-04-15 | 2 disease dataset(s)
+# Auto-generated 2026-04-16 | 2 disease dataset(s)
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> a dcat:Catalog ;
     dcterms:title "GA4GH Rare Disease Trajectory Datasets"@en ;
     dcterms:description "Community-contributed, FAIR-compliant disease trajectory datasets from GA4GH biohackathon sessions. Each dataset covers one disease: case submissions, phenotype data, and identified ontology/data gaps."@en ;
-    dcterms:modified   "2026-04-15"^^xsd:date ;
-    dcterms:hasVersion "7ae4fdab97bd" ;
+    dcterms:modified   "2026-04-16"^^xsd:date ;
+    dcterms:hasVersion "a233bc689d0a" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog/> ;
@@ -26,7 +26,7 @@
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/> a dcat:Dataset ;
     dcterms:title "Amyotrophic lateral sclerosis (ALS)"@en ;
-    dcterms:modified "2026-04-15"^^xsd:date ;
+    dcterms:modified "2026-04-16"^^xsd:date ;
     dcterms:subject <http://www.orpha.net/ORDO/Orphanet_803> ;
     dcterms:subject <https://omim.org/entry/105400> ;
     dcterms:subject <http://purl.obolibrary.org/obo/MONDO_0004976> ;
@@ -34,7 +34,7 @@
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/> a dcat:Dataset ;
     dcterms:title "Duchenne muscular dystrophy (DMD)"@en ;
-    dcterms:modified "2026-04-15"^^xsd:date ;
+    dcterms:modified "2026-04-16"^^xsd:date ;
     dcterms:subject <http://www.orpha.net/ORDO/Orphanet_98895> ;
     dcterms:subject <https://omim.org/entry/310200> ;
     dcterms:subject <http://purl.obolibrary.org/obo/MONDO_0010679> ;
