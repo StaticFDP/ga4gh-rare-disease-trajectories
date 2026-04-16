@@ -11,18 +11,24 @@
 
 
 # Disease Dataset Index — GA4GH Rare Disease Trajectories
-# Auto-generated 2026-04-16 | 2 disease dataset(s)
+# Auto-generated 2026-04-16 | 3 disease dataset(s)
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> a dcat:Catalog ;
     dcterms:title "GA4GH Rare Disease Trajectory Datasets"@en ;
     dcterms:description "Community-contributed, FAIR-compliant disease trajectory datasets from GA4GH biohackathon sessions. Each dataset covers one disease: case submissions, phenotype data, and identified ontology/data gaps."@en ;
     dcterms:modified   "2026-04-16"^^xsd:date ;
-    dcterms:hasVersion "a233bc689d0a" ;
+    dcterms:hasVersion "bf87e20bea8c" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog/> ;
+    dcat:dataset <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/> ;
     dcat:dataset <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/> ;
     dcat:dataset <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/> .
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/> a dcat:Dataset ;
+    dcterms:title "test"@en ;
+    dcterms:modified "2026-04-16"^^xsd:date ;
+    dcat:accessURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl> .
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/> a dcat:Dataset ;
     dcterms:title "Amyotrophic lateral sclerosis (ALS)"@en ;
