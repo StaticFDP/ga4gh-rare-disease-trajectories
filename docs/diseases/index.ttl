@@ -11,13 +11,13 @@
 
 
 # Disease Dataset Index — GA4GH Rare Disease Trajectories
-# Auto-generated 2026-04-16 | 4 disease dataset(s)
+# Auto-generated 2026-04-17 | 4 disease dataset(s)
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> a dcat:Catalog ;
     dcterms:title "GA4GH Rare Disease Trajectory Datasets"@en ;
     dcterms:description "Community-contributed, FAIR-compliant disease trajectory datasets from GA4GH biohackathon sessions. Each dataset covers one disease: case submissions, phenotype data, and identified ontology/data gaps."@en ;
-    dcterms:modified   "2026-04-16"^^xsd:date ;
-    dcterms:hasVersion "591794c3e355" ;
+    dcterms:modified   "2026-04-17"^^xsd:date ;
+    dcterms:hasVersion "23e99a7437fe" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog/> ;
@@ -28,17 +28,17 @@
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease/> a dcat:Dataset ;
     dcterms:title "Norrie's Disease"@en ;
-    dcterms:modified "2026-04-16"^^xsd:date ;
+    dcterms:modified "2026-04-17"^^xsd:date ;
     dcat:accessURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease.ttl> .
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/> a dcat:Dataset ;
     dcterms:title "test"@en ;
-    dcterms:modified "2026-04-16"^^xsd:date ;
+    dcterms:modified "2026-04-17"^^xsd:date ;
     dcat:accessURL <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test.ttl> .
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/> a dcat:Dataset ;
     dcterms:title "Amyotrophic lateral sclerosis (ALS)"@en ;
-    dcterms:modified "2026-04-16"^^xsd:date ;
+    dcterms:modified "2026-04-17"^^xsd:date ;
     dcterms:subject <http://www.orpha.net/ORDO/Orphanet_803> ;
     dcterms:subject <https://omim.org/entry/105400> ;
     dcterms:subject <http://purl.obolibrary.org/obo/MONDO_0004976> ;
@@ -46,7 +46,7 @@
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/> a dcat:Dataset ;
     dcterms:title "Duchenne muscular dystrophy (DMD)"@en ;
-    dcterms:modified "2026-04-16"^^xsd:date ;
+    dcterms:modified "2026-04-17"^^xsd:date ;
     dcterms:subject <http://www.orpha.net/ORDO/Orphanet_98895> ;
     dcterms:subject <https://omim.org/entry/310200> ;
     dcterms:subject <http://purl.obolibrary.org/obo/MONDO_0010679> ;
