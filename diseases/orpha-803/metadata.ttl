@@ -12,15 +12,15 @@
 
 # Disease dataset: Amyotrophic lateral sclerosis (ALS)
 # Slug: orpha-803
-# Auto-generated 2026-04-20 from GitHub Issues
-# Version: ea99ab5df4ee
+# Auto-generated 2026-04-21 from GitHub Issues
+# Version: 2cc05721a3a4
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/> a dcat:Dataset ;
     dcterms:title "Amyotrophic lateral sclerosis (ALS)"@en ;
     dcterms:description "Community-contributed disease trajectory data for Amyotrophic lateral sclerosis (ALS). Contains 1 case submission(s) and 0 gap report(s), contributed during GA4GH BYOD sessions and maintained as FAIR linked data."@en ;
     dcterms:created    "2026-04-12"^^xsd:date ;
-    dcterms:modified   "2026-04-20"^^xsd:date ;
-    dcterms:hasVersion "ea99ab5df4ee" ;
+    dcterms:modified   "2026-04-21"^^xsd:date ;
+    dcterms:hasVersion "2cc05721a3a4" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> ;
