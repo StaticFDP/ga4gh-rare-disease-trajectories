@@ -20,10 +20,13 @@
  *   ORCID_CLIENT_ID     — from orcid.org/developer-tools
  *   ORCID_CLIENT_SECRET
  *   SESSION_SECRET      — any random 32+ char string
+ *   FORGEJO_TOKEN       — (optional) Forgejo/Codeberg token for EU mirror writes
  *
  * Vars (wrangler.toml):
- *   GITHUB_REPO   — e.g. "StaticFDP/ga4gh-rare-disease-trajectories"
- *   LANDING_PAGE  — e.g. "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/"
+ *   GITHUB_REPO      — e.g. "StaticFDP/ga4gh-rare-disease-trajectories"
+ *   LANDING_PAGE     — e.g. "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/"
+ *   FORGEJO_BASE_URL — (optional) e.g. "https://codeberg.org"
+ *   FORGEJO_REPO     — (optional) e.g. "StaticFDP/ga4gh-rare-disease-trajectories"
  */
 
 // ── Session helpers (Web Crypto — no external deps) ───────────────────────────
@@ -906,6 +909,21 @@ async function handleSubmit(request, env) {
 
   if (!env.GITHUB_TOKEN) return html(500, errorPage('Server not configured (missing GITHUB_TOKEN).', landing));
 
+  // ── Mirror write to Forgejo (non-fatal, fires in parallel) ──────────────────
+  // Enabled when FORGEJO_TOKEN + FORGEJO_REPO are set in wrangler.toml / secrets.
+  if (env.FORGEJO_TOKEN && env.FORGEJO_REPO) {
+    const base = env.FORGEJO_BASE_URL || 'https://codeberg.org';
+    fetch(`${base}/api/v1/repos/${env.FORGEJO_REPO}/issues`, {
+      method:  'POST',
+      headers: {
+        'Authorization': `token ${env.FORGEJO_TOKEN}`,
+        'Content-Type':  'application/json',
+      },
+      body: JSON.stringify(issue),
+    }).catch(e => console.error('Forgejo mirror write failed (non-fatal):', e.message));
+  }
+
+  // ── Primary write to GitHub ──────────────────────────────────────────────────
   const resp = await fetch(`https://api.github.com/repos/${env.GITHUB_REPO}/issues`, {
     method: 'POST',
     headers: {

@@ -48,6 +48,11 @@ GITHUB_REPO  = os.environ.get("GITHUB_REPO",  "StaticFDP/ga4gh-rare-disease-traj
 GITHUB_SHA   = os.environ.get("GITHUB_SHA",   "unknown")
 BASE         = Path(os.environ.get("OUTPUT_BASE", "."))
 
+# EU mirror — Forgejo/Codeberg (optional; issues are merged with GitHub issues)
+FORGEJO_TOKEN    = os.environ.get("FORGEJO_TOKEN",    "")
+FORGEJO_REPO     = os.environ.get("FORGEJO_REPO",     "StaticFDP/ga4gh-rare-disease-trajectories")
+FORGEJO_BASE_URL = os.environ.get("FORGEJO_BASE_URL", "https://codeberg.org")
+
 FDP_BASE_URL     = "https://fdp.semscape.org/ga4gh-rare-disease-trajectories"
 GITHUB_TREE_URL  = f"https://github.com/{GITHUB_REPO}/tree/main/diseases"
 TODAY            = datetime.date.today().isoformat()
@@ -123,10 +128,71 @@ def gh_get(path: str) -> list | dict:
     return results
 
 
+# ── Forgejo / Codeberg API (EU mirror) ────────────────────────────────────────
+
+def forgejo_get(path: str) -> list | dict:
+    """Fetch from Forgejo API (Gitea-compatible).  Returns [] if not configured."""
+    if not FORGEJO_TOKEN:
+        return []
+    headers = {
+        "Accept":        "application/json",
+        "Authorization": f"token {FORGEJO_TOKEN}",
+    }
+    results, url = [], f"{FORGEJO_BASE_URL}/api/v1{path}"
+    while url:
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read())
+                if isinstance(data, list):
+                    results.extend(data)
+                else:
+                    return data
+            link = resp.headers.get("Link", "")
+            url = next((re.search(r'<([^>]+)>', p).group(1)
+                        for p in link.split(",") if 'rel="next"' in p), None)
+        except Exception as e:
+            print(f"  [forgejo] warning: {e}", file=sys.stderr)
+            break
+    return results
+
+
+def _normalise_issue(issue: dict, source: str) -> dict:
+    """Normalise a Forgejo issue dict to look like a GitHub issue dict."""
+    if source == "github":
+        return issue
+    # Forgejo label list uses {"name":...} same as GitHub — no change needed.
+    # html_url is present in both. body may be None in both.
+    issue.setdefault("html_url", "")
+    issue.setdefault("body", "")
+    issue.setdefault("labels", [])
+    issue.setdefault("pull_request", None)
+    return issue
+
+
 def fetch_issues(label: str) -> list:
+    """Fetch issues by label from GitHub, and optionally merge EU Forgejo issues."""
     lbl = urllib.parse.quote(label)
-    issues = gh_get(f"/repos/{GITHUB_REPO}/issues?labels={lbl}&state=all&per_page=100")
-    return [i for i in issues if "pull_request" not in i]
+
+    # GitHub (primary)
+    gh_issues = gh_get(f"/repos/{GITHUB_REPO}/issues?labels={lbl}&state=all&per_page=100")
+    gh_issues = [i for i in gh_issues if "pull_request" not in i]
+
+    # Forgejo (EU mirror) — merge if configured
+    if FORGEJO_TOKEN:
+        fj_issues = forgejo_get(f"/repos/{FORGEJO_REPO}/issues?type=issues&state=closed&limit=50&labels={lbl}")
+        fj_issues += forgejo_get(f"/repos/{FORGEJO_REPO}/issues?type=issues&state=open&limit=50&labels={lbl}")
+        fj_issues = [_normalise_issue(i, "forgejo") for i in fj_issues
+                     if not i.get("pull_request")]
+
+        # Deduplicate: skip Forgejo issues whose title already appears in GitHub set
+        gh_titles = {i.get("title", "").strip() for i in gh_issues}
+        new_from_eu = [i for i in fj_issues if i.get("title", "").strip() not in gh_titles]
+        if new_from_eu:
+            print(f"  [forgejo] merged {len(new_from_eu)} unique EU issue(s) for label '{label}'")
+        gh_issues.extend(new_from_eu)
+
+    return gh_issues
 
 # ── Body parsing ──────────────────────────────────────────────────────────────
 
