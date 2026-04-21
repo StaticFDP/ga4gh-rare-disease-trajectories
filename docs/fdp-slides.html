@@ -3,892 +3,950 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FAIR Data Point, FDP Index &amp; Virtual Platform</title>
+  <title>StaticFDP Ecosystem — How it works &amp; How to deploy</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green:  #1a6b5a;
-      --green-d:#0f4c3a;
-      --blue:   #2563eb;
-      --white:  #ffffff;
-      --dim:    rgba(255,255,255,0.65);
-      --radius: 10px;
+      --green:   #1a6b5a;
+      --green-d: #0f4c3a;
+      --blue:    #2563eb;
+      --purple:  #7c3aed;
+      --white:   #ffffff;
+      --dim:     rgba(255,255,255,0.65);
+      --radius:  10px;
     }
 
     html, body { width: 100%; height: 100%; overflow: hidden;
                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
                  font-size: 18px; }
 
-    /* ── Deck & Slides ── */
     .deck { width: 100vw; height: 100vh; position: relative; }
 
     .slide {
       display: none;
       position: absolute; inset: 0;
       flex-direction: column;
-      padding: 3.2rem 4rem 5rem;
+      padding: 2.8rem 3.8rem 5rem;
       color: var(--white);
       overflow: hidden;
     }
     .slide.active { display: flex; }
-
-    /* default dark background */
     .slide { background: #0d1117; }
 
-    /* gradient variants */
-    .slide-hero {
-      background: linear-gradient(135deg, #0f4c3a 0%, #1a6b5a 55%, #2563eb 100%);
-    }
-    .slide-blue {
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
-    }
-    .slide-purple {
-      background: linear-gradient(135deg, #1e0a3c 0%, #4c1d95 100%);
-    }
-    .slide-teal {
-      background: linear-gradient(135deg, #042f2e 0%, #134e4a 100%);
-    }
-    .slide-slate {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    }
+    .slide-hero   { background: linear-gradient(135deg, #0f4c3a 0%, #1a6b5a 55%, #2563eb 100%); }
+    .slide-blue   { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+    .slide-purple { background: linear-gradient(135deg, #1e0a3c 0%, #4c1d95 100%); }
+    .slide-teal   { background: linear-gradient(135deg, #042f2e 0%, #134e4a 100%); }
+    .slide-slate  { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+    .slide-dark   { background: linear-gradient(135deg, #09090b 0%, #18181b 100%); }
 
     /* ── Typography ── */
-    h1 {
-      font-size: clamp(2.4rem, 5vw, 3.8rem);
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -.02em;
-      margin-bottom: .7rem;
-    }
-    h2 {
-      font-size: clamp(1.9rem, 3.5vw, 2.8rem);
-      font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -.015em;
-      margin-bottom: .5rem;
-    }
-    h3 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      margin-bottom: .35rem;
-    }
-    p { font-size: 1.05rem; line-height: 1.55; color: var(--dim); }
+    h1 { font-size: clamp(2.2rem, 4.5vw, 3.6rem); font-weight: 800; line-height: 1.1;
+         letter-spacing: -.02em; margin-bottom: .6rem; }
+    h2 { font-size: clamp(1.7rem, 3vw, 2.5rem); font-weight: 700; line-height: 1.15;
+         letter-spacing: -.015em; margin-bottom: .45rem; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .3rem; }
+    p  { font-size: .97rem; line-height: 1.55; color: var(--dim); }
     strong { color: var(--white); font-weight: 700; }
-    .lead { font-size: 1.25rem; color: rgba(255,255,255,.82); line-height: 1.5; }
+    .lead { font-size: 1.15rem; color: rgba(255,255,255,.82); line-height: 1.5; }
+    a { color: #93c5fd; }
 
-    /* ── Tag / badge ── */
     .tag {
-      display: inline-block;
-      background: rgba(255,255,255,.15);
-      border: 1px solid rgba(255,255,255,.3);
-      border-radius: 20px;
-      padding: 3px 14px;
-      font-size: .8rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      margin-bottom: 1rem;
+      display: inline-block; background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.3); border-radius: 20px;
+      padding: 3px 14px; font-size: .78rem; letter-spacing: .06em;
+      text-transform: uppercase; margin-bottom: .9rem;
     }
 
-    /* ── Card grid ── */
-    .card-grid {
-      display: grid;
-      gap: 1rem;
-      flex: 1;
-    }
+    /* ── Cards ── */
+    .card-grid   { display: grid; gap: .85rem; }
     .card-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
     .card-grid-2 { grid-template-columns: 1fr 1fr; }
 
     .card {
-      background: rgba(255,255,255,.07);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: var(--radius);
-      padding: 1.1rem 1.3rem;
+      background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius); padding: 1rem 1.2rem;
     }
-    .card-accent { border-left: 4px solid #a6ce39; }
+    .card-green  { border-left: 4px solid #34d399; }
     .card-blue   { border-left: 4px solid #60a5fa; }
     .card-purple { border-left: 4px solid #c084fc; }
     .card-orange { border-left: 4px solid #fb923c; }
     .card-teal   { border-left: 4px solid #2dd4bf; }
+    .card-yellow { border-left: 4px solid #fbbf24; }
+    .card p  { font-size: .9rem; margin-top: .25rem; }
+    .card ul { padding-left: 1rem; margin-top: .3rem; }
+    .card li { font-size: .88rem; color: var(--dim); line-height: 1.55; }
+    .card li strong { font-size: .88rem; }
 
-    .card p { font-size: .95rem; margin-top: .3rem; }
-    .card ul { padding-left: 1.1rem; margin-top: .35rem; }
-    .card li { font-size: .92rem; color: var(--dim); line-height: 1.5; }
-
-    /* ── Code block ── */
+    /* ── Code ── */
     .code {
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 7px;
-      padding: .75rem 1rem;
+      background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.12);
+      border-radius: 7px; padding: .65rem .9rem;
       font-family: "SF Mono", "Fira Code", Consolas, monospace;
-      font-size: .82rem;
-      line-height: 1.6;
-      color: #e2e8f0;
-      overflow: auto;
-      white-space: pre;
+      font-size: .78rem; line-height: 1.6; color: #e2e8f0;
+      overflow: auto; white-space: pre;
     }
-    .code .cm  { color: #94a3b8; }   /* comment */
-    .code .kw  { color: #7dd3fc; }   /* keyword / prefix */
-    .code .str { color: #86efac; }   /* string / IRI */
-    .code .num { color: #fbbf24; }   /* number */
-    .code .cls { color: #f0abfc; }   /* class */
+    .cm  { color: #94a3b8; }
+    .kw  { color: #7dd3fc; }
+    .str { color: #86efac; }
+    .cls { color: #f0abfc; }
 
-    /* ── Architecture flow ── */
-    .flow {
-      display: flex;
-      align-items: center;
-      gap: 0;
-      margin: .8rem 0;
-      flex-wrap: nowrap;
-    }
+    /* ── Flow boxes ── */
+    .flow-col { display: flex; flex-direction: column; align-items: flex-start; gap: .35rem; }
     .flow-box {
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.2);
-      border-radius: 7px;
-      padding: .55rem 1rem;
-      font-size: .92rem;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      border-radius: 7px; padding: .45rem .9rem; font-size: .88rem;
+      font-weight: 600; color: #fff; white-space: nowrap;
     }
-    .flow-arrow {
-      color: rgba(255,255,255,.4);
-      font-size: 1.3rem;
-      padding: 0 .4rem;
-      flex-shrink: 0;
-    }
-    .flow-box.green  { background: rgba(26,107,90,.5);  border-color: #1a6b5a; }
-    .flow-box.blue   { background: rgba(37,99,235,.4);  border-color: #3b82f6; }
-    .flow-box.purple { background: rgba(124,58,237,.4); border-color: #a78bfa; }
-    .flow-box.orange { background: rgba(234,88,12,.35); border-color: #fb923c; }
+    .flow-box.green  { background: rgba(26,107,90,.5);  border-color: #34d399; }
+    .flow-box.blue   { background: rgba(37,99,235,.4);  border-color: #60a5fa; }
+    .flow-box.purple { background: rgba(124,58,237,.4); border-color: #c084fc; }
     .flow-box.teal   { background: rgba(20,184,166,.3); border-color: #2dd4bf; }
+    .flow-box.orange { background: rgba(234,88,12,.35); border-color: #fb923c; }
     .flow-box.bright { background: #a6ce39; color: #000; border-color: #a6ce39; font-weight: 800; }
+    .flow-arrow { color: rgba(255,255,255,.35); font-size: 1.1rem; padding-left: .9rem; }
 
-    /* ── Hierarchy diagram ── */
-    .hier {
-      display: flex;
-      flex-direction: column;
-      gap: .45rem;
-    }
-    .hier-row {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-    .hier-indent { width: 2rem; flex-shrink: 0; border-left: 2px solid rgba(255,255,255,.2); margin-left: .8rem; height: 2.2rem; border-bottom: 2px solid rgba(255,255,255,.2); }
-    .hier-box {
-      border-radius: 6px;
-      padding: .45rem 1rem;
-      font-size: .95rem;
-      font-weight: 700;
-    }
-    .hier-sub { font-size: .82rem; color: var(--dim); margin-left: .5rem; }
+    /* ── Split ── */
+    .split       { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; flex: 1; align-items: start; }
+    .split-wide  { grid-template-columns: 2fr 3fr; }
+    .split-33    { grid-template-columns: 1fr 2fr; }
 
-    /* ── Two-column with prose + code ── */
-    .split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      flex: 1;
-      align-items: start;
+    /* ── Checklist ── */
+    .checklist { list-style: none; display: flex; flex-direction: column; gap: .45rem; margin-top: .4rem; }
+    .checklist li {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .9rem; color: var(--dim); line-height: 1.45;
     }
-    .split-wide {
-      grid-template-columns: 2fr 3fr;
+    .checklist li .num {
+      background: rgba(255,255,255,.12); border-radius: 50%;
+      width: 1.4rem; height: 1.4rem; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 700; color: #fff;
     }
+    .checklist li strong { color: #fff; font-size: .9rem; }
 
-    /* ── Comparison table ── */
-    .compare {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .92rem;
-    }
-    .compare th {
-      text-align: left;
-      padding: .5rem .9rem;
-      font-size: .8rem;
-      letter-spacing: .06em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.5);
-      border-bottom: 1px solid rgba(255,255,255,.15);
-    }
-    .compare td {
-      padding: .5rem .9rem;
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      color: var(--dim);
-      vertical-align: top;
-    }
+    /* ── Compare table ── */
+    .compare { width: 100%; border-collapse: collapse; font-size: .88rem; }
+    .compare th { text-align: left; padding: .45rem .8rem; font-size: .75rem;
+                  letter-spacing: .06em; text-transform: uppercase;
+                  color: rgba(255,255,255,.45); border-bottom: 1px solid rgba(255,255,255,.15); }
+    .compare td { padding: .42rem .8rem; border-bottom: 1px solid rgba(255,255,255,.07);
+                  color: var(--dim); vertical-align: top; }
     .compare td strong { color: #fff; }
     .compare tr:last-child td { border-bottom: none; }
-    .check  { color: #4ade80; font-weight: 700; }
-    .cross  { color: #f87171; font-weight: 700; }
+    .check   { color: #4ade80; font-weight: 700; }
+    .cross   { color: #f87171; font-weight: 700; }
     .neutral { color: #fbbf24; font-weight: 700; }
 
-    /* ── URL chip ── */
-    .url-chip {
-      display: inline-block;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 5px;
-      padding: 2px 9px;
-      font-family: monospace;
-      font-size: .8rem;
-      color: #93c5fd;
-    }
+    /* ── Hierarchy ── */
+    .hier      { display: flex; flex-direction: column; gap: .4rem; }
+    .hier-row  { display: flex; align-items: center; gap: .55rem; }
+    .hier-box  { border-radius: 6px; padding: .4rem .9rem; font-size: .88rem; font-weight: 700; }
+    .hier-sub  { font-size: .78rem; color: var(--dim); }
 
-    /* ── Presenter line ── */
-    .presenter {
-      font-size: .82rem;
-      color: rgba(255,255,255,.5);
-      line-height: 1.5;
-    }
-    .presenter a { color: rgba(255,255,255,.6); text-decoration: none; }
-
-    /* ── Nav strip ── */
-    .nav-strip {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 48px;
-      background: rgba(0,0,0,.75);
-      backdrop-filter: blur(8px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      z-index: 100;
-    }
-    .nav-strip button {
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.2);
-      color: #fff;
-      font-size: .88rem;
-      padding: .3rem 1.1rem;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .nav-strip button:disabled { opacity: .3; cursor: default; }
-    .nav-strip button:hover:not(:disabled) { background: rgba(255,255,255,.2); }
-    #slide-counter { color: rgba(255,255,255,.5); font-size: .85rem; min-width: 4rem; text-align: center; }
-
-    .key-hint {
-      position: fixed;
-      bottom: 56px; right: 1.5rem;
-      font-size: .72rem;
-      color: rgba(255,255,255,.25);
-    }
-
-    /* ── Pill list ── */
-    .pill-list { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
-    .pill {
-      background: rgba(255,255,255,.1);
-      border: 1px solid rgba(255,255,255,.18);
-      border-radius: 20px;
-      padding: 3px 11px;
-      font-size: .8rem;
-      color: rgba(255,255,255,.8);
-    }
+    /* ── Pill ── */
+    .pill-list { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .4rem; }
+    .pill { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+            border-radius: 20px; padding: 2px 10px; font-size: .77rem; color: rgba(255,255,255,.8); }
 
     /* ── Callout ── */
     .callout {
-      background: rgba(166,206,57,.12);
-      border: 1px solid rgba(166,206,57,.35);
-      border-radius: 8px;
-      padding: .75rem 1rem;
-      font-size: .9rem;
-      color: rgba(255,255,255,.8);
-      margin-top: .6rem;
+      background: rgba(166,206,57,.1); border: 1px solid rgba(166,206,57,.3);
+      border-radius: 8px; padding: .65rem .9rem; font-size: .88rem;
+      color: rgba(255,255,255,.8); margin-top: .5rem;
     }
     .callout strong { color: #a6ce39; }
+
+    .url-chip {
+      display: inline-block; background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.15); border-radius: 5px;
+      padding: 1px 8px; font-family: monospace; font-size: .78rem; color: #93c5fd;
+    }
+
+    /* ── Big layer boxes for FDP↔FDPi↔VP diagram ── */
+    .layer-box {
+      border-radius: 10px; padding: .9rem 1.1rem;
+      display: flex; flex-direction: column; gap: .25rem;
+    }
+    .layer-box .lbl { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; opacity: .6; }
+    .layer-box .name { font-size: 1.05rem; font-weight: 800; }
+    .layer-box .desc { font-size: .82rem; color: rgba(255,255,255,.7); }
+
+    /* ── Nav ── */
+    .nav-strip {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 48px;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      gap: 1.5rem; z-index: 100;
+    }
+    .nav-strip button {
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2);
+      color: #fff; font-size: .85rem; padding: .28rem 1.1rem;
+      border-radius: 6px; cursor: pointer;
+    }
+    .nav-strip button:disabled { opacity: .3; cursor: default; }
+    .nav-strip button:hover:not(:disabled) { background: rgba(255,255,255,.2); }
+    #slide-counter { color: rgba(255,255,255,.5); font-size: .82rem; min-width: 4rem; text-align: center; }
+    .key-hint { position: fixed; bottom: 56px; right: 1.5rem;
+                font-size: .7rem; color: rgba(255,255,255,.22); }
+    .presenter { font-size: .78rem; color: rgba(255,255,255,.5); }
+    .presenter a { color: rgba(255,255,255,.6); text-decoration: none; }
   </style>
 </head>
 <body>
-
 <div class="deck" id="deck">
 
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 1 — Title
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-hero active" id="slide-1">
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.8rem;">
-      <span class="tag">GA4GH Session · April 16, 2026</span>
-      <p class="presenter">
-        Andra Waagmeester &nbsp;·&nbsp; Amsterdam UMC &nbsp;·&nbsp;
-        ORCID <a href="https://orcid.org/0000-0001-9773-4008" target="_blank">0000-0001-9773-4008</a>
-      </p>
-    </div>
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 1 — Title
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-hero active" id="slide-1">
 
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:1.4rem;">
-      <h1>FAIR Data Points,<br>FDP Index &amp; Virtual Platform</h1>
-      <p class="lead" style="max-width:680px;">
-        How machine-readable metadata travels from a single dataset
-        all the way to a federated, queryable network — and how this
-        session's data fits into that picture.
-      </p>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.6rem;">
+    <span class="tag">StaticFDP Ecosystem</span>
+    <p class="presenter">
+      Andra Waagmeester &nbsp;·&nbsp; Amsterdam UMC &nbsp;·&nbsp;
+      ORCID <a href="https://orcid.org/0000-0001-9773-4008" target="_blank">0000-0001-9773-4008</a>
+    </p>
+  </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem;margin-top:.5rem;">
-        <div class="card card-accent">
-          <h3>FDP</h3>
-          <p>A REST endpoint that describes your dataset in RDF, following the DCAT + FDP-O vocabulary.</p>
-        </div>
-        <div class="card card-blue">
-          <h3>FDP Index</h3>
-          <p>A central registry that harvests metadata from all registered FDPs for discovery.</p>
-        </div>
-        <div class="card card-purple">
-          <h3>Virtual Platform</h3>
-          <p>A federated network of FDPs acting as one — data stays at source, queries travel.</p>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /slide-1 -->
-
-
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 2 — What is an FDP?
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-teal" id="slide-2">
-
-    <h2>What is a FAIR Data Point?</h2>
-    <p class="lead" style="margin-bottom:1.2rem;">
-      A stable URL that returns machine-readable metadata about one or more datasets — the "business card" of your data, written in RDF.
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:1.2rem;">
+    <h1>FAIR Data Points<br>on static hosting</h1>
+    <p class="lead" style="max-width:660px;">
+      Three open-source reference implementations — FDP, FDP Index, and Virtual Platform —
+      deployable with no dedicated server. This deck explains how each layer works
+      and what you need to deploy one.
     </p>
 
-    <div class="split" style="flex:1;">
-
-      <div style="display:flex;flex-direction:column;gap:.9rem;">
-        <div class="card card-teal">
-          <h3>Three roles in one</h3>
-          <ul>
-            <li><strong>Metadata API</strong> — serves RDF at stable IRIs via content negotiation (Turtle, JSON-LD)</li>
-            <li><strong>Catalogue</strong> — organises datasets into a hierarchy</li>
-            <li><strong>FAIR gateway</strong> — each resource carries provenance, licence, and links to the data</li>
-          </ul>
-        </div>
-
-        <div class="card">
-          <h3>Standards it uses</h3>
-          <div class="pill-list">
-            <span class="pill">DCAT 3</span>
-            <span class="pill">Dublin Core</span>
-            <span class="pill">FDP-O ontology</span>
-            <span class="pill">SHACL profiles</span>
-            <span class="pill">schema.org</span>
-            <span class="pill">re3data</span>
-          </div>
-        </div>
-
-        <div class="callout">
-          <strong>Spec:</strong> <a href="https://specs.fairdatapoint.org" target="_blank" style="color:#a6ce39;">specs.fairdatapoint.org</a><br>
-          <strong>Reference impl:</strong> <a href="https://github.com/FAIRDataTeam/FAIRDataPoint" target="_blank" style="color:#a6ce39;">FAIRDataTeam/FAIRDataPoint</a>
-        </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.85rem;margin-top:.4rem;">
+      <div class="card card-green">
+        <h3>staticfdp</h3>
+        <p>Publishes a DCAT-conformant FDP from form submissions. Forms → Issues → RDF → Pages.</p>
       </div>
-
-      <div style="display:flex;flex-direction:column;gap:.75rem;">
-        <p style="font-size:.88rem;color:rgba(255,255,255,.5);margin-bottom:.2rem;">Metadata hierarchy</p>
-        <div class="hier">
-          <div class="hier-row">
-            <div class="hier-box" style="background:rgba(37,99,235,.45);border:1px solid #3b82f6;">
-              fdp:MetadataService
-            </div>
-            <span class="hier-sub">— the FDP root</span>
-          </div>
-          <div class="hier-row" style="margin-left:1.6rem;">
-            <div style="width:1.4rem;border-left:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);height:1.4rem;flex-shrink:0;"></div>
-            <div class="hier-box" style="background:rgba(20,184,166,.35);border:1px solid #2dd4bf;">
-              dcat:Catalog
-            </div>
-            <span class="hier-sub">— thematic collection</span>
-          </div>
-          <div class="hier-row" style="margin-left:3.6rem;">
-            <div style="width:1.4rem;border-left:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);height:1.4rem;flex-shrink:0;"></div>
-            <div class="hier-box" style="background:rgba(124,58,237,.4);border:1px solid #a78bfa;">
-              dcat:Dataset
-            </div>
-            <span class="hier-sub">— one cohort, study, registry…</span>
-          </div>
-          <div class="hier-row" style="margin-left:5.6rem;">
-            <div style="width:1.4rem;border-left:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);height:1.4rem;flex-shrink:0;"></div>
-            <div class="hier-box" style="background:rgba(234,88,12,.35);border:1px solid #fb923c;">
-              dcat:Distribution
-            </div>
-            <span class="hier-sub">— TTL, CSV, FHIR, API…</span>
-          </div>
-        </div>
-
-        <div class="code" style="margin-top:.6rem;"
-><span class="cm"># This session's FDP root (Turtle)</span>
-<span class="str">&lt;https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/&gt;</span>
-    a  <span class="cls">fdp:MetadataService</span>, <span class="cls">r3d:Repository</span> ;
-    <span class="kw">dcterms:title</span>  <span class="str">"GA4GH Rare Disease Trajectories"</span><span class="kw">@en</span> ;
-    <span class="kw">dcterms:license</span>  <span class="str">&lt;https://creativecommons.org/licenses/by/4.0/&gt;</span> ;
-    <span class="kw">fdp:hasCatalog</span>  <span class="str">:catalog</span> .</div>
+      <div class="card card-blue">
+        <h3>staticfdp-index</h3>
+        <p>Harvests registered FDPs and serves a discovery catalog as static RDF + HTML.</p>
       </div>
-
-    </div>
-
-  </div><!-- /slide-2 -->
-
-
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 3 — FDP Metadata model in this project
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-slate" id="slide-3">
-
-    <h2>FDP Metadata Model — This Project</h2>
-    <p class="lead" style="margin-bottom:1rem;">
-      The catalog at
-      <span class="url-chip">fdp.semscape.org/…/fdp/catalog.ttl</span>
-      follows the standard hierarchy exactly.
-    </p>
-
-    <div class="split split-wide" style="flex:1;">
-
-      <div style="display:flex;flex-direction:column;gap:.8rem;">
-        <div class="card card-blue">
-          <h3>MetadataService (FDP root)</h3>
-          <p>Single FDP for the whole GA4GH session. Declares publisher, licence (CC-BY 4.0), and links to the Catalog.</p>
-        </div>
-        <div class="card card-teal">
-          <h3>Catalog</h3>
-          <p>
-            "Rare Disease Trajectory Descriptions — GA4GH Session April 2026"
-          </p>
-          <p style="margin-top:.3rem;">
-            Theme taxonomies: ORDO · HPO · MONDO
-          </p>
-        </div>
-        <div class="card card-purple">
-          <h3>Datasets (7)</h3>
-          <ul>
-            <li>Per-disease dataset index (auto-generated)</li>
-            <li>ALS TDI Registry · RARE-X · IAMRARE · PhenoDB</li>
-            <li>Ontology &amp; data model gaps</li>
-            <li>Community-submitted disease cases</li>
-          </ul>
-        </div>
-        <div class="card card-orange">
-          <h3>Distributions</h3>
-          <p>Turtle · JSON-LD · Markdown · YAML — each with a stable <code style="font-size:.8rem;">dcat:accessURL</code> on GitHub Pages.</p>
-        </div>
-      </div>
-
-      <div class="code"
-><span class="cm"># catalog.ttl (abridged)</span>
-<span class="str">:catalog</span> a <span class="cls">dcat:Catalog</span> ;
-  <span class="kw">dcterms:title</span>  <span class="str">"Rare Disease Trajectory Descriptions"</span><span class="kw">@en</span> ;
-  <span class="kw">dcat:themeTaxonomy</span>
-      <span class="str">&lt;http://www.orpha.net/ontology/orphanet.owl&gt;</span>,
-      <span class="str">&lt;http://purl.obolibrary.org/obo/hp.owl&gt;</span>,
-      <span class="str">&lt;http://purl.obolibrary.org/obo/mondo.owl&gt;</span> ;
-  <span class="kw">dcat:dataset</span>  <span class="str">:dataset-disease-index</span>,
-                <span class="str">:dataset-submissions</span>, … .
-
-<span class="str">:dataset-submissions</span> a <span class="cls">dcat:Dataset</span> ;
-  <span class="kw">dcterms:title</span>
-      <span class="str">"Community-Submitted Disease Cases"</span><span class="kw">@en</span> ;
-  <span class="kw">dcat:keyword</span>
-      <span class="str">"disease cases"</span><span class="kw">@en</span>, <span class="str">"ORCID"</span><span class="kw">@en</span> ;
-  <span class="kw">dcat:distribution</span>  <span class="str">:dist-submissions-ttl</span> .
-
-<span class="str">:dist-submissions-ttl</span> a <span class="cls">dcat:Distribution</span> ;
-  <span class="kw">dcterms:format</span>   <span class="str">"text/turtle"</span> ;
-  <span class="kw">dcat:downloadURL</span>
-      <span class="str">&lt;…/fdp/submissions.ttl&gt;</span> .</div>
-
-    </div>
-
-  </div><!-- /slide-3 -->
-
-
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 4 — FDP Index
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-blue" id="slide-4">
-
-    <h2>FDP Index</h2>
-    <p class="lead" style="margin-bottom:1.2rem;">
-      A central registry that knows where all the FDPs are — enabling
-      discovery without centralising the data.
-    </p>
-
-    <div class="card-grid card-grid-2" style="flex:1;">
-
-      <div style="display:flex;flex-direction:column;gap:.8rem;">
-        <div class="card card-blue">
-          <h3>How an FDP registers</h3>
-          <p>It sends one HTTP POST to the index:</p>
-          <div class="code" style="margin-top:.5rem;">POST https://index.fairdatapoint.org/
-Content-Type: application/json
-
-{
-  "clientUrl":
-    "https://fdp.semscape.org/
-     ga4gh-rare-disease-trajectories/fdp/"
-}</div>
-          <p style="margin-top:.4rem;">The index then harvests metadata from that URL periodically.</p>
-        </div>
-
-        <div class="card card-teal">
-          <h3>What the index stores</h3>
-          <ul>
-            <li>The FDP root IRI</li>
-            <li>Last-seen timestamp</li>
-            <li>Health / reachability state</li>
-            <li>Harvested catalog + dataset titles</li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="display:flex;flex-direction:column;gap:.8rem;">
-
-        <div class="card">
-          <h3>Discovery flow</h3>
-          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:.5rem;margin-top:.5rem;">
-            <div class="flow-box green">FDP publishes metadata</div>
-            <div style="display:flex;align-items:center;">
-              <span class="flow-arrow" style="padding:0 .5rem 0 .7rem;">&#8595;</span>
-              <span style="font-size:.82rem;color:var(--dim);">POST /entries (ping)</span>
-            </div>
-            <div class="flow-box blue">FDP Index harvests &amp; stores</div>
-            <div style="display:flex;align-items:center;">
-              <span class="flow-arrow" style="padding:0 .5rem 0 .7rem;">&#8595;</span>
-              <span style="font-size:.82rem;color:var(--dim);">client queries index</span>
-            </div>
-            <div class="flow-box purple">Client discovers datasets</div>
-            <div style="display:flex;align-items:center;">
-              <span class="flow-arrow" style="padding:0 .5rem 0 .7rem;">&#8595;</span>
-              <span style="font-size:.82rem;color:var(--dim);">dereferences FDP IRI</span>
-            </div>
-            <div class="flow-box teal">Client fetches data directly</div>
-          </div>
-        </div>
-
-        <div class="card card-orange">
-          <h3>Reference implementation</h3>
-          <p>
-            <a href="https://github.com/FAIRDataTeam/FAIRDataPoint-index"
-               target="_blank" style="color:#fb923c;">FAIRDataTeam/FAIRDataPoint-index</a>
-          </p>
-          <p style="margin-top:.3rem;">
-            Live public index: <span class="url-chip">index.fairdatapoint.org</span>
-          </p>
-          <p style="margin-top:.3rem;">
-            Also used by the ELIXIR Beacon network and national FDP deployments
-            to expose data from hospitals and biobanks.
-          </p>
-        </div>
-
+      <div class="card card-purple">
+        <h3>staticfdp-vp</h3>
+        <p>Aggregates multiple FDP Indexes into a federated discovery hub.</p>
       </div>
     </div>
 
-  </div><!-- /slide-4 -->
+    <div style="display:flex;gap:.7rem;flex-wrap:wrap;margin-top:.2rem;">
+      <a href="https://github.com/StaticFDP" target="_blank"
+         style="font-size:.83rem;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.25);
+                padding:4px 14px;border-radius:6px;text-decoration:none;">
+        github.com/StaticFDP →
+      </a>
+      <a href="https://codeberg.org/StaticFDP" target="_blank"
+         style="font-size:.83rem;color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.25);
+                padding:4px 14px;border-radius:6px;text-decoration:none;">
+        codeberg.org/StaticFDP →
+      </a>
+    </div>
+  </div>
+
+</div><!-- /slide-1 -->
 
 
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 5 — Virtual Platform
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-purple" id="slide-5">
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 2 — FDP ↔ FDPi ↔ VP: the relationship
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-dark" id="slide-2">
 
-    <h2>Virtual Platform</h2>
-    <p class="lead" style="margin-bottom:1.1rem;">
-      Many FDPs, connected through the index, behave as one queryable
-      platform — without moving or copying any data.
-    </p>
+  <h2>FDP · FDP Index · Virtual Platform</h2>
+  <p class="lead" style="margin-bottom:1.2rem;">
+    Three distinct layers. Each can be deployed independently —
+    together they form a fully federated FAIR data infrastructure.
+  </p>
 
-    <div class="card-grid card-grid-2" style="flex:1;align-items:start;">
+  <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;flex:1;align-items:center;">
 
-      <div style="display:flex;flex-direction:column;gap:.85rem;">
-        <div class="card card-purple">
-          <h3>Core idea</h3>
-          <p>
-            Data stays at the source institution. The index holds only
-            metadata. A client resolves the metadata IRI and then fetches
-            the actual distribution directly — no central data warehouse.
-          </p>
-        </div>
-
-        <div class="card">
-          <h3>In practice for rare diseases</h3>
-          <ul>
-            <li>Hospital A registers its patient cohort FDP</li>
-            <li>Registry B registers its FDP</li>
-            <li>Researcher queries the index for <em>ORPHA:98895</em></li>
-            <li>Index returns IRIs for matching datasets at A and B</li>
-            <li>Researcher downloads distributions — federated without a central server</li>
-          </ul>
-        </div>
-
-        <div class="card card-teal">
-          <h3>GA4GH connection</h3>
-          <p>
-            GA4GH Data Connect, DRS, and Beacon v2 all rely on the same
-            principle: stable IRIs for data, federated discovery, no
-            data centralisation. FDPs are the FAIR metadata layer on top.
-          </p>
-        </div>
+    <!-- FDP -->
+    <div style="display:flex;flex-direction:column;gap:.7rem;">
+      <div class="layer-box" style="background:rgba(52,211,153,.12);border:2px solid #34d399;">
+        <span class="lbl">Layer 1</span>
+        <span class="name" style="color:#34d399;">FAIR Data Point</span>
+        <span class="desc">Publishes datasets as machine-readable DCAT metadata at a stable URL</span>
       </div>
-
-      <div style="display:flex;flex-direction:column;gap:.7rem;">
-        <p style="font-size:.85rem;color:var(--dim);margin-bottom:.1rem;">Topology</p>
-
-        <!-- Simple federation diagram -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
-          <div class="flow-box teal" style="text-align:center;font-size:.83rem;">FDP<br><span style="font-weight:400;font-size:.73rem;">Hospital A</span></div>
-          <div class="flow-box teal" style="text-align:center;font-size:.83rem;">FDP<br><span style="font-weight:400;font-size:.73rem;">Hospital B</span></div>
-          <div class="flow-box teal" style="text-align:center;font-size:.83rem;">FDP<br><span style="font-weight:400;font-size:.73rem;">Registry C</span></div>
-          <div class="flow-box green" style="text-align:center;font-size:.83rem;">FDP<br><span style="font-weight:400;font-size:.73rem;">This session</span></div>
-        </div>
-        <div style="display:flex;justify-content:center;">
-          <span class="flow-arrow" style="font-size:1.6rem;">&#8595; &#8595; &#8595; &#8595;</span>
-        </div>
-        <div class="flow-box blue" style="text-align:center;">FDP Index</div>
-        <div style="display:flex;justify-content:center;">
-          <span class="flow-arrow" style="font-size:1.6rem;">&#8595;</span>
-        </div>
-        <div class="flow-box purple" style="text-align:center;">Virtual Platform<br><span style="font-weight:400;font-size:.8rem;">unified query layer</span></div>
-
-        <div class="callout" style="margin-top:.3rem;">
-          <strong>ELIXIR deployment:</strong> used by rare disease networks
-          (ERNs) and national nodes to federate data across borders
-          under the GDPR — metadata is open, data access is governed.
-        </div>
+      <div class="card" style="font-size:.85rem;">
+        <ul>
+          <li>One per project / institution</li>
+          <li>Metadata hierarchy: MetadataService → Catalog → Dataset → Distribution</li>
+          <li>Serves Turtle + JSON-LD via static files</li>
+          <li><strong>StaticFDP:</strong> GitHub/Codeberg Pages</li>
+        </ul>
       </div>
-
+      <div class="callout" style="background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3);">
+        <strong>Example:</strong> fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/
+      </div>
     </div>
 
-  </div><!-- /slide-5 -->
+    <!-- arrow 1 -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding:0 1rem;gap:.3rem;">
+      <span style="font-size:.72rem;color:rgba(255,255,255,.4);text-align:center;max-width:80px;">registers<br>(ping / YAML)</span>
+      <span style="font-size:2rem;color:rgba(255,255,255,.3);">→</span>
+      <span style="font-size:.72rem;color:rgba(255,255,255,.4);text-align:center;max-width:80px;">harvests<br>catalog.ttl</span>
+      <span style="font-size:2rem;color:rgba(255,255,255,.3);">←</span>
+    </div>
+
+    <!-- FDP Index -->
+    <div style="display:flex;flex-direction:column;gap:.7rem;">
+      <div class="layer-box" style="background:rgba(96,165,250,.12);border:2px solid #60a5fa;">
+        <span class="lbl">Layer 2</span>
+        <span class="name" style="color:#60a5fa;">FDP Index</span>
+        <span class="desc">Central registry that discovers and harvests metadata from all registered FDPs</span>
+      </div>
+      <div class="card" style="font-size:.85rem;">
+        <ul>
+          <li>One per community / domain</li>
+          <li>Stores: FDP IRI, health state, harvested titles</li>
+          <li>Exposes an index catalog as RDF</li>
+          <li><strong>StaticFDP:</strong> <code style="font-size:.8rem;">staticfdp-index</code></li>
+        </ul>
+      </div>
+      <div class="callout" style="background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.3);">
+        <strong>Reference:</strong> index.fairdatapoint.org (Java/Spring Boot)
+      </div>
+    </div>
+
+    <!-- arrow 2 -->
+    <div style="display:flex;flex-direction:column;align-items:center;padding:0 1rem;gap:.3rem;">
+      <span style="font-size:.72rem;color:rgba(255,255,255,.4);text-align:center;max-width:80px;">registers<br>index URL</span>
+      <span style="font-size:2rem;color:rgba(255,255,255,.3);">→</span>
+      <span style="font-size:.72rem;color:rgba(255,255,255,.4);text-align:center;max-width:80px;">aggregates<br>index.ttl</span>
+      <span style="font-size:2rem;color:rgba(255,255,255,.3);">←</span>
+    </div>
+
+    <!-- VP -->
+    <div style="display:flex;flex-direction:column;gap:.7rem;">
+      <div class="layer-box" style="background:rgba(192,132,252,.12);border:2px solid #c084fc;">
+        <span class="lbl">Layer 3</span>
+        <span class="name" style="color:#c084fc;">Virtual Platform</span>
+        <span class="desc">Federated discovery hub — aggregates multiple indexes, data stays at source</span>
+      </div>
+      <div class="card" style="font-size:.85rem;">
+        <ul>
+          <li>One per federation / consortium</li>
+          <li>No data centralisation — only pointers</li>
+          <li>Serves a federation graph as RDF</li>
+          <li><strong>StaticFDP:</strong> <code style="font-size:.8rem;">staticfdp-vp</code></li>
+        </ul>
+      </div>
+      <div class="callout" style="background:rgba(192,132,252,.08);border-color:rgba(192,132,252,.3);">
+        <strong>Used by:</strong> ELIXIR ERNs, Health-RI, BBMRI-ERIC
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /slide-2 -->
 
 
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 6 — Reference Implementation
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-slate" id="slide-6">
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 3 — What is an FDP? (spec + model)
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-teal" id="slide-3">
 
-    <h2>Reference Implementation</h2>
-    <p class="lead" style="margin-bottom:1rem;">
-      The canonical FDP is a Java Spring Boot service maintained by
-      the FAIRDataTeam at
-      <a href="https://github.com/FAIRDataTeam/FAIRDataPoint"
-         target="_blank" style="color:#93c5fd;">github.com/FAIRDataTeam/FAIRDataPoint</a>.
-    </p>
+  <h2>What is a FAIR Data Point?</h2>
+  <p class="lead" style="margin-bottom:1.1rem;">
+    A stable URL that returns machine-readable metadata about datasets — written in RDF, structured as a DCAT hierarchy.
+  </p>
 
-    <div class="card-grid card-grid-3" style="flex:1;">
+  <div class="split" style="flex:1;">
+
+    <div style="display:flex;flex-direction:column;gap:.8rem;">
+      <div class="card card-teal">
+        <h3>Three roles in one</h3>
+        <ul>
+          <li><strong>Metadata API</strong> — serves RDF at stable IRIs (Turtle, JSON-LD)</li>
+          <li><strong>Catalogue</strong> — organises datasets into a hierarchy</li>
+          <li><strong>FAIR gateway</strong> — carries provenance, licence, access links</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Standards</h3>
+        <div class="pill-list">
+          <span class="pill">DCAT 3</span>
+          <span class="pill">Dublin Core</span>
+          <span class="pill">FDP-O ontology</span>
+          <span class="pill">SHACL profiles</span>
+          <span class="pill">schema.org</span>
+          <span class="pill">re3data</span>
+        </div>
+      </div>
 
       <div class="card card-blue">
-        <h3>Architecture</h3>
-        <ul>
-          <li>Java 17 + Spring Boot</li>
-          <li>MongoDB (metadata store)</li>
-          <li>Blazegraph (triple store)</li>
-          <li>Docker Compose deployment</li>
-          <li>Swagger UI for the REST API</li>
-        </ul>
-        <p style="margin-top:.5rem;">
-          Full dynamic REST API: <code style="font-size:.78rem;">GET /catalog</code>,
-          <code style="font-size:.78rem;">PUT /dataset/{id}</code>, etc.
+        <h3>Reference implementation</h3>
+        <p>Java 17 + Spring Boot + MongoDB + Blazegraph</p>
+        <p style="margin-top:.3rem;">
+          <a href="https://github.com/FAIRDataTeam/FAIRDataPoint" target="_blank">FAIRDataTeam/FAIRDataPoint</a>
+          &nbsp;·&nbsp; Spec: <a href="https://specs.fairdatapoint.org" target="_blank">specs.fairdatapoint.org</a>
         </p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:.7rem;">
+      <p style="font-size:.82rem;color:rgba(255,255,255,.45);margin-bottom:.1rem;">Metadata hierarchy</p>
+      <div class="hier">
+        <div class="hier-row">
+          <div class="hier-box" style="background:rgba(37,99,235,.45);border:1px solid #60a5fa;">fdp:MetadataService</div>
+          <span class="hier-sub">— the FDP root</span>
+        </div>
+        <div class="hier-row" style="margin-left:1.5rem;">
+          <div style="width:1.3rem;height:1.3rem;border-left:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);flex-shrink:0;"></div>
+          <div class="hier-box" style="background:rgba(20,184,166,.35);border:1px solid #2dd4bf;">dcat:Catalog</div>
+          <span class="hier-sub">— thematic collection</span>
+        </div>
+        <div class="hier-row" style="margin-left:3.3rem;">
+          <div style="width:1.3rem;height:1.3rem;border-left:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);flex-shrink:0;"></div>
+          <div class="hier-box" style="background:rgba(124,58,237,.4);border:1px solid #c084fc;">dcat:Dataset</div>
+          <span class="hier-sub">— one cohort, study, registry…</span>
+        </div>
+        <div class="hier-row" style="margin-left:5.1rem;">
+          <div style="width:1.3rem;height:1.3rem;border-left:2px solid rgba(255,255,255,.2);border-bottom:2px solid rgba(255,255,255,.2);flex-shrink:0;"></div>
+          <div class="hier-box" style="background:rgba(234,88,12,.35);border:1px solid #fb923c;">dcat:Distribution</div>
+          <span class="hier-sub">— TTL, CSV, FHIR, API…</span>
+        </div>
+      </div>
+
+      <div class="code" style="margin-top:.4rem;"
+><span class="cm"># FDP root (Turtle)</span>
+<span class="str">&lt;https://example.org/fdp/&gt;</span>
+    a  <span class="cls">fdp:MetadataService</span>, <span class="cls">r3d:Repository</span> ;
+    <span class="kw">dcterms:title</span>   <span class="str">"My FAIR Data Point"</span><span class="kw">@en</span> ;
+    <span class="kw">dcterms:license</span> <span class="str">&lt;https://creativecommons.org/licenses/by/4.0/&gt;</span> ;
+    <span class="kw">fdp:hasCatalog</span>  <span class="str">:catalog</span> .
+
+<span class="str">:catalog</span> a <span class="cls">dcat:Catalog</span> ;
+    <span class="kw">dcat:dataset</span> <span class="str">:my-dataset</span> .
+
+<span class="str">:my-dataset</span> a <span class="cls">dcat:Dataset</span> ;
+    <span class="kw">dcat:distribution</span> <span class="str">:dist-ttl</span> .
+
+<span class="str">:dist-ttl</span> a <span class="cls">dcat:Distribution</span> ;
+    <span class="kw">dcterms:format</span>   <span class="str">"text/turtle"</span> ;
+    <span class="kw">dcat:downloadURL</span> <span class="str">&lt;https://example.org/fdp/data.ttl&gt;</span> .</div>
+    </div>
+
+  </div>
+
+</div><!-- /slide-3 -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 4 — staticfdp: inner workings + deploy
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-dark" id="slide-4">
+
+  <div style="display:flex;align-items:baseline;gap:.9rem;margin-bottom:.5rem;">
+    <h2>staticfdp</h2>
+    <span class="tag" style="margin-bottom:0;background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.4);color:#34d399;">Layer 1 — FAIR Data Point</span>
+  </div>
+  <p class="lead" style="margin-bottom:1rem;">
+    Form submissions become GitHub / Forgejo Issues. A CI pipeline converts them to RDF Turtle. GitHub / Codeberg Pages serves the FDP.
+  </p>
+
+  <div class="split" style="flex:1;">
+
+    <!-- Left: pipeline -->
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div class="card card-green">
+        <h3>How it works</h3>
+        <div class="flow-col" style="margin-top:.5rem;">
+          <div class="flow-box green" style="font-size:.83rem;">👤 ORCID login + web form</div>
+          <span class="flow-arrow">↓ POST to GitHub / Forgejo Issues</span>
+          <div class="flow-box blue" style="font-size:.83rem;">☁ Cloudflare Worker (or Deno / Hetzner)</div>
+          <span class="flow-arrow">↓ issue created (dual-write optional)</span>
+          <div class="flow-box purple" style="font-size:.83rem;">⚙ GitHub Actions / Woodpecker CI</div>
+          <span class="flow-arrow">↓ runs issues_to_datasets.py</span>
+          <div class="flow-box teal" style="font-size:.83rem;">🐢 RDF Turtle + JSON-LD → docs/fdp/</div>
+          <span class="flow-arrow">↓ git commit + push</span>
+          <div class="flow-box bright" style="font-size:.83rem;">🌐 GitHub Pages / Codeberg Pages → FDP URL</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Key insight:</strong> GitHub Issues = structured, ORCID-attributed data store.
+        Git = version history. Pages = FDP server. No new infrastructure needed.
+      </div>
+    </div>
+
+    <!-- Right: deploy checklist -->
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div class="card card-yellow">
+        <h3>What you need to deploy</h3>
+        <ul class="checklist" style="margin-top:.6rem;">
+          <li><span class="num">1</span><span>Fork <span class="url-chip">StaticFDP/staticfdp</span> on GitHub or Codeberg</span></li>
+          <li><span class="num">2</span><span>Run <strong>bash scripts/setup.sh</strong> — choose GitHub, Codeberg, or both; sets <code style="font-size:.82rem;">fdp-config.yaml</code></span></li>
+          <li><span class="num">3</span><span>Register an <strong>ORCID Member API app</strong> at orcid.org/developer-tools → get Client ID + Secret</span></li>
+          <li><span class="num">4</span><span>Deploy the <strong>Cloudflare Worker</strong>: <code style="font-size:.82rem;">cd worker && npx wrangler deploy</code><br>
+            <em style="font-size:.8rem;">(or run <code>infra/hetzner-deploy.sh</code> on a Hetzner VPS for EU hosting)</em></span></li>
+          <li><span class="num">5</span><span>Set <strong>5 secrets</strong> via <code style="font-size:.82rem;">wrangler secret put</code>:<br>
+            <code style="font-size:.78rem;">GITHUB_TOKEN &nbsp;·&nbsp; ORCID_CLIENT_ID &nbsp;·&nbsp; ORCID_CLIENT_SECRET &nbsp;·&nbsp; SESSION_SECRET</code><br>
+            + <code style="font-size:.78rem;">FORGEJO_TOKEN</code> (if dual-write to Codeberg)</span></li>
+          <li><span class="num">6</span><span>Enable <strong>GitHub Pages</strong> in repo Settings → Pages → Branch: main, Path: /docs</span></li>
+          <li><span class="num">7</span><span>✓ Done — every form submission creates a GitHub Issue; CI converts it to RDF within ~60 s</span></li>
+        </ul>
+      </div>
+
+      <div class="card" style="font-size:.83rem;">
+        <h3>Minimal cost</h3>
+        <ul>
+          <li>GitHub / Codeberg — <strong>free</strong></li>
+          <li>Cloudflare Workers free tier — <strong>100k req/day free</strong></li>
+          <li>Hetzner CX11 (EU alt.) — <strong>€3.79 / month</strong></li>
+          <li>ORCID Member API — <strong>free for researchers</strong></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /slide-4 -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 5 — staticfdp-index: inner workings + deploy
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-blue" id="slide-5">
+
+  <div style="display:flex;align-items:baseline;gap:.9rem;margin-bottom:.5rem;">
+    <h2>staticfdp-index</h2>
+    <span class="tag" style="margin-bottom:0;background:rgba(96,165,250,.15);border-color:rgba(96,165,250,.4);color:#60a5fa;">Layer 2 — FDP Index</span>
+  </div>
+  <p class="lead" style="margin-bottom:1rem;">
+    FDPs register by opening an Issue or adding a YAML file. A CI pipeline harvests their catalogs daily and publishes a DCAT index catalog as static RDF + HTML.
+  </p>
+
+  <div class="split" style="flex:1;">
+
+    <!-- Left: pipeline -->
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div class="card card-blue">
+        <h3>How it works</h3>
+        <div class="flow-col" style="margin-top:.5rem;">
+          <div class="flow-box blue" style="font-size:.83rem;">📋 FDP operator opens "Register FDP" Issue</div>
+          <span class="flow-arrow">↓ YAML added to registered-fdps/</span>
+          <div class="flow-box teal" style="font-size:.83rem;">⏰ Daily schedule (or on new issue)</div>
+          <span class="flow-arrow">↓ CI triggers harvest_fdps.py</span>
+          <div class="flow-box purple" style="font-size:.83rem;">🔍 Fetches catalog.ttl from each FDP</div>
+          <span class="flow-arrow">↓ validates DCAT, extracts titles</span>
+          <div class="flow-box teal" style="font-size:.83rem;">🐢 Writes docs/fdp-index/index.ttl + index.jsonld</div>
+          <span class="flow-arrow">↓ git commit + push</span>
+          <div class="flow-box bright" style="font-size:.83rem;">🌐 Static index live on GitHub / Codeberg Pages</div>
+        </div>
       </div>
 
       <div class="card card-teal">
-        <h3>What it provides</h3>
+        <h3>What the index catalog contains</h3>
         <ul>
-          <li>Web UI for data stewards to create/edit metadata</li>
-          <li>Content negotiation (Turtle, JSON-LD, N-Triples)</li>
-          <li>SHACL validation on write</li>
-          <li>Built-in SPARQL endpoint</li>
-          <li>Auto-ping to FDP Index on startup</li>
-          <li>Access control (open / logged-in / metadata-only)</li>
+          <li>One <code style="font-size:.82rem;">dcat:Dataset</code> per registered FDP</li>
+          <li>Title, description, landing page, catalog URL</li>
+          <li>Last harvest timestamp</li>
+          <li>dcat:Distribution pointing to each FDP's catalog.ttl</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Right: deploy checklist -->
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div class="card card-yellow">
+        <h3>What you need to deploy</h3>
+        <ul class="checklist" style="margin-top:.6rem;">
+          <li><span class="num">1</span><span>Fork <span class="url-chip">StaticFDP/staticfdp-index</span> on GitHub or Codeberg</span></li>
+          <li><span class="num">2</span><span>Run <strong>bash scripts/setup.sh</strong> — choose platform, set title + publisher</span></li>
+          <li><span class="num">3</span><span>Enable <strong>GitHub Pages</strong> (branch: main, path: /docs)<br>
+            and / or <strong>Codeberg Pages</strong> in repo settings</span></li>
+          <li><span class="num">4</span><span>Set <code style="font-size:.82rem;">GITHUB_TOKEN</code> secret for the Actions runner to commit generated files<br>
+            <em style="font-size:.8rem;">(fine-grained PAT: Contents read + write)</em></span></li>
+          <li><span class="num">5</span><span>Add FDPs to register: create <code style="font-size:.82rem;">registered-fdps/my-fdp.yaml</code> with <code style="font-size:.82rem;">catalog_url</code>, title, description</span></li>
+          <li><span class="num">6</span><span>✓ Done — harvest runs daily at 04:25 UTC; trigger manually via workflow_dispatch any time</span></li>
         </ul>
       </div>
 
-      <div style="display:flex;flex-direction:column;gap:.8rem;">
-        <div class="card card-purple">
-          <h3>SHACL profiles</h3>
-          <p>
-            Every resource type (Catalog, Dataset, Distribution) has a SHACL
-            shape that defines required fields. Any metadata that fails validation
-            is rejected at write time.
-          </p>
-          <p style="margin-top:.3rem;">
-            The profiles are themselves published as RDF and versioned — so
-            older clients can still validate against the version they know.
-          </p>
-        </div>
-        <div class="card card-orange">
-          <h3>Used in production by</h3>
-          <ul>
-            <li>ELIXIR national nodes</li>
-            <li>Health-RI (Netherlands)</li>
-            <li>BBMRI-ERIC</li>
-            <li>Maastricht University</li>
-            <li>… and this session's Koetai FDP</li>
-          </ul>
+      <div class="code"
+><span class="cm"># registered-fdps/ga4gh-rdp.yaml</span>
+title: <span class="str">"GA4GH Rare Disease Trajectories"</span>
+catalog_url: <span class="str">"https://fdp.semscape.org/…/fdp/catalog.ttl"</span>
+landing_page: <span class="str">"https://fdp.semscape.org/…/"</span>
+description: <span class="str">"Rare disease cases from GA4GH BYOD 2026"</span>
+contact: <span class="str">"0000-0001-9773-4008"</span></div>
+
+      <div class="callout">
+        <strong>No server needed.</strong> The index is rebuilt by CI and served as static files —
+        same principle as the FDP itself.
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /slide-5 -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 6 — staticfdp-vp: inner workings + deploy
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-purple" id="slide-6">
+
+  <div style="display:flex;align-items:baseline;gap:.9rem;margin-bottom:.5rem;">
+    <h2>staticfdp-vp</h2>
+    <span class="tag" style="margin-bottom:0;background:rgba(192,132,252,.15);border-color:rgba(192,132,252,.4);color:#c084fc;">Layer 3 — Virtual Platform</span>
+  </div>
+  <p class="lead" style="margin-bottom:1rem;">
+    Multiple FDP Indexes are aggregated into one federation graph. Data stays at source — the VP only holds pointers. Rebuilt by CI on a schedule.
+  </p>
+
+  <div class="split" style="flex:1;">
+
+    <!-- Left: pipeline -->
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div class="card card-purple">
+        <h3>How it works</h3>
+        <div class="flow-col" style="margin-top:.5rem;">
+          <div class="flow-box purple" style="font-size:.83rem;">📋 Index operator opens "Register FDP Index" Issue</div>
+          <span class="flow-arrow">↓ YAML added to registered-indexes/</span>
+          <div class="flow-box teal" style="font-size:.83rem;">⏰ Daily schedule (or on new issue)</div>
+          <span class="flow-arrow">↓ CI triggers build_vp.py</span>
+          <div class="flow-box blue" style="font-size:.83rem;">🔍 Fetches index.ttl from each FDP Index</div>
+          <span class="flow-arrow">↓ counts FDPs, merges catalogs</span>
+          <div class="flow-box teal" style="font-size:.83rem;">🐢 Writes docs/vp/federation.ttl + federation.jsonld</div>
+          <span class="flow-arrow">↓ git commit + push</span>
+          <div class="flow-box bright" style="font-size:.83rem;">🌐 Federation graph live on GitHub / Codeberg Pages</div>
         </div>
       </div>
 
+      <div class="card" style="font-size:.83rem;">
+        <h3>In practice (rare disease example)</h3>
+        <ul>
+          <li>Hospital A FDP registers with Rare Disease Index</li>
+          <li>Registry B FDP registers with Rare Disease Index</li>
+          <li>Rare Disease Index registers with the VP</li>
+          <li>Researcher queries VP federation.ttl → gets all FDP IRIs</li>
+          <li>Downloads distributions directly from A and B — <strong>no central warehouse</strong></li>
+        </ul>
+      </div>
     </div>
 
-  </div><!-- /slide-6 -->
+    <!-- Right: deploy checklist -->
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div class="card card-yellow">
+        <h3>What you need to deploy</h3>
+        <ul class="checklist" style="margin-top:.6rem;">
+          <li><span class="num">1</span><span>Fork <span class="url-chip">StaticFDP/staticfdp-vp</span> on GitHub or Codeberg</span></li>
+          <li><span class="num">2</span><span>Run <strong>bash scripts/setup.sh</strong> — choose platform, set title + publisher</span></li>
+          <li><span class="num">3</span><span>Enable <strong>GitHub Pages</strong> (branch: main, path: /docs)<br>
+            and / or <strong>Codeberg Pages</strong></span></li>
+          <li><span class="num">4</span><span>Set <code style="font-size:.82rem;">GITHUB_TOKEN</code> secret (Contents read + write)</span></li>
+          <li><span class="num">5</span><span>Add FDP Indexes: create <code style="font-size:.82rem;">registered-indexes/my-index.yaml</code> with <code style="font-size:.82rem;">index_url</code>, title, description</span></li>
+          <li><span class="num">6</span><span>✓ Done — aggregation runs daily at 04:40 UTC</span></li>
+        </ul>
+      </div>
+
+      <div class="code"
+><span class="cm"># registered-indexes/rare-disease.yaml</span>
+title: <span class="str">"Rare Disease Community FDP Index"</span>
+index_url: <span class="str">"https://example.org/fdp-index/index.ttl"</span>
+landing_page: <span class="str">"https://example.org/fdp-index/"</span>
+description: <span class="str">"Index for rare disease FDPs worldwide"</span>
+contact: <span class="str">"maintainer@example.org"</span></div>
+
+      <div class="callout">
+        <strong>ELIXIR / GA4GH context:</strong> The same federation model is used by ELIXIR
+        national nodes and GA4GH Data Connect. StaticFDP-VP is a fully static alternative —
+        same DCAT-AP semantics, no dedicated server.
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /slide-6 -->
 
 
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 7 — StaticFDP: this project
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-teal" id="slide-7">
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 7 — The full stack together
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-slate" id="slide-7">
 
-    <h2>StaticFDP: a Lightweight Implementation</h2>
-    <p class="lead" style="margin-bottom:1rem;">
-      Same metadata model as the reference implementation — but the "server"
-      is a GitHub repository and GitHub Pages. Zero hosting cost, fully
-      version-controlled, GitOps-native.
+  <h2>The Full Ecosystem Stack</h2>
+  <p class="lead" style="margin-bottom:1.1rem;">
+    Three independent deployments that compose into a federated infrastructure —
+    each with its own GitHub + Codeberg mirror.
+  </p>
+
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:.5rem;">
+
+    <!-- Row 1: FDPs -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;">
+      <div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:.6rem .8rem;text-align:center;">
+        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
+        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">Hospital A</div>
+      </div>
+      <div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:.6rem .8rem;text-align:center;">
+        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
+        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">Registry B</div>
+      </div>
+      <div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:.6rem .8rem;text-align:center;">
+        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
+        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">Biobank C</div>
+      </div>
+      <div style="background:rgba(52,211,153,.2);border:2px solid #34d399;border-radius:8px;padding:.6rem .8rem;text-align:center;">
+        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
+        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">This session ↑</div>
+      </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div style="display:flex;justify-content:center;align-items:center;gap:.4rem;">
+      <span style="font-size:1.4rem;color:rgba(255,255,255,.25);">↓ &nbsp; ↓ &nbsp; ↓ &nbsp; ↓</span>
+      <span style="font-size:.75rem;color:rgba(255,255,255,.35);margin-left:.6rem;">register + harvest</span>
+    </div>
+
+    <!-- Row 2: Index -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+      <div style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);border-radius:8px;padding:.7rem 1rem;">
+        <div style="font-size:.7rem;color:#60a5fa;text-transform:uppercase;letter-spacing:.06em;">staticfdp-index</div>
+        <div style="font-size:.92rem;font-weight:700;margin-top:.2rem;">Rare Disease Community Index</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.15rem;">harvests FDPs A, B, C, session</div>
+      </div>
+      <div style="background:rgba(96,165,250,.08);border:1px dashed rgba(96,165,250,.25);border-radius:8px;padding:.7rem 1rem;display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:.85rem;color:rgba(255,255,255,.3);font-style:italic;">… other community index</span>
+      </div>
+    </div>
+
+    <!-- Arrow down -->
+    <div style="display:flex;justify-content:center;align-items:center;gap:.4rem;">
+      <span style="font-size:1.4rem;color:rgba(255,255,255,.25);">↓ &nbsp; ↓</span>
+      <span style="font-size:.75rem;color:rgba(255,255,255,.35);margin-left:.6rem;">register + aggregate</span>
+    </div>
+
+    <!-- Row 3: VP -->
+    <div style="background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.3);border-radius:8px;padding:.7rem 1.2rem;text-align:center;">
+      <div style="font-size:.7rem;color:#c084fc;text-transform:uppercase;letter-spacing:.06em;">staticfdp-vp</div>
+      <div style="font-size:1rem;font-weight:700;margin-top:.15rem;">Federation Virtual Platform — federation.ttl served on GitHub + Codeberg Pages</div>
+    </div>
+
+    <!-- Bottom row: GitHub + Codeberg -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.3rem;">
+      <div class="callout" style="margin-top:0;">
+        <strong>GitHub:</strong> Pages + Actions &nbsp;·&nbsp; github.com/StaticFDP
+      </div>
+      <div class="callout" style="margin-top:0;background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.25);">
+        <strong>Codeberg:</strong> Pages + Woodpecker CI &nbsp;·&nbsp; codeberg.org/StaticFDP
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /slide-7 -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 8 — StaticFDP vs Reference Implementation
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-teal" id="slide-8">
+
+  <h2>StaticFDP vs Reference Implementation</h2>
+  <p class="lead" style="margin-bottom:1rem;">
+    Same metadata model — different infrastructure philosophy. Choose based on your needs.
+  </p>
+
+  <div class="split split-33" style="flex:1;">
+
+    <div style="display:flex;flex-direction:column;gap:.75rem;">
+      <div class="card card-teal">
+        <h3>When to use StaticFDP</h3>
+        <ul>
+          <li>No server / DevOps budget</li>
+          <li>Community-contributed data (forms + ORCID auth)</li>
+          <li>Want Git-native version history</li>
+          <li>Short-term event / session FDP</li>
+          <li>EU or US jurisdiction choice matters</li>
+          <li>Biohackathon / research group</li>
+        </ul>
+      </div>
+      <div class="card card-blue">
+        <h3>When to use reference impl</h3>
+        <ul>
+          <li>Need dynamic REST API</li>
+          <li>Data steward web UI required</li>
+          <li>Real-time SHACL validation</li>
+          <li>Built-in SPARQL endpoint</li>
+          <li>Production hospital / national node</li>
+        </ul>
+      </div>
+    </div>
+
+    <table class="compare">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Reference impl<br><span style="font-weight:400;text-transform:none;font-size:.75rem;">FAIRDataTeam</span></th>
+          <th>staticfdp</th>
+          <th>staticfdp-index</th>
+          <th>staticfdp-vp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DCAT + FDP-O metadata</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+        <tr>
+          <td>Content negotiation</td>
+          <td><span class="check">Dynamic</span></td>
+          <td><span class="neutral">Static files</span></td>
+          <td><span class="neutral">Static files</span></td>
+          <td><span class="neutral">Static files</span></td>
+        </tr>
+        <tr>
+          <td>SHACL validation</td>
+          <td><span class="check">On write</span></td>
+          <td><span class="neutral">On CI</span></td>
+          <td><span class="neutral">On CI</span></td>
+          <td><span class="neutral">On CI</span></td>
+        </tr>
+        <tr>
+          <td>SPARQL endpoint</td>
+          <td><span class="check">Built-in</span></td>
+          <td><span class="neutral">External demo</span></td>
+          <td><span class="cross">—</span></td>
+          <td><span class="cross">—</span></td>
+        </tr>
+        <tr>
+          <td>Data submission UI</td>
+          <td><span class="neutral">Admin only</span></td>
+          <td><span class="check">Public + ORCID</span></td>
+          <td><span class="check">Issue template</span></td>
+          <td><span class="check">Issue template</span></td>
+        </tr>
+        <tr>
+          <td>Version history</td>
+          <td><span class="neutral">Internal DB</span></td>
+          <td><span class="check">Git</span></td>
+          <td><span class="check">Git</span></td>
+          <td><span class="check">Git</span></td>
+        </tr>
+        <tr>
+          <td>FDP Index registration</td>
+          <td><span class="check">Auto on startup</span></td>
+          <td><span class="neutral">GitHub Action</span></td>
+          <td><span class="check">Is the index</span></td>
+          <td><span class="neutral">n/a</span></td>
+        </tr>
+        <tr>
+          <td>Hosting cost</td>
+          <td><span class="cross">Server required</span></td>
+          <td><span class="check">Free</span></td>
+          <td><span class="check">Free</span></td>
+          <td><span class="check">Free</span></td>
+        </tr>
+        <tr>
+          <td>EU hosting option</td>
+          <td><span class="neutral">Deploy anywhere</span></td>
+          <td><span class="check">Codeberg / Hetzner</span></td>
+          <td><span class="check">Codeberg</span></td>
+          <td><span class="check">Codeberg</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</div><!-- /slide-8 -->
+
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SLIDE 9 — Try it / Access the data
+══════════════════════════════════════════════════════════════════ -->
+<div class="slide slide-hero" id="slide-9"
+     style="justify-content:center;align-items:center;text-align:center;gap:1.6rem;">
+
+  <div>
+    <p style="font-size:.9rem;letter-spacing:.1em;text-transform:uppercase;opacity:.55;margin-bottom:.4rem;">
+      Live reference deployment
     </p>
+    <h1 style="font-size:clamp(2rem,4.5vw,3.2rem);">Deploy your own &amp; access the data</h1>
+    <p class="lead" style="margin-top:.5rem;max-width:640px;">
+      Fork any of the three repos, run setup.sh, and your FAIR Data Point infrastructure
+      is live in minutes.
+    </p>
+  </div>
 
-    <div class="split" style="flex:1;">
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem;width:100%;max-width:920px;">
+    <a href="https://github.com/StaticFDP/staticfdp" target="_blank"
+       style="display:block;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.35);
+              border-radius:10px;padding:1rem;text-decoration:none;color:#fff;">
+      <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#34d399;margin-bottom:.35rem;">Fork on GitHub</div>
+      <div style="font-weight:700;font-size:.97rem;">staticfdp</div>
+      <div style="font-size:.8rem;opacity:.6;margin-top:.25rem;">Static FAIR Data Point</div>
+    </a>
+    <a href="https://github.com/StaticFDP/staticfdp-index" target="_blank"
+       style="display:block;background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.35);
+              border-radius:10px;padding:1rem;text-decoration:none;color:#fff;">
+      <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#60a5fa;margin-bottom:.35rem;">Fork on GitHub</div>
+      <div style="font-weight:700;font-size:.97rem;">staticfdp-index</div>
+      <div style="font-size:.8rem;opacity:.6;margin-top:.25rem;">Static FDP Index</div>
+    </a>
+    <a href="https://github.com/StaticFDP/staticfdp-vp" target="_blank"
+       style="display:block;background:rgba(192,132,252,.15);border:1px solid rgba(192,132,252,.35);
+              border-radius:10px;padding:1rem;text-decoration:none;color:#fff;">
+      <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:#c084fc;margin-bottom:.35rem;">Fork on GitHub</div>
+      <div style="font-weight:700;font-size:.97rem;">staticfdp-vp</div>
+      <div style="font-size:.8rem;opacity:.6;margin-top:.25rem;">Static Virtual Platform</div>
+    </a>
+  </div>
 
-      <div style="display:flex;flex-direction:column;gap:.8rem;">
-        <div class="card card-teal">
-          <h3>The pipeline</h3>
-          <div class="flow" style="flex-direction:column;align-items:flex-start;gap:.4rem;margin-top:.5rem;">
-            <div class="flow-box green" style="font-size:.85rem;">ORCID login &nbsp;+&nbsp; web form</div>
-            <span class="flow-arrow" style="padding-left:.9rem;">&#8595;</span>
-            <div class="flow-box blue" style="font-size:.85rem;">Cloudflare Worker &rarr; GitHub Issue</div>
-            <span class="flow-arrow" style="padding-left:.9rem;">&#8595;</span>
-            <div class="flow-box purple" style="font-size:.85rem;">GitHub Actions &rarr; Python &rarr; RDF/Turtle</div>
-            <span class="flow-arrow" style="padding-left:.9rem;">&#8595;</span>
-            <div class="flow-box teal" style="font-size:.85rem;">Committed to <code>docs/fdp/</code></div>
-            <span class="flow-arrow" style="padding-left:.9rem;">&#8595;</span>
-            <div class="flow-box bright" style="font-size:.85rem;">GitHub Pages &rarr; FDP URL</div>
-          </div>
-        </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.9rem;width:100%;max-width:920px;">
+    <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog.ttl"
+       target="_blank"
+       style="display:block;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+              border-radius:10px;padding:.9rem;text-decoration:none;color:#fff;">
+      <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-bottom:.3rem;">RDF Turtle</div>
+      <div style="font-weight:700;font-size:.9rem;">catalog.ttl</div>
+      <div style="font-size:.78rem;opacity:.55;margin-top:.2rem;">Load with rdflib, Jena, any triple store</div>
+    </a>
+    <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/"
+       target="_blank"
+       style="display:block;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);
+              border-radius:10px;padding:.9rem;text-decoration:none;color:#fff;">
+      <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-bottom:.3rem;">Per-disease datasets</div>
+      <div style="font-weight:700;font-size:.9rem;">diseases/index</div>
+      <div style="font-size:.78rem;opacity:.55;margin-top:.2rem;">One TTL + JSON-LD per disease</div>
+    </a>
+    <a href="https://fdp.semscape.org/sparql-demo/"
+       target="_blank"
+       style="display:block;background:rgba(166,206,57,.15);border:1px solid rgba(166,206,57,.3);
+              border-radius:10px;padding:.9rem;text-decoration:none;color:#fff;">
+      <div style="font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.55;margin-bottom:.3rem;">Interactive</div>
+      <div style="font-weight:700;font-size:.9rem;">SPARQL demo</div>
+      <div style="font-size:.78rem;opacity:.55;margin-top:.2rem;">Live query — no setup needed</div>
+    </a>
+  </div>
 
-        <div class="callout">
-          <strong>Key insight:</strong> GitHub Issues are a structured, audited, ORCID-attributed data store. GitHub Actions is the RDF generator. GitHub Pages is the FDP server. No new infrastructure needed.
-        </div>
-      </div>
-
-      <div>
-        <table class="compare">
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>Reference impl</th>
-              <th>StaticFDP</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Metadata model</td>
-              <td><span class="check">DCAT + FDP-O</span></td>
-              <td><span class="check">DCAT + FDP-O</span></td>
-            </tr>
-            <tr>
-              <td>Content negotiation</td>
-              <td><span class="check">Dynamic</span></td>
-              <td><span class="neutral">Static TTL / JSON-LD files</span></td>
-            </tr>
-            <tr>
-              <td>SHACL validation</td>
-              <td><span class="check">On write</span></td>
-              <td><span class="neutral">On CI (pre-commit)</span></td>
-            </tr>
-            <tr>
-              <td>SPARQL endpoint</td>
-              <td><span class="check">Built-in</span></td>
-              <td><span class="neutral">Separate SPARQL demo service</span></td>
-            </tr>
-            <tr>
-              <td>FDP Index ping</td>
-              <td><span class="check">Automatic</span></td>
-              <td><span class="neutral">Manual / GitHub Action</span></td>
-            </tr>
-            <tr>
-              <td>Version history</td>
-              <td><span class="neutral">Internal DB</span></td>
-              <td><span class="check">Git commits</span></td>
-            </tr>
-            <tr>
-              <td>Hosting cost</td>
-              <td><span class="cross">Server required</span></td>
-              <td><span class="check">Free (GitHub Pages)</span></td>
-            </tr>
-            <tr>
-              <td>Data submission UI</td>
-              <td><span class="neutral">Admin web UI</span></td>
-              <td><span class="check">Public web forms + ORCID</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-    </div>
-
-  </div><!-- /slide-7 -->
-
-
-  <!-- ══════════════════════════════════════════════════
-       SLIDE 8 — Try it now
-  ══════════════════════════════════════════════════ -->
-  <div class="slide slide-hero" id="slide-8"
-       style="justify-content:center;align-items:center;text-align:center;gap:1.8rem;">
-
-    <div>
-      <p style="font-size:1rem;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-bottom:.5rem;">
-        Live data — query it now
-      </p>
-      <h1 style="font-size:clamp(2.2rem,5vw,3.6rem);">Access the data</h1>
-      <p class="lead" style="margin-top:.6rem;max-width:600px;">
-        Everything produced during this session is immediately accessible
-        as FAIR machine-readable data.
-      </p>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;width:100%;max-width:900px;">
-      <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog.ttl"
-         target="_blank"
-         style="display:block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-                border-radius:10px;padding:1.1rem;text-decoration:none;color:#fff;">
-        <div style="font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:.4rem;">RDF Turtle</div>
-        <div style="font-weight:700;font-size:1rem;">catalog.ttl</div>
-        <div style="font-size:.82rem;opacity:.6;margin-top:.3rem;">Full DCAT catalog — load with rdflib, Jena, or any triple store</div>
-      </a>
-      <a href="https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/"
-         target="_blank"
-         style="display:block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-                border-radius:10px;padding:1.1rem;text-decoration:none;color:#fff;">
-        <div style="font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:.4rem;">Per-disease</div>
-        <div style="font-weight:700;font-size:1rem;">diseases/index</div>
-        <div style="font-size:.82rem;opacity:.6;margin-top:.3rem;">One TTL + JSON-LD file per disease. Auto-updated on every submission.</div>
-      </a>
-      <a href="https://fdp.semscape.org/sparql-demo/"
-         target="_blank"
-         style="display:block;background:rgba(166,206,57,.2);border:1px solid rgba(166,206,57,.4);
-                border-radius:10px;padding:1.1rem;text-decoration:none;color:#fff;">
-        <div style="font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin-bottom:.4rem;">Interactive</div>
-        <div style="font-weight:700;font-size:1rem;">SPARQL demo</div>
-        <div style="font-size:.82rem;opacity:.6;margin-top:.3rem;">Write SPARQL against the live data — no setup needed.</div>
-      </a>
-    </div>
-
-    <div class="code" style="font-size:.8rem;text-align:left;width:100%;max-width:900px;"
-><span class="cm"># Load with Python rdflib</span>
+  <div class="code" style="font-size:.78rem;text-align:left;width:100%;max-width:920px;"
+><span class="cm"># Python — load the reference deployment</span>
 <span class="kw">from</span> rdflib <span class="kw">import</span> Graph
 g = Graph()
 g.parse(<span class="str">"https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/catalog.ttl"</span>)
 <span class="kw">print</span>(len(g), <span class="str">"triples"</span>)</div>
 
-  </div><!-- /slide-8 -->
+</div><!-- /slide-9 -->
+
 
 </div><!-- /deck -->
 
-<!-- ── Navigation ── -->
 <div class="nav-strip">
   <button id="btn-prev" onclick="go(-1)" disabled>Previous</button>
-  <span id="slide-counter">1 / 8</span>
+  <span id="slide-counter">1 / 9</span>
   <button id="btn-next" onclick="go(1)">Next</button>
 </div>
-
 <div class="key-hint">Arrow keys · click to advance</div>
 
 <script>
@@ -916,6 +974,5 @@ g.parse(<span class="str">"https://fdp.semscape.org/ga4gh-rare-disease-trajector
     go(1);
   });
 </script>
-
 </body>
 </html>
