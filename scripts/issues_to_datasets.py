@@ -41,21 +41,112 @@ import urllib.request
 import urllib.parse
 from pathlib import Path
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# ── Config — read fdp-config.yaml, override with env vars ────────────────────
+
+def _load_fdp_config() -> dict:
+    """
+    Load fdp-config.yaml from the repo root (one level up from this script).
+    Returns an empty dict if the file is absent or unparseable.
+    Requires only stdlib — no PyYAML needed (uses a minimal key:value parser
+    that handles the simple structure of fdp-config.yaml).
+    """
+    config_path = Path(__file__).parent.parent / "fdp-config.yaml"
+    if not config_path.exists():
+        return {}
+    try:
+        # Minimal YAML parser for our known structure (avoids PyYAML dep)
+        import re as _re
+        result: dict = {}
+        stack: list  = [result]
+        indent_stack: list = [-1]
+        with open(config_path, encoding="utf-8") as f:
+            for raw in f:
+                line = raw.rstrip()
+                if not line or line.lstrip().startswith("#"):
+                    continue
+                indent = len(line) - len(line.lstrip())
+                # pop stack on dedent
+                while indent <= indent_stack[-1]:
+                    stack.pop(); indent_stack.pop()
+                m = _re.match(r'^(\s*)([^:]+):\s*(.*)', line)
+                if not m:
+                    continue
+                key = m.group(2).strip()
+                val = m.group(3).strip().strip('"\'')
+                parent = stack[-1]
+                if not isinstance(parent, dict):
+                    continue
+                if val == "":
+                    child: dict = {}
+                    parent[key] = child
+                    stack.append(child)
+                    indent_stack.append(indent)
+                else:
+                    parent[key] = val
+        return result
+    except Exception as e:
+        print(f"[config] Warning: could not parse fdp-config.yaml: {e}", file=sys.stderr)
+        return {}
+
+_CFG = _load_fdp_config()
+
+def _cfg(*keys, default=""):
+    """Traverse nested config dict by keys."""
+    node = _CFG
+    for k in keys:
+        if not isinstance(node, dict):
+            return default
+        node = node.get(k, default)
+    return node if node != "" else default
+
+# ── Runtime values (env vars override config file) ───────────────────────────
 
 GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN", "")
-GITHUB_REPO  = os.environ.get("GITHUB_REPO",  "StaticFDP/ga4gh-rare-disease-trajectories")
 GITHUB_SHA   = os.environ.get("GITHUB_SHA",   "unknown")
 BASE         = Path(os.environ.get("OUTPUT_BASE", "."))
 
-# EU mirror — Forgejo/Codeberg (optional; issues are merged with GitHub issues)
-FORGEJO_TOKEN    = os.environ.get("FORGEJO_TOKEN",    "")
-FORGEJO_REPO     = os.environ.get("FORGEJO_REPO",     "StaticFDP/ga4gh-rare-disease-trajectories")
-FORGEJO_BASE_URL = os.environ.get("FORGEJO_BASE_URL", "https://codeberg.org")
+# Platform selection — read from config, overridable via env vars.
+# INFRASTRUCTURE_OVERRIDE (set by workflow_dispatch input) takes top precedence.
+_OVERRIDE = os.environ.get("INFRASTRUCTURE_OVERRIDE", "").strip()
+_PRIMARY  = _OVERRIDE or _cfg("infrastructure", "primary", default="github")
 
-FDP_BASE_URL     = "https://fdp.semscape.org/ga4gh-rare-disease-trajectories"
+GITHUB_REPO = (
+    os.environ.get("GITHUB_REPO")
+    or _cfg("infrastructure", "github", "repo")
+    or "StaticFDP/ga4gh-rare-disease-trajectories"
+)
+USE_GITHUB = (
+    os.environ.get("GITHUB_TOKEN", "") != ""        # token present means enabled
+    or _cfg("infrastructure", "github", "enabled") == "true"
+    or _PRIMARY in ("github", "both")
+)
+
+FORGEJO_TOKEN    = os.environ.get("FORGEJO_TOKEN", "")
+FORGEJO_REPO     = (
+    os.environ.get("FORGEJO_REPO")
+    or _cfg("infrastructure", "codeberg", "repo")
+    or "StaticFDP/ga4gh-rare-disease-trajectories"
+)
+FORGEJO_BASE_URL = (
+    os.environ.get("FORGEJO_BASE_URL")
+    or _cfg("infrastructure", "codeberg", "base_url")
+    or "https://codeberg.org"
+)
+USE_FORGEJO = bool(FORGEJO_TOKEN)
+
+FDP_BASE_URL = (
+    os.environ.get("FDP_BASE_URL")
+    or _cfg("fdp", "base_url")
+    or "https://fdp.semscape.org/ga4gh-rare-disease-trajectories"
+)
 GITHUB_TREE_URL  = f"https://github.com/{GITHUB_REPO}/tree/main/diseases"
 TODAY            = datetime.date.today().isoformat()
+
+# Announce active configuration
+_src = "fdp-config.yaml" if _CFG else "defaults"
+print(f"[config] Loaded from {_src}")
+print(f"[config] Primary platform: {_PRIMARY}  |  GitHub: {USE_GITHUB}  |  Forgejo: {USE_FORGEJO}")
+print(f"[config] FDP base URL: {FDP_BASE_URL}")
 
 # ── Ontology prefix → IRI ─────────────────────────────────────────────────────
 

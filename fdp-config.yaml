@@ -1,0 +1,37 @@
+# FDP Infrastructure Configuration
+# ==================================
+# This file controls where your FAIR Data Point lives.
+# Run  scripts/setup.sh  to answer these questions interactively,
+# or edit this file directly and commit the result.
+#
+# infrastructure.primary controls which platform is the single source
+# of truth for Issues (form submissions):
+#   github    — GitHub.com  (Microsoft, US jurisdiction)
+#   codeberg  — Codeberg.org (German non-profit, EU jurisdiction, Hetzner Frankfurt)
+#   both      — dual-write to both; issues are merged on build
+
+infrastructure:
+  primary: github          # github | codeberg | both
+
+  github:
+    enabled: true
+    repo: StaticFDP/ga4gh-rare-disease-trajectories
+    pages_url: https://fdp.semscape.org/ga4gh-rare-disease-trajectories
+    # Token supplied via GITHUB_TOKEN env var / CI secret — never stored here
+
+  codeberg:
+    enabled: false
+    repo: StaticFDP/ga4gh-rare-disease-trajectories
+    base_url: https://codeberg.org
+    pages_url: https://eu.fdp.semscape.org/ga4gh-rare-disease-trajectories
+    # Token supplied via FORGEJO_TOKEN env var / CI secret — never stored here
+
+fdp:
+  # Human-readable name for this FDP instance (shown in catalog metadata)
+  title: "GA4GH Rare Disease Trajectories — FAIR Data Point"
+  # base_url is the canonical public URL for the FDP (used in all RDF metadata)
+  # This is deployment-specific — change when forking for a new project.
+  base_url: https://fdp.semscape.org/ga4gh-rare-disease-trajectories
+  license: https://creativecommons.org/licenses/by/4.0/
+  publisher_name: "GA4GH Rare Disease Phenotyping Working Group"
+  publisher_url: https://www.ga4gh.org/

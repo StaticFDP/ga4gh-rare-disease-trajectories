@@ -18,6 +18,17 @@ on:
     - cron: '25 4 * * *'
 
   workflow_dispatch:
+    inputs:
+      infrastructure:
+        description: 'Where should the FDP data live? (overrides fdp-config.yaml for this run)'
+        required: false
+        default: ''
+        type: choice
+        options:
+          - ''
+          - github
+          - codeberg
+          - both
 
 permissions:
   contents: write
@@ -53,6 +64,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPO:  ${{ github.repository }}
           GITHUB_SHA:   ${{ github.sha }}
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+          # Manual dispatch can override the platform for a single run
+          INFRASTRUCTURE_OVERRIDE: ${{ github.event.inputs.infrastructure }}
         run: python3 scripts/issues_to_datasets.py
 
       - name: Commit generated datasets
