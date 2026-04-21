@@ -280,7 +280,10 @@
         </ul>
       </div>
       <div class="callout" style="background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3);">
-        <strong>Example:</strong> fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/
+        <strong>Live examples:</strong><br>
+        · <a href="https://fdp.dcc.sib.swiss" target="_blank" style="color:#34d399;">fdp.dcc.sib.swiss</a> — SIB/SPHN (Switzerland)<br>
+        · <a href="https://catalogus.healthdata.nl" target="_blank" style="color:#34d399;">catalogus.healthdata.nl</a> — Health-RI (Netherlands)<br>
+        · fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/ — this session
       </div>
     </div>
 
@@ -308,7 +311,9 @@
         </ul>
       </div>
       <div class="callout" style="background:rgba(96,165,250,.08);border-color:rgba(96,165,250,.3);">
-        <strong>Reference:</strong> index.fairdatapoint.org (Java/Spring Boot)
+        <strong>Live example:</strong><br>
+        · <a href="https://index.vp.erdera.org" target="_blank" style="color:#93c5fd;">index.vp.erdera.org</a> — ERDERA rare disease index<br>
+        · <a href="https://index.fairdatapoint.org" target="_blank" style="color:#93c5fd;">index.fairdatapoint.org</a> — public FDP index (reference impl)
       </div>
     </div>
 
@@ -336,7 +341,9 @@
         </ul>
       </div>
       <div class="callout" style="background:rgba(192,132,252,.08);border-color:rgba(192,132,252,.3);">
-        <strong>Used by:</strong> ELIXIR ERNs, Health-RI, BBMRI-ERIC
+        <strong>Live example:</strong><br>
+        · <a href="https://vp.erdera.org" target="_blank" style="color:#c084fc;">vp.erdera.org</a> — ERDERA RD Discovery Portal<br>
+        <span style="font-size:.78rem;opacity:.7;">170+ partners, 37 countries — Horizon Europe grant N°101156595</span>
       </div>
     </div>
 
@@ -380,11 +387,16 @@
       </div>
 
       <div class="card card-blue">
-        <h3>Reference implementation</h3>
-        <p>Java 17 + Spring Boot + MongoDB + Blazegraph</p>
-        <p style="margin-top:.3rem;">
+        <h3>Specification &amp; reference implementation</h3>
+        <p>
+          Spec: <a href="https://specs.fairdatapoint.org" target="_blank">specs.fairdatapoint.org</a><br>
+          Ontology: <a href="https://github.com/FAIRDataTeam/FDP-O" target="_blank">FDP-O</a>
+          — <code style="font-size:.78rem;">https://w3id.org/fdp/fdp-o#</code><br>
+          Docs: <a href="https://docs.fairdatapoint.org" target="_blank">docs.fairdatapoint.org</a>
+        </p>
+        <p style="margin-top:.4rem;">
+          Reference impl: Java 17 + Spring Boot + MongoDB + Blazegraph<br>
           <a href="https://github.com/FAIRDataTeam/FAIRDataPoint" target="_blank">FAIRDataTeam/FAIRDataPoint</a>
-          &nbsp;·&nbsp; Spec: <a href="https://specs.fairdatapoint.org" target="_blank">specs.fairdatapoint.org</a>
         </p>
       </div>
     </div>
@@ -580,6 +592,15 @@ contact: <span class="str">"0000-0001-9773-4008"</span></div>
         <strong>No server needed.</strong> The index is rebuilt by CI and served as static files —
         same principle as the FDP itself.
       </div>
+
+      <div class="card card-blue" style="margin-top:.1rem;">
+        <h3>Real-world FDP Indexes</h3>
+        <ul>
+          <li><a href="https://index.vp.erdera.org" target="_blank" style="color:#93c5fd;">index.vp.erdera.org</a> — ERDERA rare disease community index (Horizon Europe)</li>
+          <li><a href="https://index.fairdatapoint.org" target="_blank" style="color:#93c5fd;">index.fairdatapoint.org</a> — public index, reference implementation</li>
+          <li>Health-RI National Catalogue harvests from per-institution FDPs across the Netherlands</li>
+        </ul>
+      </div>
     </div>
 
   </div>
@@ -655,9 +676,20 @@ description: <span class="str">"Index for rare disease FDPs worldwide"</span>
 contact: <span class="str">"maintainer@example.org"</span></div>
 
       <div class="callout">
-        <strong>ELIXIR / GA4GH context:</strong> The same federation model is used by ELIXIR
-        national nodes and GA4GH Data Connect. StaticFDP-VP is a fully static alternative —
-        same DCAT-AP semantics, no dedicated server.
+        <strong>ERDERA Virtual Platform</strong> — the largest live deployment:<br>
+        <a href="https://vp.erdera.org" target="_blank" style="color:#c084fc;">vp.erdera.org</a>
+        aggregates rare disease FDPs across 170+ partners in 37 countries.<br>
+        Funded by Horizon Europe (grant N°101156595), coordinated by INSERM.<br>
+        Successor to the EJP-RD Virtual Platform.
+      </div>
+
+      <div class="card card-blue" style="margin-top:.1rem;">
+        <h3>Real-world VPs</h3>
+        <ul>
+          <li><a href="https://vp.erdera.org" target="_blank" style="color:#93c5fd;">vp.erdera.org</a> — ERDERA RD Discovery Portal (EU, Horizon Europe)</li>
+          <li>ELIXIR national nodes federation (Health-RI, BBMRI-ERIC, EMBL-EBI)</li>
+          <li>GA4GH Data Connect + Beacon v2 share the same "data stays at source" principle</li>
+        </ul>
       </div>
     </div>
 
@@ -682,20 +714,24 @@ contact: <span class="str">"maintainer@example.org"</span></div>
     <!-- Row 1: FDPs -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;">
       <div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:.6rem .8rem;text-align:center;">
-        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
-        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">Hospital A</div>
+        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">FDP (ref. impl)</div>
+        <div style="font-size:.82rem;font-weight:700;margin-top:.2rem;">SIB/SPHN</div>
+        <div style="font-size:.7rem;opacity:.55;">fdp.dcc.sib.swiss</div>
       </div>
       <div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:.6rem .8rem;text-align:center;">
-        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
-        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">Registry B</div>
+        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">FDP (ref. impl)</div>
+        <div style="font-size:.82rem;font-weight:700;margin-top:.2rem;">Health-RI NL</div>
+        <div style="font-size:.7rem;opacity:.55;">catalogus.healthdata.nl</div>
       </div>
       <div style="background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:.6rem .8rem;text-align:center;">
-        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
-        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">Biobank C</div>
+        <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">FDP (any impl)</div>
+        <div style="font-size:.82rem;font-weight:700;margin-top:.2rem;">Your institution</div>
+        <div style="font-size:.7rem;opacity:.55;">fork staticfdp →</div>
       </div>
       <div style="background:rgba(52,211,153,.2);border:2px solid #34d399;border-radius:8px;padding:.6rem .8rem;text-align:center;">
         <div style="font-size:.7rem;color:#34d399;text-transform:uppercase;letter-spacing:.06em;">staticfdp</div>
-        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">This session ↑</div>
+        <div style="font-size:.82rem;font-weight:700;margin-top:.2rem;">GA4GH session ↑</div>
+        <div style="font-size:.7rem;opacity:.55;">fdp.semscape.org</div>
       </div>
     </div>
 
@@ -708,12 +744,12 @@ contact: <span class="str">"maintainer@example.org"</span></div>
     <!-- Row 2: Index -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
       <div style="background:rgba(96,165,250,.12);border:1px solid rgba(96,165,250,.3);border-radius:8px;padding:.7rem 1rem;">
-        <div style="font-size:.7rem;color:#60a5fa;text-transform:uppercase;letter-spacing:.06em;">staticfdp-index</div>
-        <div style="font-size:.92rem;font-weight:700;margin-top:.2rem;">Rare Disease Community Index</div>
-        <div style="font-size:.8rem;color:rgba(255,255,255,.5);margin-top:.15rem;">harvests FDPs A, B, C, session</div>
+        <div style="font-size:.7rem;color:#60a5fa;text-transform:uppercase;letter-spacing:.06em;">FDP Index (ref. impl / staticfdp-index)</div>
+        <div style="font-size:.88rem;font-weight:700;margin-top:.2rem;">ERDERA Rare Disease Index</div>
+        <div style="font-size:.75rem;color:rgba(255,255,255,.5);margin-top:.15rem;">index.vp.erdera.org — harvests 100s of FDPs across ERNs</div>
       </div>
       <div style="background:rgba(96,165,250,.08);border:1px dashed rgba(96,165,250,.25);border-radius:8px;padding:.7rem 1rem;display:flex;align-items:center;justify-content:center;">
-        <span style="font-size:.85rem;color:rgba(255,255,255,.3);font-style:italic;">… other community index</span>
+        <span style="font-size:.82rem;color:rgba(255,255,255,.35);font-style:italic;">index.fairdatapoint.org<br>… other community indexes</span>
       </div>
     </div>
 
@@ -725,8 +761,11 @@ contact: <span class="str">"maintainer@example.org"</span></div>
 
     <!-- Row 3: VP -->
     <div style="background:rgba(192,132,252,.12);border:1px solid rgba(192,132,252,.3);border-radius:8px;padding:.7rem 1.2rem;text-align:center;">
-      <div style="font-size:.7rem;color:#c084fc;text-transform:uppercase;letter-spacing:.06em;">staticfdp-vp</div>
-      <div style="font-size:1rem;font-weight:700;margin-top:.15rem;">Federation Virtual Platform — federation.ttl served on GitHub + Codeberg Pages</div>
+      <div style="font-size:.7rem;color:#c084fc;text-transform:uppercase;letter-spacing:.06em;">Virtual Platform (ref. impl / staticfdp-vp)</div>
+      <div style="font-size:.95rem;font-weight:700;margin-top:.15rem;">
+        <a href="https://vp.erdera.org" target="_blank" style="color:#c084fc;">vp.erdera.org</a>
+        — ERDERA RD Discovery Portal &nbsp;·&nbsp; 170+ partners, 37 countries, Horizon Europe
+      </div>
     </div>
 
     <!-- Bottom row: GitHub + Codeberg -->
