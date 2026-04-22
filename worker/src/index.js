@@ -242,7 +242,10 @@ function page(title, subtitle, idBar, body, landing) {
 
 function identityBar(session, landing) {
   if (!session) return '';
-  const label = `Signed in via ORCID &nbsp;·&nbsp; <strong>${session.name || session.id}</strong> <span style="font-family:monospace;font-size:11px">(${session.id})</span>`;
+  const rorBadge = session.ror_name
+    ? `&nbsp;·&nbsp; 🏢 <a href="${session.ror_id}" target="_blank" rel="noopener" style="color:var(--brand-dark);font-weight:600;">${session.ror_name}</a>`
+    : '';
+  const label = `Signed in via ORCID &nbsp;·&nbsp; <strong>${session.name || session.id}</strong> <span style="font-family:monospace;font-size:11px">(${session.id})</span>${rorBadge}`;
   return `<div class="id-bar">${label}<a href="/auth/logout">Sign out</a></div>`;
 }
 
@@ -290,8 +293,60 @@ function loginPage(returnTo, env) {
 
 // ── ORCID OAuth ───────────────────────────────────────────────────────────────
 
-const ORCID_AUTH  = 'https://orcid.org/oauth/authorize';
-const ORCID_TOKEN = 'https://orcid.org/oauth/token';
+const ORCID_AUTH    = 'https://orcid.org/oauth/authorize';
+const ORCID_TOKEN   = 'https://orcid.org/oauth/token';
+const ORCID_API_PUB = 'https://pub.orcid.org/v3.0';
+const ORCID_API_W   = 'https://api.orcid.org/v3.0';
+
+async function fetchOrcidRoR(orcidId, accessToken) {
+  try {
+    const resp = await fetch(`${ORCID_API_PUB}/${orcidId}/employments`, {
+      headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${accessToken}` },
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    for (const group of (data['affiliation-group'] || [])) {
+      for (const summary of (group.summaries || [])) {
+        const emp = summary['employment-summary'];
+        if (!emp || emp['end-date']) continue;
+        const org    = emp.organization || {};
+        const disamb = org['disambiguated-organization'];
+        if (disamb?.['disambiguation-source'] === 'ROR') {
+          return {
+            ror_id:      disamb['disambiguated-organization-identifier'],
+            ror_name:    org.name || '',
+            ror_country: org.address?.country || '',
+          };
+        }
+      }
+    }
+    return null;
+  } catch { return null; }
+}
+
+async function orcidUpdateAffiliation(request, env) {
+  if (request.method !== 'POST') return new Response('Method not allowed', { status: 405 });
+  const session = await readSession(request.headers.get('Cookie'), env.SESSION_SECRET);
+  if (!session) return new Response(JSON.stringify({ error: 'Not authenticated' }), { status: 401, headers: { 'Content-Type': 'application/json' } });
+  if (!session.access_token) return new Response(JSON.stringify({ error: 'No ORCID write token — please sign in again.' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  let body;
+  try { body = await request.json(); } catch { return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400, headers: { 'Content-Type': 'application/json' } }); }
+  const { ror_id, ror_name, ror_country } = body;
+  if (!ror_id || !ror_name) return new Response(JSON.stringify({ error: 'ror_id and ror_name are required' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+  const orcidResp = await fetch(`${ORCID_API_W}/${session.id}/employment`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${session.access_token}`, 'Content-Type': 'application/vnd.orcid+json', 'Accept': 'application/json' },
+    body: JSON.stringify({ organization: { name: ror_name, address: { country: ror_country || '' }, 'disambiguated-organization': { 'disambiguated-organization-identifier': ror_id, 'disambiguation-source': 'ROR' } }, visibility: 'public' }),
+  });
+  if (!orcidResp.ok) {
+    const errText = await orcidResp.text();
+    return new Response(JSON.stringify({ error: `ORCID API error ${orcidResp.status}: ${errText}` }), { status: 502, headers: { 'Content-Type': 'application/json' } });
+  }
+  const headers = new Headers({ 'Content-Type': 'application/json' });
+  headers.append('Set-Cookie', `ror_id=${encodeURIComponent(ror_id)}; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL}`);
+  headers.append('Set-Cookie', `ror_name=${encodeURIComponent(ror_name)}; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL}`);
+  return new Response(JSON.stringify({ ok: true }), { headers });
+}
 
 function orcidStart(request, env) {
   const url      = new URL(request.url);
@@ -302,7 +357,7 @@ function orcidStart(request, env) {
   const auth = new URL(ORCID_AUTH);
   auth.searchParams.set('client_id',     env.ORCID_CLIENT_ID);
   auth.searchParams.set('response_type', 'code');
-  auth.searchParams.set('scope',         '/authenticate');
+  auth.searchParams.set('scope',         '/authenticate /read-limited /activities/update');
   auth.searchParams.set('redirect_uri',  redirect);
   auth.searchParams.set('state',         state);
 
@@ -319,7 +374,7 @@ async function orcidCallback(request, env) {
   if (!code) return html(400, errorPage('ORCID login failed — no code received.', landing));
   if (!env.SESSION_SECRET) return html(500, errorPage('Server misconfiguration: SESSION_SECRET is not set. Please contact the administrator.', landing));
 
-  const redirect = `${url.origin}/auth/orcid/callback`;
+  const redirectUri = `${url.origin}/auth/orcid/callback`;
 
   try {
     const tokenResp = await fetch(ORCID_TOKEN, {
@@ -330,7 +385,7 @@ async function orcidCallback(request, env) {
         client_secret: env.ORCID_CLIENT_SECRET,
         grant_type:    'authorization_code',
         code,
-        redirect_uri:  redirect,
+        redirect_uri:  redirectUri,
       }),
     });
 
@@ -339,21 +394,32 @@ async function orcidCallback(request, env) {
       return html(502, errorPage(`ORCID token exchange failed (${tokenResp.status}): ${msg}`, landing));
     }
 
-    const data = await tokenResp.json();
-    // ORCID returns orcid iD and name directly in the token response
+    const data        = await tokenResp.json();
+    const orcidId     = data.orcid || data['orcid-identifier']?.path || 'unknown';
+    const orcidName   = data.name  || '';
+    const accessToken = data.access_token || '';
+
+    const ror = await fetchOrcidRoR(orcidId, accessToken);
+
     const session = await makeSession({
-      provider: 'orcid',
-      id:       data.orcid || data['orcid-identifier']?.path || 'unknown',
-      name:     data.name  || '',
+      provider:     'orcid',
+      id:           orcidId,
+      name:         orcidName,
+      access_token: accessToken,
+      ror_id:       ror?.ror_id      || '',
+      ror_name:     ror?.ror_name    || '',
+      ror_country:  ror?.ror_country || '',
     }, env.SESSION_SECRET);
 
-    return new Response(null, {
-      status: 302,
-      headers: {
-        Location: returnTo || env.LANDING_PAGE || '/',
-        'Set-Cookie': sessionCookie(session),
-      },
-    });
+    const headers = new Headers({ Location: returnTo || env.LANDING_PAGE || '/' });
+    headers.append('Set-Cookie', sessionCookie(session));
+    if (ror) {
+      headers.append('Set-Cookie', `ror_id=${encodeURIComponent(ror.ror_id)}; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL}`);
+      headers.append('Set-Cookie', `ror_name=${encodeURIComponent(ror.ror_name)}; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL}`);
+      headers.append('Set-Cookie', `ror_country=${encodeURIComponent(ror.ror_country)}; Path=/; SameSite=Lax; Max-Age=${SESSION_TTL}`);
+    }
+    return new Response(null, { status: 302, headers });
+
   } catch (err) {
     return html(500, errorPage(`ORCID login error: ${err.message}`, landing));
   }
@@ -1032,6 +1098,9 @@ export default {
     }
 
     if (request.method === 'POST' && path === '/submit') return handleSubmit(request, env);
+
+    if (request.method === 'POST' && path === '/auth/orcid/update-affiliation')
+      return orcidUpdateAffiliation(request, env);
 
     return new Response('Not found', { status: 404 });
   },
