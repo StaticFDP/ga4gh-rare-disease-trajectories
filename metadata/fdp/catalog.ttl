@@ -1,6 +1,7 @@
 @prefix dcat:    <https://www.w3.org/ns/dcat#> .
 @prefix dcterms: <http://purl.org/dc/terms/> .
 @prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+@prefix schema:  <https://schema.org/> .
 @prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix ordo:    <http://www.orpha.net/ORDO/Orphanet_> .
@@ -9,6 +10,7 @@
 @prefix mondo:   <http://purl.obolibrary.org/obo/MONDO_> .
 @prefix fdp:     <https://w3id.org/fdp/fdp-o#> .
 @prefix r3d:     <http://www.re3data.org/schema/3-0#> .
+@prefix orcid:   <https://orcid.org/> .
 @prefix :        <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> .
 
 # ─── FAIR Data Point root ─────────────────────────────────────────────────────
@@ -50,6 +52,40 @@ Includes community-submitted disease cases contributed via ORCID-authenticated w
 :publisher a foaf:Organization ;
     foaf:name  "GA4GH Rare Disease Phenotyping Working Group" ;
     foaf:page  <https://www.ga4gh.org/> .
+
+# ─── Authors / creators ───────────────────────────────────────────────────────
+
+<https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/>
+    dcterms:creator  orcid:0000-0002-1215-167X ,
+                     orcid:0000-0003-1775-9921 ,
+                     orcid:0000-0001-7542-0286 ,
+                     orcid:0000-0001-9773-4008 .
+
+:catalog
+    dcterms:creator  orcid:0000-0002-1215-167X ,
+                     orcid:0000-0003-1775-9921 ,
+                     orcid:0000-0001-7542-0286 ,
+                     orcid:0000-0001-9773-4008 .
+
+orcid:0000-0002-1215-167X a foaf:Person ;
+    foaf:name        "Rajaram Kaliyaperumal" ;
+    foaf:account     <https://orcid.org/0000-0002-1215-167X> ;
+    schema:sameAs    <https://orcid.org/0000-0002-1215-167X> .
+
+orcid:0000-0003-1775-9921 a foaf:Person ;
+    foaf:name        "Eric G. Prud'hommeaux" ;
+    foaf:account     <https://orcid.org/0000-0003-1775-9921> ;
+    schema:sameAs    <https://orcid.org/0000-0003-1775-9921> .
+
+orcid:0000-0001-7542-0286 a foaf:Person ;
+    foaf:name        "Egon Willighagen" ;
+    foaf:account     <https://orcid.org/0000-0001-7542-0286> ;
+    schema:sameAs    <https://orcid.org/0000-0001-7542-0286> .
+
+orcid:0000-0001-9773-4008 a foaf:Person ;
+    foaf:name        "Andra Waagmeester" ;
+    foaf:account     <https://orcid.org/0000-0001-9773-4008> ;
+    schema:sameAs    <https://orcid.org/0000-0001-9773-4008> .
 
 # ─── Disease index (auto-generated per-disease datasets) ──────────────────────
 

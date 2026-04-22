@@ -111,6 +111,23 @@ All Turtle files are validated against ShEx on every pull request. SHACL is auto
 | *break* | | |
 | 4:35 | Wrap-up & next steps | All |
 
+## Authors
+
+This work was envisioned by:
+
+| Name | ORCID |
+|---|---|
+| Rajaram Kaliyaperumal | [![ORCID](https://img.shields.io/badge/ORCID-0000--0002--1215--167X-a6ce39?logo=orcid)](https://orcid.org/0000-0002-1215-167X) |
+| Eric G. Prud'hommeaux | [![ORCID](https://img.shields.io/badge/ORCID-0000--0003--1775--9921-a6ce39?logo=orcid)](https://orcid.org/0000-0003-1775-9921) |
+| Egon Willighagen | [![ORCID](https://img.shields.io/badge/ORCID-0000--0001--7542--0286-a6ce39?logo=orcid)](https://orcid.org/0000-0001-7542-0286) |
+| Andra Waagmeester | [![ORCID](https://img.shields.io/badge/ORCID-0000--0001--9773--4008-a6ce39?logo=orcid)](https://orcid.org/0000-0001-9773-4008) |
+
+Community contributors are recorded in the ORCID field of each submitted issue.
+Machine-readable citation metadata is available in [`CITATION.cff`](CITATION.cff).
+RDF provenance (`dcterms:creator`) is in [`metadata/fdp/catalog.ttl`](metadata/fdp/catalog.ttl).
+
+---
+
 ## Outputs we aim to produce
 
 - [ ] Structured narrative template for rare disease cases
