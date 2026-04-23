@@ -12,15 +12,15 @@
 
 # Disease dataset: Norrie's Disease
 # Slug: disease-norrie-s-disease
-# Auto-generated 2026-04-22 from GitHub Issues
-# Version: 7957076082c4
+# Auto-generated 2026-04-23 from GitHub Issues
+# Version: baebaf1cc32a
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease/> a dcat:Dataset ;
     dcterms:title "Norrie's Disease"@en ;
     dcterms:description "Community-contributed disease trajectory data for Norrie's Disease. Contains 1 case submission(s) and 0 gap report(s), contributed during GA4GH BYOD sessions and maintained as FAIR linked data."@en ;
     dcterms:created    "2026-04-16"^^xsd:date ;
-    dcterms:modified   "2026-04-22"^^xsd:date ;
-    dcterms:hasVersion "7957076082c4" ;
+    dcterms:modified   "2026-04-23"^^xsd:date ;
+    dcterms:hasVersion "baebaf1cc32a" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> ;
