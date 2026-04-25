@@ -11,7 +11,7 @@
 
 
 # Ontology and data gaps for: test
-# Auto-generated 2026-04-24
+# Auto-generated 2026-04-25
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/gap/onto/4> a schema:DefinedTerm ;
     dcterms:title "Ontology gap #4"@en ;
