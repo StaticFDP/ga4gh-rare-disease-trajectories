@@ -4,7 +4,7 @@
   "name": "GA4GH Rare Disease Trajectory Datasets",
   "description": "Community-contributed FAIR disease trajectory datasets from GA4GH biohackathon sessions.",
   "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/",
-  "dateModified": "2026-04-25",
+  "dateModified": "2026-04-26",
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "publisher": {
     "@type": "Organization",
@@ -16,7 +16,7 @@
       "@type": "Dataset",
       "name": "Norrie's Disease",
       "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-norrie-s-disease/",
-      "dateModified": "2026-04-25",
+      "dateModified": "2026-04-26",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
@@ -28,7 +28,7 @@
       "@type": "Dataset",
       "name": "test",
       "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/",
-      "dateModified": "2026-04-25",
+      "dateModified": "2026-04-26",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
@@ -40,7 +40,7 @@
       "@type": "Dataset",
       "name": "Amyotrophic lateral sclerosis (ALS)",
       "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-803/",
-      "dateModified": "2026-04-25",
+      "dateModified": "2026-04-26",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
@@ -53,7 +53,7 @@
       "@type": "Dataset",
       "name": "Duchenne muscular dystrophy (DMD)",
       "url": "https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/",
-      "dateModified": "2026-04-25",
+      "dateModified": "2026-04-26",
       "license": "https://creativecommons.org/licenses/by/4.0/",
       "distribution": {
         "@type": "DataDownload",
