@@ -12,15 +12,15 @@
 
 # Disease dataset: test
 # Slug: disease-test
-# Auto-generated 2026-04-29 from GitHub Issues
-# Version: 62864dc05492
+# Auto-generated 2026-04-30 from GitHub Issues
+# Version: f03c59102407
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/disease-test/> a dcat:Dataset ;
     dcterms:title "test"@en ;
     dcterms:description "Community-contributed disease trajectory data for test. Contains 1 case submission(s) and 1 gap report(s), contributed during GA4GH BYOD sessions and maintained as FAIR linked data."@en ;
     dcterms:created    "2026-04-16"^^xsd:date ;
-    dcterms:modified   "2026-04-29"^^xsd:date ;
-    dcterms:hasVersion "62864dc05492" ;
+    dcterms:modified   "2026-04-30"^^xsd:date ;
+    dcterms:hasVersion "f03c59102407" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> ;
