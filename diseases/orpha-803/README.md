@@ -3,7 +3,7 @@
 **ORPHA:803** · [ORPHA:803](https://www.orpha.net/en/disease/detail/803)
 
 > Community-contributed FAIR disease dataset — GA4GH Rare Disease Trajectories project.
-> First contributed: 2026-04-12 · Last updated: 2026-05-01
+> First contributed: 2026-04-12 · Last updated: 2026-05-02
 
 ## What is in this dataset?
 
