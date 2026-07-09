@@ -11,7 +11,7 @@
 
 
 # Flat community submissions index
-# Auto-generated 2026-07-08 | 4 case(s)
+# Auto-generated 2026-07-09 | 4 case(s)
 # Source: https://github.com/StaticFDP/ga4gh-rare-disease-trajectories/issues?q=label%3Adisease-case
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/submissions/5> a dcat:Dataset ;
