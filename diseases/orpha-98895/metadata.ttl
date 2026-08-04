@@ -12,15 +12,15 @@
 
 # Disease dataset: Duchenne muscular dystrophy (DMD)
 # Slug: orpha-98895
-# Auto-generated 2026-08-03 from GitHub Issues
-# Version: 49567f2905b8
+# Auto-generated 2026-08-04 from GitHub Issues
+# Version: ced356f98b0b
 
 <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/orpha-98895/> a dcat:Dataset ;
     dcterms:title "Duchenne muscular dystrophy (DMD)"@en ;
     dcterms:description "Community-contributed disease trajectory data for Duchenne muscular dystrophy (DMD). Contains 1 case submission(s) and 0 gap report(s), contributed during GA4GH BYOD sessions and maintained as FAIR linked data."@en ;
     dcterms:created    "2026-04-12"^^xsd:date ;
-    dcterms:modified   "2026-08-03"^^xsd:date ;
-    dcterms:hasVersion "49567f2905b8" ;
+    dcterms:modified   "2026-08-04"^^xsd:date ;
+    dcterms:hasVersion "ced356f98b0b" ;
     dcterms:license    <https://creativecommons.org/licenses/by/4.0/> ;
     dcterms:publisher  <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/fdp/> ;
     dcat:isPartOf      <https://fdp.semscape.org/ga4gh-rare-disease-trajectories/diseases/> ;
